@@ -18,6 +18,7 @@ type User struct {
 	LastLoginIP string            `json:"last_login_ip" gorm:"column:last_login_ip;type:varchar(255)"`
 	InviteCode  string            `json:"invite_code" gorm:"unique;column:invite_code;type:varchar(255)"`
 	InvitedBy   int               `json:"invited_by" gorm:"column:invited_by;type:int"`
+	Secret      string            `json:"secret" gorm:"column:secret;type:varchar(64)"`
 }
 
 func (User) TableName() string {

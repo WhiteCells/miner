@@ -4,7 +4,8 @@ type LoginReq struct {
 	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`
 	// todo 图形验证码
-	// todo google 验证码
+	// google 验证码
+	GoogleCode string `json:"google_code" binding:"required"`
 }
 
 type RegisterReq struct {

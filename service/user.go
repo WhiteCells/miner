@@ -29,7 +29,7 @@ func NewUserSerivce() *UserService {
 	}
 }
 
-// 用户注册
+// Register 用户注册
 func (s *UserService) Register(ctx *gin.Context, req *dto.RegisterReq) error {
 	// 检查用户名是否已存在
 	// 需要改成从缓存中查
@@ -40,6 +40,9 @@ func (s *UserService) Register(ctx *gin.Context, req *dto.RegisterReq) error {
 	// 生成邀请码
 	inviteCode := utils.GenerateInviteCode()
 
+	// 生成身份验证密钥
+	secret := utils.CreateSecret()
+
 	user := &model.User{
 		Name:       req.Username,
 		Password:   req.Password,
@@ -47,6 +50,7 @@ func (s *UserService) Register(ctx *gin.Context, req *dto.RegisterReq) error {
 		Role:       role.User,
 		Status:     status.UserOn,
 		InviteCode: inviteCode,
+		Secret:     secret,
 	}
 
 	// 如果有邀请码，处理邀请关系
@@ -74,7 +78,7 @@ func (s *UserService) Register(ctx *gin.Context, req *dto.RegisterReq) error {
 	return s.userDAO.CreateUser(user)
 }
 
-// 用户登录
+// Login 用户登录
 func (s *UserService) Login(ctx *gin.Context, req *dto.LoginReq) (string, int, error) {
 	// 先读缓存
 
@@ -86,6 +90,10 @@ func (s *UserService) Login(ctx *gin.Context, req *dto.LoginReq) (string, int, e
 
 	ctx.Set("user_id", id)
 	ctx.Set("user_role", user.Role)
+
+	if !utils.VerifyCodeMoment(user.Secret, req.GoogleCode) {
+		return "", -1, errors.New("invalid GoogleCode")
+	}
 
 	// 验证密码
 	if !s.validatePassword(user, req.Password) {

@@ -24,7 +24,7 @@ func NewFarmService() *FarmService {
 	}
 }
 
-// 创建矿场
+// CreateFarm 创建矿场
 func (s *FarmService) CreateFarm(ctx context.Context, req *dto.CreateFarmReq) (int, error) {
 	farm := &model.Farm{
 		Name:     req.Name,
@@ -47,7 +47,7 @@ func (s *FarmService) CreateFarm(ctx context.Context, req *dto.CreateFarmReq) (i
 	return farmID, s.userFarmDAO.CreateUserFarm(userFarm)
 }
 
-// 获取矿场信息
+// GetFarmInfo 获取矿场信息
 func (s *FarmService) GetFarmInfo(ctx context.Context, req *dto.GetFarmInfoReq) (*model.Farm, error) {
 	// 缓存获取
 	farm, err := s.farmCache.GetFarmInfo(ctx, req.FarmID)
@@ -69,7 +69,7 @@ func (s *FarmService) GetFarmInfo(ctx context.Context, req *dto.GetFarmInfoReq) 
 	return farm, nil
 }
 
-// 更新矿场信息
+// UpdateFarm 更新矿场信息
 func (s *FarmService) UpdateFarm(ctx context.Context, userID, farmID int, updates map[string]interface{}) error {
 	// 检查权限
 	if !s.checkFarmPermission(userID, farmID, []perm.FarmPerm{perm.FarmOwner, perm.FarmManager}) {
@@ -100,7 +100,7 @@ func (s *FarmService) UpdateFarm(ctx context.Context, userID, farmID int, update
 	return s.farmCache.DeleteFarmCache(ctx, farmID)
 }
 
-// 转移矿场所有权
+// TransferFarmOwnership 转移矿场所有权
 func (s *FarmService) TransferFarmOwnership(ctx context.Context, req *dto.TransferMinerReq) error {
 	// 检查当前用户是否是矿场所有者
 	if !s.checkFarmPermission(req.FromUserID, req.FarmID, []perm.FarmPerm{perm.FarmOwner}) {
@@ -109,12 +109,12 @@ func (s *FarmService) TransferFarmOwnership(ctx context.Context, req *dto.Transf
 	return s.userFarmDAO.TransferFarmOwnership(req.FromUserID, req.ToUserID, req.FarmID)
 }
 
-// 获取用户的所有矿场
+// GetUserAllFarm 获取用户的所有矿场
 func (s *FarmService) GetUserAllFarm(ctx context.Context, userID int) ([]model.Farm, error) {
 	return s.farmDAO.GetUserAllFarm(userID)
 }
 
-// 添加矿场成员
+// AddFarmMember 添加矿场成员
 func (s *FarmService) AddFarmMember(ctx context.Context, userID, farmID, memberID int, role perm.FarmPerm) error {
 	// 检查权限
 	if !s.checkFarmPermission(userID, farmID, []perm.FarmPerm{perm.FarmOwner}) {
@@ -132,7 +132,7 @@ func (s *FarmService) AddFarmMember(ctx context.Context, userID, farmID, memberI
 	})
 }
 
-// 移除矿场成员
+// RemoveFarmMember 移除矿场成员
 func (s *FarmService) RemoveFarmMember(ctx context.Context, userID, farmID, memberID int) error {
 	// 检查权限
 	if !s.checkFarmPermission(userID, farmID, []perm.FarmPerm{perm.FarmOwner}) {
