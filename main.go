@@ -17,10 +17,13 @@ func main() {
 
 	gin.SetMode(utils.Config.Server.Mode)
 	ctx := gin.Default()
+	ctx.Use(middleware.OperLog())
 	middleware.InitSession(ctx)
 	userRoute := route.NewUserRoute()
 	userRoute.InitUserRoute(ctx)
 	farmRoute := route.NewFarmRoute()
 	farmRoute.InitFarmRoute(ctx)
+	minerRoute := route.NewMinerRoute()
+	minerRoute.InitMinerRoute(ctx)
 	ctx.Run(":8080")
 }

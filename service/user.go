@@ -25,6 +25,7 @@ func NewUserSerivce() *UserService {
 	return &UserService{
 		userDAO:         mysql.NewUserDAO(),
 		userCache:       redis.NewUserCache(),
+		operLog:         mysql.NewOperLogDAO(),
 		pointsRecordDAO: mysql.NewPointRecordDAO(),
 	}
 }
@@ -41,7 +42,10 @@ func (s *UserService) Register(ctx *gin.Context, req *dto.RegisterReq) error {
 	inviteCode := utils.GenerateInviteCode()
 
 	// 生成身份验证密钥
-	secret := utils.CreateSecret()
+	secret, err := utils.CreateSecret()
+	if err != nil {
+		return errors.New("failed to create secret")
+	}
 
 	user := &model.User{
 		Name:       req.Username,
@@ -64,13 +68,12 @@ func (s *UserService) Register(ctx *gin.Context, req *dto.RegisterReq) error {
 		// 给邀请人增加积分
 		err = s.addInvitePoints(ctx, inviter.ID)
 		if err != nil {
-			return err
+			return errors.New("add invite points failed")
 		}
 	}
 
 	// 缓存
-	err := s.userCache.SetUserInfo(ctx, user)
-	if err != nil {
+	if err = s.userCache.SetUserInfoByID(ctx, user); err != nil {
 		return errors.New("user cached failed")
 	}
 
@@ -79,70 +82,67 @@ func (s *UserService) Register(ctx *gin.Context, req *dto.RegisterReq) error {
 }
 
 // Login 用户登录
-func (s *UserService) Login(ctx *gin.Context, req *dto.LoginReq) (string, int, error) {
+func (s *UserService) Login(ctx *gin.Context, req *dto.LoginReq) (int, error) {
 	// 先读缓存
+	// ip, err := s.userCache.GetLoginIPByName(ctx, req.Username)
+	// if err != nil {
 
+	// }
 	// 获取用户信息
 	user, id, err := s.userDAO.GetUserByUsername(req.Username)
 	if err != nil {
-		return "", -1, errors.New("user not found")
+		return -1, errors.New("user not found")
 	}
 
-	ctx.Set("user_id", id)
-	ctx.Set("user_role", user.Role)
-
-	if !utils.VerifyCodeMoment(user.Secret, req.GoogleCode) {
-		return "", -1, errors.New("invalid GoogleCode")
-	}
+	// 验证 Google 验证码
+	// if ret, err := utils.VerifyCodeMoment(user.Secret, req.GoogleCode); ret || err != nil {
+	// 	return "", -1, errors.New("invalid GoogleCode")
+	// }
 
 	// 验证密码
 	if !s.validatePassword(user, req.Password) {
-		return "", -1, errors.New("invalid password")
+		return -1, errors.New("invalid password")
 	}
 
 	// 检查用户状态
 	if user.Status != status.UserOn {
-		return "", -1, errors.New("account is disabled")
+		return -1, errors.New("account is disabled")
 	}
 
 	// 检查积分是否欠费
 	if user.Points < 0 {
-		return "", -1, errors.New("insufficient points")
+		return -1, errors.New("insufficient points")
 	}
 
 	// 检查IP是否变化
 	if user.LastLoginIP != "" && user.LastLoginIP != ctx.ClientIP() {
-		return "", -1, errors.New("ip")
+		return -1, errors.New("ip")
 	}
 
 	// 生成 JWT token
 	token, err := utils.GenerateToken(user.ID, user.Name, user.Role, 24)
 	if err != nil {
-		return "", -1, err
+		return -1, err
 	}
 
 	// 更新登录 IP 信息
 	user.LastLoginIP = ctx.ClientIP()
 	s.userDAO.UpdateUser(user)
 
-	// 缓存 info token ip
-	if err := s.userCache.SetUserInfo(ctx, user); err != nil {
-		return "", -1, err
+	// 缓存 info token
+	if err := s.userCache.SetUserInfoByID(ctx, user); err != nil {
+		return -1, err
 	}
-	if err := s.userCache.SetUserToken(ctx, user.ID, token); err != nil {
-		return "", -1, err
-	}
-	if err := s.userCache.SetLoginIP(ctx, user.ID, ctx.ClientIP()); err != nil {
-		return "", -1, err
+	if err := s.userCache.SetUserTokenByID(ctx, user.ID, token); err != nil {
+		return -1, err
 	}
 
-	// todo token 后期不返回
-	return token, id, nil
+	return id, nil
 }
 
 // 更新用户信息
-func (s *UserService) UpdateUserInfo(ctx *gin.Context, req *dto.UpdateInfoReq) error {
-	user, err := s.userDAO.GetUserByID(req.UserID)
+func (s *UserService) UpdateUserInfo(ctx *gin.Context, userID int, req *dto.UpdateInfoReq) error {
+	user, err := s.userDAO.GetUserByID(userID)
 	if err != nil {
 		return err
 	}
@@ -155,7 +155,7 @@ func (s *UserService) UpdateUserInfo(ctx *gin.Context, req *dto.UpdateInfoReq) e
 	}
 
 	// 清除缓存
-	return s.userCache.DeleteUserCache(ctx, req.UserID)
+	return s.userCache.DeleteUserCache(ctx)
 }
 
 // 更新密码
@@ -176,7 +176,7 @@ func (s *UserService) UpdatePassword(ctx *gin.Context, userID int, oldPassword, 
 	}
 
 	// 清除缓存
-	return s.userCache.DeleteUserCache(ctx, userID)
+	return s.userCache.DeleteUserCache(ctx)
 }
 
 // 添加积分
@@ -215,7 +215,7 @@ func (s *UserService) addInvitePoints(ctx *gin.Context, inviterID int) error {
 // 获取用户信息
 func (s *UserService) GetUserInfo(ctx *gin.Context, req *dto.GetUserInfoReq) (*model.User, error) {
 	// 先从缓存获取
-	user, err := s.userCache.GetUserInfo(ctx, req.UserID)
+	user, err := s.userCache.GetUserInfoByID(ctx, req.UserID)
 	if err == nil {
 		return user, nil
 	}
@@ -227,7 +227,7 @@ func (s *UserService) GetUserInfo(ctx *gin.Context, req *dto.GetUserInfoReq) (*m
 	}
 
 	// 更新缓存
-	if err := s.userCache.SetUserInfo(ctx, user); err != nil {
+	if err := s.userCache.SetUserInfoByID(ctx, user); err != nil {
 		return nil, err
 	}
 

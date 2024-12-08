@@ -32,7 +32,60 @@ func (c *FarmController) CreateFarm(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"message": "create farm success",
 		"farm_id": farmID,
+		"message": "create farm success",
+	})
+}
+
+func (c *FarmController) GetUserAllFarm(ctx *gin.Context) {
+	farms, err := c.farmService.GetUserAllFarmInfo(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{
+		"farms": farms,
+	})
+}
+
+func (c *FarmController) DeleteFarm(ctx *gin.Context) {
+	var req dto.DeleteFarmReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	if err := c.farmService.DeleteFarm(ctx, &req); err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "delete success",
+	})
+}
+
+func (c *FarmController) UpdateFarm(ctx *gin.Context) {
+	var req dto.UpdateFarmReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	if err := c.farmService.UpdateFarm(ctx, &req); err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": "update success",
 	})
 }

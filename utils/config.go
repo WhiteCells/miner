@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"log"
+
 	"github.com/spf13/viper"
 )
 
@@ -50,19 +52,17 @@ type ServerConfig struct {
 
 var Config ServerConfig
 
-func InitConfig(configFile string, configType string) error {
+func InitConfig(configFile string, configType string) {
 	viper.SetConfigFile(configFile)
 	viper.SetConfigType(configType)
 
 	err := viper.ReadInConfig()
 	if err != nil {
-		return err
+		log.Fatalf("Failed to read config %v", err)
 	}
 
 	err = viper.Unmarshal(&Config)
 	if err != nil {
-		return err
+		log.Fatalf("Failed to Unmarshal config %v", err)
 	}
-
-	return nil
 }

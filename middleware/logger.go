@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
+	"miner/common/role"
 	"miner/model"
 	"miner/utils"
 	"time"
@@ -22,7 +23,7 @@ func (w bodyLogWriter) Write(b []byte) (int, error) {
 }
 
 // 操作日志中间件
-func OperLogger() gin.HandlerFunc {
+func OperLog() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		// GET请求不记录日志
 		if ctx.Request.Method == "GET" {
@@ -54,11 +55,16 @@ func OperLogger() gin.HandlerFunc {
 			//
 			return
 		}
+		userRole, exists := ctx.Get("user_role")
+		if !exists {
+			return
+		}
 
 		// 创建操作日志
 		operLog := model.OperLog{
 			UserID:   userID.(int),
 			UserName: userName.(string),
+			UserRole: userRole.(role.RoleType),
 			Action:   ctx.Request.Method,
 			Target:   ctx.FullPath(),
 			IP:       ctx.ClientIP(),

@@ -56,10 +56,38 @@ func (r *RedisService) Del(ctx context.Context, key string) error {
 	return r.Client.Del(ctx, key).Err()
 }
 
-func (r *RedisService) HSet(ctx context.Context, key, field string, value interface{}) error {
+func (r *RedisService) HSet(ctx context.Context, key string, field string, value interface{}) error {
 	return r.Client.HSet(ctx, key, field, value).Err()
 }
 
-func (r *RedisService) GSet(ctx context.Context, key, field string) (string, error) {
+func (r *RedisService) GSet(ctx context.Context, key string, field string) (string, error) {
 	return r.Client.HGet(ctx, key, field).Result()
 }
+
+func (r *RedisService) Scan(ctx context.Context, pattern string) ([]string, error) {
+	var keys []string
+	var cursor uint64
+	for {
+		var err error
+		var keys2 []string
+		keys2, cursor, err = r.Client.Scan(ctx, cursor, pattern, 100).Result()
+		if err != nil {
+			return nil, err
+		}
+		keys = append(keys, keys2...)
+
+		if cursor == 0 {
+			break
+		}
+	}
+	return keys, nil
+}
+
+func (r *RedisService) Close(ctx context.Context) error {
+	return r.Client.Close()
+}
+
+// func (r *RedisService) Exists(ctx context.Context, key string) bool {
+// 	exists := r.Client.Exists(ctx, key).Err()
+// 	return exists
+// }

@@ -29,7 +29,7 @@ func (dao *MinerDAO) GetMinerByID(id int) (*model.Miner, error) {
 func (dao *MinerDAO) GetFarmMiners(farmID int) ([]model.Miner, error) {
 	var miners []model.Miner
 	err := utils.DB.Joins("JOIN farm_miners ON miners.id = farm_miners.miner_id").
-		Where("farm_miners.mining_farm_id = ?", farmID).
+		Where("farm_miners.farm_id = ?", farmID).
 		Find(&miners).Error
 	return miners, err
 }

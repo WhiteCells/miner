@@ -21,10 +21,10 @@ func (dao *UserFarmDAO) CreateUserFarm(userFarm *model.UserFarm) error {
 }
 
 // 获取用户在矿场的权限
-func (dao *UserFarmDAO) GetUserFarmRole(userID int, farmID int) (perm.FarmPerm, error) {
+func (dao *UserFarmDAO) GetUserFarmPerm(userID int, farmID int) (perm.FarmPerm, error) {
 	var userFarm model.UserFarm
-	err := utils.DB.Where("user_id = ? AND farm_id = ?", userID, farmID).Error
-	return userFarm.Role, err
+	err := utils.DB.Where("user_id = ? AND farm_id = ?", userID, farmID).First(&userFarm).Error
+	return userFarm.Perm, err
 }
 
 // 更新用户在矿场的权限

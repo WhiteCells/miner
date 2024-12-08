@@ -17,18 +17,11 @@ func NewUserRoute() *UserRoute {
 	}
 }
 
-func (r *UserRoute) InitUserRoute(rg *gin.Engine) {
-	publicGroup := rg.Group("/user")
-	publicGroup.Use(middleware.OperLogger())
+func (ur *UserRoute) InitUserRoute(r *gin.Engine) {
+	route := r.Group("/user")
 	{
-		publicGroup.POST("/register", r.userController.Register)
-		publicGroup.POST("/login", r.userController.Login, middleware.LoginLog())
+		route.POST("/register", ur.userController.Register)
+		route.POST("/login", ur.userController.Login, middleware.LoginLog())
 	}
-	authGroup := rg.Group("/user")
-	authGroup.Use(middleware.JWTAuth())
-	authGroup.Use(middleware.IPVerify())
-	// authGroup.Use(middleware.RoleAuth(""))
-	{
-		// authGroup.PUT("/:id", r.userController)
-	}
+	// logout
 }

@@ -22,9 +22,11 @@ func (fr *FarmRoute) InitFarmRoute(rg *gin.Engine) {
 	route := rg.Group("/farm")
 	route.Use(middleware.IPVerify())
 	route.Use(middleware.JWTAuth())
-	route.Use(middleware.OperLogger())
 	route.Use(middleware.RoleAuth(role.User))
 	{
-		route.POST("/add", fr.farmController.CreateFarm)
+		route.POST("", fr.farmController.CreateFarm)
+		route.DELETE("", fr.farmController.DeleteFarm)
+		route.PUT("", fr.farmController.UpdateFarm)
+		route.GET("", fr.farmController.GetUserAllFarm)
 	}
 }

@@ -4,14 +4,14 @@ package status
 type MinerStatus int
 
 const (
-	MinerOn  MinerStatus = 0
-	MinerOff MinerStatus = 1
+	MinerOn  MinerStatus = 1
+	MinerOff MinerStatus = 0
 )
 
 // 用户状态
 type UserStatus int
 
 const (
-	UserOn  UserStatus = 0
-	UserOff UserStatus = 1
+	UserOn  UserStatus = 1
+	UserOff UserStatus = 0
 )

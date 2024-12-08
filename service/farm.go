@@ -41,22 +41,22 @@ func (s *FarmService) CreateFarm(ctx context.Context, req *dto.CreateFarmReq) (i
 	userFarm := &model.UserFarm{
 		UserID: ctx.Value("user_id").(int),
 		FarmID: farmID,
-		Role:   perm.FarmOwner,
+		Perm:   perm.FarmOwner,
 	}
 
 	return farmID, s.userFarmDAO.CreateUserFarm(userFarm)
 }
 
 // GetFarmInfo 获取矿场信息
-func (s *FarmService) GetFarmInfo(ctx context.Context, req *dto.GetFarmInfoReq) (*model.Farm, error) {
+func (s *FarmService) GetFarmInfo(ctx context.Context, farmID int) (*model.Farm, error) {
 	// 缓存获取
-	farm, err := s.farmCache.GetFarmInfo(ctx, req.FarmID)
+	farm, err := s.farmCache.GetFarmInfo(ctx, farmID)
 	if err == nil {
 		return farm, nil
 	}
 
 	// 缓存未命中，数据库获取
-	farm, err = s.farmDAO.GetFarmByID(req.FarmID)
+	farm, err = s.farmDAO.GetFarmByID(farmID)
 	if err != nil {
 		return nil, err
 	}
@@ -69,35 +69,73 @@ func (s *FarmService) GetFarmInfo(ctx context.Context, req *dto.GetFarmInfoReq) 
 	return farm, nil
 }
 
+// GetAllFarmInfo 获取所有矿场信息
+func (s *FarmService) GetUserAllFarmInfo(ctx context.Context) (*[]model.Farm, error) {
+	userID, exists := ctx.Value("user_id").(int)
+	if !exists {
+		return nil, errors.New("invalid user_id in context")
+	}
+	return s.farmDAO.GetUserAllFarm(userID)
+}
+
 // UpdateFarm 更新矿场信息
-func (s *FarmService) UpdateFarm(ctx context.Context, userID, farmID int, updates map[string]interface{}) error {
-	// 检查权限
-	if !s.checkFarmPermission(userID, farmID, []perm.FarmPerm{perm.FarmOwner, perm.FarmManager}) {
+func (s *FarmService) UpdateFarm(ctx context.Context, req *dto.UpdateFarmReq) error {
+	userID, exists := ctx.Value("user_id").(int)
+	if !exists {
+		return errors.New("invalid user_id in context")
+	}
+	if !s.checkFarmPermission(userID, req.FarmID, []perm.FarmPerm{perm.FarmOwner, perm.FarmManager}) {
 		return errors.New("permission denied")
 	}
 
-	farm, err := s.farmDAO.GetFarmByID(farmID)
+	// 查找矿场
+	farm, err := s.farmDAO.GetFarmByID(req.FarmID)
 	if err != nil {
 		return err
 	}
 
-	// 更新矿场信息
-	for key, value := range updates {
+	for key, value := range req.UpdateInfo {
 		switch key {
 		case "name":
-			farm.Name = value.(string)
+			name := value.(string)
+			if name == "" || len(name) > 100 {
+				return errors.New("invalid farm name")
+			}
+			farm.Name = name
 		case "time_zone":
-			farm.TimeZone = value.(string)
+			timeZone := value.(string)
+			if timeZone == "" {
+				return errors.New("invalid farm time zone")
+			}
+			farm.TimeZone = timeZone
 		}
 	}
 
-	// 保存更新
+	// todo bug，当缓存更新失败时，数据库回滚
+	// 更新数据库
 	if err := s.farmDAO.UpdateFarm(farm); err != nil {
 		return err
 	}
 
-	// 清除缓存
-	return s.farmCache.DeleteFarmCache(ctx, farmID)
+	// 更新缓存
+	if err = s.farmCache.SetFarmInfo(ctx, farm); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// DeleteFarm 删除矿场
+func (s *FarmService) DeleteFarm(ctx context.Context, req *dto.DeleteFarmReq) error {
+	// 检查用户对矿场的权限
+	userID, exists := ctx.Value("user_id").(int)
+	if !exists {
+		return errors.New("invalid user_id in context")
+	}
+	if !s.checkFarmPermission(userID, req.FarmID, []perm.FarmPerm{perm.FarmOwner}) {
+		return errors.New("permission denied")
+	}
+	return s.farmDAO.DeleteFarmByID(req.FarmID)
 }
 
 // TransferFarmOwnership 转移矿场所有权
@@ -109,26 +147,21 @@ func (s *FarmService) TransferFarmOwnership(ctx context.Context, req *dto.Transf
 	return s.userFarmDAO.TransferFarmOwnership(req.FromUserID, req.ToUserID, req.FarmID)
 }
 
-// GetUserAllFarm 获取用户的所有矿场
-func (s *FarmService) GetUserAllFarm(ctx context.Context, userID int) ([]model.Farm, error) {
-	return s.farmDAO.GetUserAllFarm(userID)
-}
-
 // AddFarmMember 添加矿场成员
-func (s *FarmService) AddFarmMember(ctx context.Context, userID, farmID, memberID int, role perm.FarmPerm) error {
+func (s *FarmService) AddFarmMember(ctx context.Context, userID, farmID, memberID int, permission perm.FarmPerm) error {
 	// 检查权限
 	if !s.checkFarmPermission(userID, farmID, []perm.FarmPerm{perm.FarmOwner}) {
 		return errors.New("permission denied")
 	}
 
-	if !isValidRole(role) {
+	if !isValidPerm(permission) {
 		return errors.New("invalid role")
 	}
 
 	return s.userFarmDAO.CreateUserFarm(&model.UserFarm{
 		UserID: memberID,
 		FarmID: farmID,
-		Role:   role,
+		Perm:   permission,
 	})
 }
 
@@ -139,7 +172,7 @@ func (s *FarmService) RemoveFarmMember(ctx context.Context, userID, farmID, memb
 		return errors.New("permission denied")
 	}
 
-	memberRole, err := s.userFarmDAO.GetUserFarmRole(memberID, farmID)
+	memberRole, err := s.userFarmDAO.GetUserFarmPerm(memberID, farmID)
 	if err != nil {
 		return err
 	}
@@ -152,9 +185,9 @@ func (s *FarmService) RemoveFarmMember(ctx context.Context, userID, farmID, memb
 	return s.userFarmDAO.DeleteUserFarm(memberID, farmID)
 }
 
-// 检查用户对矿场的权限
+// checkFarmPermission 检查用户对矿场的权限
 func (s *FarmService) checkFarmPermission(userID, farmID int, allowedRoles []perm.FarmPerm) bool {
-	role, err := s.userFarmDAO.GetUserFarmRole(userID, farmID)
+	role, err := s.userFarmDAO.GetUserFarmPerm(userID, farmID)
 	if err != nil {
 		return false
 	}
@@ -167,12 +200,12 @@ func (s *FarmService) checkFarmPermission(userID, farmID int, allowedRoles []per
 	return false
 }
 
-// 检查角色是否有效
-func isValidRole(role perm.FarmPerm) bool {
+// isValidPerm 检查权限是否有效
+func isValidPerm(role perm.FarmPerm) bool {
 	validRoles := map[perm.FarmPerm]bool{
-		"owner":   true,
-		"manager": true,
-		"viewer":  true,
+		perm.FarmOwner:   true,
+		perm.FarmManager: true,
+		perm.FarmViewer:  true,
 	}
 	return validRoles[role]
 }

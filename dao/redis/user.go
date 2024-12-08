@@ -16,15 +16,13 @@ func NewUserCache() *UserCache {
 }
 
 const (
-	userKeyPrefix    = "user:"
 	userInfoTimeout  = 30 * time.Minute
 	userTokenTimeout = 24 * time.Hour
 	loginIPTimeout   = 24 * time.Hour
 )
 
-// {user:<id>:info, []}
-func (c *UserCache) SetUserInfo(ctx context.Context, user *model.User) error {
-	key := fmt.Sprintf("%s%d:info", userKeyPrefix, user.ID)
+func (c *UserCache) SetUserInfoByID(ctx context.Context, user *model.User) error {
+	key := fmt.Sprintf("user:%d:info", user.ID)
 	userJSON, err := json.Marshal(user)
 	if err != nil {
 		return err
@@ -32,66 +30,60 @@ func (c *UserCache) SetUserInfo(ctx context.Context, user *model.User) error {
 	return utils.RDB.Set(ctx, key, string(userJSON), userInfoTimeout)
 }
 
-// 获取 user:<id>:info 的值
-func (c *UserCache) GetUserInfo(ctx context.Context, userID int) (*model.User, error) {
-	key := fmt.Sprintf("%s%d:info", userKeyPrefix, userID)
+func (c *UserCache) GetUserInfoByID(ctx context.Context, userID int) (*model.User, error) {
+	key := fmt.Sprintf("user:%d:info", userID)
 	userJSON, err := utils.RDB.Get(ctx, key)
 	if err != nil {
 		return nil, err
 	}
-
 	var user model.User
 	err = json.Unmarshal([]byte(userJSON), &user)
 	return &user, err
 }
 
-// {user:<id>:token, []}
-func (c *UserCache) SetUserToken(ctx context.Context, userID int, token string) error {
-	key := fmt.Sprintf("%s%d:token", userKeyPrefix, userID)
+func (c *UserCache) SetUserInfoByName(ctx context.Context, user *model.User) error {
+	key := fmt.Sprintf("user:%s:info", user.Name)
+	userJSON, err := json.Marshal(user)
+	if err != nil {
+		return err
+	}
+	return utils.RDB.Set(ctx, key, userJSON, userInfoTimeout)
+}
+
+func (c *UserCache) GetUserInfoByName(ctx context.Context, userName string) (*model.User, error) {
+	key := fmt.Sprintf("user:%s:info", userName)
+	userJSON, err := utils.RDB.Get(ctx, key)
+	if err != nil {
+		return nil, err
+	}
+	var user model.User
+	err = json.Unmarshal([]byte(userJSON), &user)
+	return &user, err
+}
+
+func (c *UserCache) SetUserTokenByID(ctx context.Context, userID int, token string) error {
+	key := fmt.Sprintf("user:%d:token", userID)
 	return utils.RDB.Set(ctx, key, token, userTokenTimeout)
 }
 
-// 获取 user:<id>:token 的值
-func (c *UserCache) GetUserToken(ctx context.Context, userID int) (string, error) {
-	key := fmt.Sprintf("%s%d:token", userKeyPrefix, userID)
+func (c *UserCache) GetUserTokenByID(ctx context.Context, userID int) (string, error) {
+	key := fmt.Sprintf("user:%d:token", userID)
 	return utils.RDB.Get(ctx, key)
 }
 
-// {user:<id>:last_ip, []}
-func (c *UserCache) SetLoginIP(ctx context.Context, userID int, ip string) error {
-	key := fmt.Sprintf("%s%d:last_ip", userKeyPrefix, userID)
-	return utils.RDB.Set(ctx, key, ip, loginIPTimeout)
-}
+func (c *UserCache) DeleteUserCache(ctx context.Context) error {
+	pattern := "user:*"
 
-// 获取 user:<id>:last_ip 的值
-func (c *UserCache) GetLoginIPByID(ctx context.Context, userID int) (string, error) {
-	key := fmt.Sprintf("%s%d:last_ip", userKeyPrefix, userID)
-	return utils.RDB.Get(ctx, key)
-}
-
-// {user:<name>:last_ip, []}
-func (c *UserCache) GetLoginIPByName(ctx context.Context, userName string) (string, error) {
-	key := fmt.Sprintf("%s%s:last_ip", userKeyPrefix, userName)
-	return utils.RDB.Get(ctx, key)
-}
-
-// 删除缓存
-func (c *UserCache) DeleteUserCache(ctx context.Context, userID int) error {
-	keys := []string{
-		fmt.Sprintf("%s%d:info", userKeyPrefix, userID),
-		fmt.Sprintf("%s%d:token", userKeyPrefix, userID),
-		fmt.Sprintf("%s%d:last_ip", userKeyPrefix, userID),
+	keys, err := utils.RDB.Scan(ctx, pattern)
+	if err != nil {
+		return fmt.Errorf("scan keys error: %w", err)
 	}
 
 	for _, key := range keys {
 		if err := utils.RDB.Del(ctx, key); err != nil {
-			return err
+			return fmt.Errorf("failed to delete key %s: %w", key, err)
 		}
 	}
+
 	return nil
 }
-
-// todo
-// func (c *UserCache) createKey() {
-// 	return fmt.Sprintf("%s%s%s")
-// }

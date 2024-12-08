@@ -5,6 +5,7 @@ import (
 	"errors"
 	"miner/common/dto"
 	"miner/common/perm"
+	"miner/common/status"
 	"miner/dao/mysql"
 	"miner/dao/redis"
 	"miner/model"
@@ -12,57 +13,88 @@ import (
 
 type MinerService struct {
 	minerDAO     *mysql.MinerDAO
+	minerCache   *redis.MinerCache
+	userFarmDAO  *mysql.UserFarmDAO
 	farmMinerDAO *mysql.FarmMinerDAO
 	userMinerDAO *mysql.UserMinerDAO
-	minerCache   *redis.MinerCache
 	farmService  *FarmService
 }
 
 func NewMinerService() *MinerService {
 	return &MinerService{
 		minerDAO:     mysql.NewMinerDAO(),
+		minerCache:   redis.NewMinerCache(),
 		farmMinerDAO: mysql.NewFarmMinerDAO(),
 		userMinerDAO: mysql.NewUserMinerDAO(),
-		minerCache:   redis.NewMinerCache(),
 		farmService:  NewFarmService(),
 	}
 }
 
 // 创建矿机
 func (s *MinerService) CreateMiner(ctx context.Context, req *dto.CreateMinerReq) error {
+	userID, exists := ctx.Value("user_id").(int)
+	if !exists {
+		return errors.New("invalid user_id in context")
+	}
 	// 检查用户对矿场的权限
-	if !s.farmService.checkFarmPermission(req.UserID, req.FarmID, []perm.FarmPerm{perm.FarmOwner, perm.FarmManager}) {
+	if !s.farmService.checkFarmPermission(userID, req.FarmID, []perm.FarmPerm{perm.FarmOwner, perm.FarmManager}) {
 		return errors.New("permission denied")
 	}
 
 	// 创建矿机
 	miner := &model.Miner{
 		Name:        req.Name,
-		IPAddress:   req.IPAddress,
+		IP:          req.IP,
 		SSHPort:     req.SSHPort,
 		SSHUser:     req.SSHUser,
 		SSHPassword: req.SSHPassword,
-		Status:      1,
+		Status:      status.MinerOn,
 	}
 
 	// 测试连接 todo
 
-	// 创建矿机记录
+	// 创建矿机
 	if err := s.minerDAO.CreateMiner(miner); err != nil {
 		return err
 	}
 
+	// todo 事务
 	// 创建矿场-矿机关联
-	return s.farmMinerDAO.CreateFarmMiner(&model.FarmMiner{
+	farmMiner := &model.FarmMiner{
 		MinerID: miner.ID,
 		FarmID:  req.FarmID,
-	})
+	}
+	err := s.farmMinerDAO.CreateFarmMiner(farmMiner)
+	if err != nil {
+		return err
+	}
+
+	// 创建用户-矿机关联
+	userMiner := &model.UserMiner{
+		UserID:  userID,
+		MinerID: miner.ID,
+		Perm:    perm.MinerOwner,
+	}
+	err = s.userMinerDAO.CreateUserMiner(userMiner)
+	return err
+}
+
+func (s *MinerService) DeleteMiner(ctx context.Context, req *dto.DeleteMinerReq) error {
+	// 检查权限
+	userID, exists := ctx.Value("user_id").(int)
+	if !exists {
+		return errors.New("invalid user_id in context")
+	}
+	if !s.checkMinerPermission(userID, req.FarmID, req.MinerID, []perm.MinerPerm{perm.MinerOwner}) {
+		return errors.New("permission denied")
+	}
+	return s.minerDAO.DeleteMiner(req.MinerID)
 }
 
 // 获取矿机信息
 func (s *MinerService) GetMinerInfo(ctx context.Context, minerID int) (*model.Miner, error) {
 	// 先从缓存获取
-	miner, err := s.minerCache.GetMinerInfo(ctx, minerID)
+	miner, err := s.minerCache.GetMinerInfoByID(ctx, minerID)
 	if err == nil {
 		return miner, nil
 	}
@@ -74,7 +106,7 @@ func (s *MinerService) GetMinerInfo(ctx context.Context, minerID int) (*model.Mi
 	}
 
 	// 更新缓存
-	if err := s.minerCache.SetMinerInfo(ctx, miner); err != nil {
+	if err := s.minerCache.SetMinerInfoByID(ctx, miner); err != nil {
 		return nil, err
 	}
 
@@ -82,23 +114,27 @@ func (s *MinerService) GetMinerInfo(ctx context.Context, minerID int) (*model.Mi
 }
 
 // 更新矿机信息
-func (s *MinerService) UpdateMiner(ctx context.Context, userID, minerID int, updates map[string]interface{}) error {
-	if !s.checkMinerPermission(userID, minerID, []perm.MinerPerm{perm.MinerOwner, perm.MinerManager}) {
+func (s *MinerService) UpdateMiner(ctx context.Context, req *dto.UpdateMinerReq) error {
+	userID, exists := ctx.Value("user_id").(int)
+	if !exists {
+		return errors.New("invalid user_id in context")
+	}
+	if !s.checkMinerPermission(userID, req.FarmID, req.MinerID, []perm.MinerPerm{perm.MinerOwner, perm.MinerManager}) {
 		return errors.New("permission denied")
 	}
 
-	miner, err := s.minerDAO.GetMinerByID(minerID)
+	miner, err := s.minerDAO.GetMinerByID(req.MinerID)
 	if err != nil {
 		return err
 	}
 
 	// 更新矿机信息
-	for key, value := range updates {
+	for key, value := range req.UpdateInfo {
 		switch key {
 		case "name":
 			miner.Name = value.(string)
 		case "ip_address":
-			miner.IPAddress = value.(string)
+			miner.IP = value.(string)
 		case "ssh_port":
 			miner.SSHPort = value.(int)
 		case "ssh_user":
@@ -106,27 +142,36 @@ func (s *MinerService) UpdateMiner(ctx context.Context, userID, minerID int, upd
 		case "ssh_password":
 			miner.SSHPassword = value.(string)
 		case "status":
-			miner.Status = value.(int)
+			miner.Status = value.(status.MinerStatus)
 		}
 	}
 
-	// todo 更新了SSH相关信息，需要测试连接
+	// todo 需要测试连接
 
 	// 保存更新
 	if err := s.minerDAO.UpdateMiner(miner); err != nil {
 		return err
 	}
 
-	// 清除缓存
 	// 更新缓存
 	// return s.minerCache.DeleteMinerCache(ctx, minerID)
 	return err
 }
 
+func (s *MinerService) GetUserAllMinerInFarm(ctx context.Context, req *dto.GetUserAllMinerInFarmReq) (*[]model.Miner, error) {
+	userID, exists := ctx.Value("user_id").(int)
+	if !exists {
+		return nil, errors.New("invalid user_id in context")
+	}
+	// 缓存
+	// 数据库
+	return s.userMinerDAO.GetUserAllMinerInFarm(userID, req.FarmID)
+}
+
 // 转移矿机到其他矿场
 func (s *MinerService) TransferMiner(ctx context.Context, userID, minerID, fromFarmID, toFarmID int) error {
 	// 检查源矿场权限
-	if !s.checkMinerPermission(userID, fromFarmID, []perm.MinerPerm{perm.MinerOwner}) {
+	if !s.checkMinerPermission(userID, fromFarmID, minerID, []perm.MinerPerm{perm.MinerOwner}) {
 		return errors.New("permission denied")
 	}
 
@@ -145,10 +190,6 @@ func (s *MinerService) TransferMiner(ctx context.Context, userID, minerID, fromF
 // GetMinerStats 获取矿机状态信息
 func (s *MinerService) GetMinerStats(ctx context.Context, minerID int) (map[string]interface{}, error) {
 	// 先从缓存获取
-	stats, err := s.minerCache.GetMinerStats(ctx, minerID)
-	if err == nil {
-		return stats, nil
-	}
 
 	// 获取矿机信息
 	// miner, err := s.minerDAO.GetMinerByID(minerID)
@@ -158,39 +199,48 @@ func (s *MinerService) GetMinerStats(ctx context.Context, minerID int) (map[stri
 
 	// 通过获取矿机状态 todo
 	// stats, err = s.getMinerStatsViaSSH(miner)
-
-	// 更新缓存
-	if err := s.minerCache.SetMinerStats(ctx, minerID, stats); err != nil {
-		return nil, err
-	}
-
-	return stats, nil
+	return nil, nil
 }
 
 // 应用飞行表到矿机
-func (s *MinerService) ApplyFlightSheet(ctx context.Context, userID, minerID, flightSheetID int) error {
-	if !s.checkMinerPermission(userID, minerID, []perm.MinerPerm{perm.MinerOwner, perm.MinerManager}) {
-		return errors.New("permission denied")
-	}
+// func (s *MinerService) ApplyFlightSheet(ctx context.Context, userID, minerID, flightSheetID int) error {
+// 	if !s.checkMinerPermission(userID, minerID, []perm.MinerPerm{perm.MinerOwner, perm.MinerManager}) {
+// 		return errors.New("permission denied")
+// 	}
 
-	// 获取矿机信息
+// 	// 获取矿机信息
 
-	// 获取飞行表信息
+// 	// 获取飞行表信息
 
-	// 应用飞行表配置
+// 	// 应用飞行表配置
 
-	// 更新关联关系
-	return nil
-}
+// 	// 更新关联关系
+// 	return nil
+// }
 
-func (s *MinerService) checkMinerPermission(userID int, minerID int, allowedRoles []perm.MinerPerm) bool {
-	role, err := s.userMinerDAO.GetUserMinerRole(userID, minerID)
+func (s *MinerService) checkMinerPermission(userID int, FarmID int, minerID int, allowedPerms []perm.MinerPerm) bool {
+	// user 对 farm 的权限
+	userFarmPerm, err := s.userFarmDAO.GetUserFarmPerm(userID, FarmID)
 	if err != nil {
 		return false
 	}
+	hasUserFarmPerm := false
+	for _, allowedPerm := range allowedPerms {
+		if perm.Perm(userFarmPerm) == perm.Perm(allowedPerm) {
+			hasUserFarmPerm = true
+		}
+	}
+	if !hasUserFarmPerm {
+		return false
+	}
 
-	for _, allowedRole := range allowedRoles {
-		if role == allowedRole {
+	// user 对 miner 的权限
+	userMinerPerm, err := s.userMinerDAO.GetUserMinerPerm(userID, minerID)
+	if err != nil {
+		return false
+	}
+	for _, allowedPerm := range allowedPerms {
+		if userMinerPerm == allowedPerm {
 			return true
 		}
 	}

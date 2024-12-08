@@ -24,6 +24,7 @@ func InitJWT() {
 // 生成 JWT token
 // token 无状态
 // todo 防止删除的用户生成的 token 被应用于新用户，需要在表中进行确认
+// todo 表中确认效率太低了，维护一个黑名单，存放过期 token
 func GenerateToken(userID int, username string, role role.RoleType, expireHours int) (string, error) {
 	nowTime := time.Now()
 	expireTime := nowTime.Add(time.Duration(expireHours) * time.Hour)
@@ -50,15 +51,12 @@ func ParseToken(token string) (*Claims, error) {
 	tokenClaims, err := jwt.ParseWithClaims(token, &Claims{}, func(token *jwt.Token) (interface{}, error) {
 		return jwtSecret, nil
 	})
-
 	if err != nil {
 		return nil, err
 	}
 
-	if tokenClaims != nil {
-		if claims, ok := tokenClaims.Claims.(*Claims); ok && tokenClaims.Valid {
-			return claims, nil
-		}
+	if claims, ok := tokenClaims.Claims.(*Claims); ok && tokenClaims.Valid {
+		return claims, nil
 	}
 
 	return nil, errors.New("invalid token")
