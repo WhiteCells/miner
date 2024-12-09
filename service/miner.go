@@ -24,6 +24,7 @@ func NewMinerService() *MinerService {
 	return &MinerService{
 		minerDAO:     mysql.NewMinerDAO(),
 		minerCache:   redis.NewMinerCache(),
+		userFarmDAO:  mysql.NewUserFarmDAO(),
 		farmMinerDAO: mysql.NewFarmMinerDAO(),
 		userMinerDAO: mysql.NewUserMinerDAO(),
 		farmService:  NewFarmService(),
@@ -64,8 +65,7 @@ func (s *MinerService) CreateMiner(ctx context.Context, req *dto.CreateMinerReq)
 		MinerID: miner.ID,
 		FarmID:  req.FarmID,
 	}
-	err := s.farmMinerDAO.CreateFarmMiner(farmMiner)
-	if err != nil {
+	if err := s.farmMinerDAO.CreateFarmMiner(farmMiner); err != nil {
 		return err
 	}
 
@@ -75,18 +75,28 @@ func (s *MinerService) CreateMiner(ctx context.Context, req *dto.CreateMinerReq)
 		MinerID: miner.ID,
 		Perm:    perm.MinerOwner,
 	}
-	err = s.userMinerDAO.CreateUserMiner(userMiner)
-	return err
+	if err := s.userMinerDAO.CreateUserMiner(userMiner); err != nil {
+		// fallback
+		return err
+	}
+	return nil
 }
 
+// 删除矿机
 func (s *MinerService) DeleteMiner(ctx context.Context, req *dto.DeleteMinerReq) error {
-	// 检查权限
 	userID, exists := ctx.Value("user_id").(int)
 	if !exists {
 		return errors.New("invalid user_id in context")
 	}
 	if !s.checkMinerPermission(userID, req.FarmID, req.MinerID, []perm.MinerPerm{perm.MinerOwner}) {
 		return errors.New("permission denied")
+	}
+
+	if err := s.minerDAO.DeleteMiner(req.MinerID); err != nil {
+		return errors.New("delete miner failed")
+	}
+	if err := s.userMinerDAO.DeleteUserMiner(userID, req.FarmID); err != nil {
+		return errors.New("delete user-miner failed")
 	}
 	return s.minerDAO.DeleteMiner(req.MinerID)
 }
@@ -158,6 +168,7 @@ func (s *MinerService) UpdateMiner(ctx context.Context, req *dto.UpdateMinerReq)
 	return err
 }
 
+// 获取用户在矿场的所有矿机
 func (s *MinerService) GetUserAllMinerInFarm(ctx context.Context, req *dto.GetUserAllMinerInFarmReq) (*[]model.Miner, error) {
 	userID, exists := ctx.Value("user_id").(int)
 	if !exists {

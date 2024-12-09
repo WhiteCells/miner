@@ -20,7 +20,6 @@ func (dao *UserDAO) CreateUser(user *model.User) error {
 		return err
 	}
 	user.Password = string(hashedPassword)
-
 	return utils.DB.Create(user).Error
 }
 
@@ -30,10 +29,10 @@ func (dao *UserDAO) GetUserByID(id int) (*model.User, error) {
 	return &user, err
 }
 
-func (dao *UserDAO) GetUserByUsername(name string) (*model.User, int, error) {
+func (dao *UserDAO) GetUserByName(name string) (*model.User, error) {
 	var user model.User
 	err := utils.DB.Where("name = ?", name).First(&user).Error
-	return &user, user.ID, err
+	return &user, err
 }
 
 func (dao *UserDAO) GetUserByInviteCode(inviteCode string) (*model.User, error) {

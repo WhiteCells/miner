@@ -18,11 +18,19 @@ func (dao *FlightsheetDAO) CreateFlightSheet(fs *model.Flightsheet) error {
 	return utils.DB.Create(fs).Error
 }
 
-// 获取飞行表信息
-func (dao *FlightsheetDAO) GetFlightSheetByID(id int) (*model.Flightsheet, error) {
-	var fs model.Flightsheet
-	err := utils.DB.First(&fs, id).Error
-	return &fs, err
+// 删除飞行表
+func (dao *FlightsheetDAO) DeleteFlightSheet(id int) error {
+	return utils.DB.Transaction(func(tx *gorm.DB) error {
+		// 删除关联
+		if err := tx.Where("flightsheet_id = ?", id).Delete(&model.MinerFlightsheet{}).Error; err != nil {
+			return err
+		}
+		if err := tx.Where("flightsheet_id = ?", id).Delete(&model.FlightsheetWallet{}).Error; err != nil {
+			return err
+		}
+		// 删除飞行表
+		return tx.Delete(&model.Flightsheet{}, id).Error
+	})
 }
 
 // 更新飞行表
@@ -30,19 +38,20 @@ func (dao *FlightsheetDAO) UpdateFlightSheet(fs *model.Flightsheet) error {
 	return utils.DB.Save(fs).Error
 }
 
-// 删除飞行表
-func (dao *FlightsheetDAO) DeleteFlightSheet(id int) error {
-	return utils.DB.Transaction(func(tx *gorm.DB) error {
-		// 删除关联
-		if err := tx.Where("flight_sheet_id = ?", id).Delete(&model.MinerFlightsheet{}).Error; err != nil {
-			return err
-		}
-		if err := tx.Where("flight_sheet_id = ?", id).Delete(&model.FlightsheetWallet{}).Error; err != nil {
-			return err
-		}
-		// 删除飞行表
-		return tx.Delete(&model.Flightsheet{}, id).Error
-	})
+// 获取用户的所有飞行表
+func (dao *FlightsheetDAO) GetUserAllFlightsheet(userID int) (*[]model.Flightsheet, error) {
+	var flightsheets []model.Flightsheet
+	err := utils.DB.Joins("JOIN user_flightsheet ON user.id = user_flightsheet").
+		Where("user_flightsheet.user_id = ?", userID).
+		Find(&flightsheets).Error
+	return &flightsheets, err
+}
+
+// 获取飞行表信息
+func (dao *FlightsheetDAO) GetFlightSheetByID(id int) (*model.Flightsheet, error) {
+	var fs model.Flightsheet
+	err := utils.DB.First(&fs, id).Error
+	return &fs, err
 }
 
 // 将飞行表应用到矿机

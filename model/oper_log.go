@@ -1,12 +1,16 @@
 package model
 
-import "miner/common/role"
+import (
+	"miner/common/role"
+	"time"
+)
 
 type OperLog struct {
 	ID       int           `json:"id" gorm:"column:id;type:int;primaryKey;autoIncrement;comment:日志唯一标识"`
 	UserID   int           `json:"user_id" gorm:"column:user_id;type:int;comment:用户ID"`
 	UserName string        `json:"user_name" gorm:"column:user_name;type:varchar(255);comment:用户名"`
 	UserRole role.RoleType `json:"user_role" gorm:"column:user_role;type:text;comment:用户角色"`
+	Time     time.Time     `json:"time" gorm:"column:time;type:datetime;comment:操作时间"`
 	Action   string        `json:"action" gorm:"column:action;type:varchar(255);comment:请求类型"`
 	Target   string        `json:"target" gorm:"column:target;type:varchar(255);comment:请求目标"`
 	IP       string        `json:"ip" gorm:"column:ip;type:varchar(255);comment:用户IP"`

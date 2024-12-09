@@ -18,6 +18,21 @@ func (dao *UserMinerDAO) CreateUserMiner(userFarm *model.UserMiner) error {
 	return utils.DB.Create(userFarm).Error
 }
 
+// 删除用户与矿场的联系
+func (dao *UserMinerDAO) DeleteUserMiner(userID int, minerID int) error {
+	userMiner, err := dao.GetUserMiner(userID, minerID)
+	if err != nil {
+		return err
+	}
+	return utils.DB.Delete(userMiner).Error
+}
+
+func (dao *UserMinerDAO) GetUserMiner(userID int, minerID int) (*model.UserMiner, error) {
+	var userMiner model.UserMiner
+	err := utils.DB.Where("user_id = ? AND miner_id = ?", userID, minerID).First(&userMiner).Error
+	return &userMiner, err
+}
+
 // 获取用户在矿机中的权限
 func (dao *UserMinerDAO) GetUserMinerPerm(userID int, minerID int) (perm.MinerPerm, error) {
 	var userFarm model.UserMiner

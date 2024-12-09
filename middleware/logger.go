@@ -65,6 +65,7 @@ func OperLog() gin.HandlerFunc {
 			UserID:   userID.(int),
 			UserName: userName.(string),
 			UserRole: userRole.(role.RoleType),
+			Time:     time.Now(),
 			Action:   ctx.Request.Method,
 			Target:   ctx.FullPath(),
 			IP:       ctx.ClientIP(),

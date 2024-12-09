@@ -1,6 +1,9 @@
 package dto
 
-import "miner/common/points"
+import (
+	"miner/common/points"
+	"time"
+)
 
 type LoginReq struct {
 	Username string `json:"username" binding:"required"`
@@ -25,6 +28,7 @@ type AddPointsReq struct {
 	UserID int               `json:"user_id" binding:"required"`
 	Type   points.PointsType `json:"type" binding:"required"`
 	Point  int               `json:"point" binding:"required"`
+	Time   time.Time         `json:"time" binding:"required"`
 }
 
 type GetUserInfoReq struct {

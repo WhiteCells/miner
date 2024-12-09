@@ -5,7 +5,6 @@ import (
 	"miner/service"
 	"net/http"
 
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
 
@@ -34,8 +33,7 @@ func (c *UserController) Register(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"message": "注册成功",
-		"data":    req.Username,
+		"message": "login success",
 	})
 }
 
@@ -48,7 +46,7 @@ func (c *UserController) Login(ctx *gin.Context) {
 		})
 		return
 	}
-	userID, err := c.userService.Login(ctx, &req)
+	err = c.userService.Login(ctx, &req)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
@@ -56,19 +54,7 @@ func (c *UserController) Login(ctx *gin.Context) {
 		return
 	}
 
-	ctx.Set("user_id", userID)
-
-	session := sessions.Default(ctx)
-	session.Set("user_id", userID)
-	if err := session.Save(); err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": "Failed to save session",
-		})
-		return
-	}
-
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "login success",
-		"user_id": userID,
 	})
 }

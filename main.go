@@ -25,5 +25,7 @@ func main() {
 	farmRoute.InitFarmRoute(ctx)
 	minerRoute := route.NewMinerRoute()
 	minerRoute.InitMinerRoute(ctx)
+	flightsheetRoute := route.NewFlightsheetRoute()
+	flightsheetRoute.InitFlightsheetRoute(ctx)
 	ctx.Run(":8080")
 }

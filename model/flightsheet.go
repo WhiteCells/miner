@@ -1,9 +1,11 @@
 package model
 
 type Flightsheet struct {
-	Id     int    `json:"id" gorm:"column:id;type:int;primaryKey;autoIncrement;comment:飞行表ID"`
-	Name   string `json:"name" gorm:"unqiue;column:name;type:varchar(255);comment:飞行表名"`
-	Config string `json:"config" gorm:"column:config;type:varchar(255);comment:飞行表配置"`
+	ID       int    `json:"id" gorm:"column:id;type:int;primaryKey;autoIncrement;comment:飞行表ID"`
+	Name     string `json:"name" gorm:"unqiue;column:name;type:varchar(255);comment:飞行表名"`
+	CoinType string `json:"coin_type" gorm:"column:coin_type;type:varchar(255);comment:货币类型"`
+	MinePool string `json:"mine_pool" gorm:"column:mine_pool;type:varchar(255);comment:矿池"`
+	MineSoft string `json:"mine_soft" gorm:"column:mine_soft;type:varchar(255);comment:挖矿软件"`
 }
 
 func (Flightsheet) TableName() string {

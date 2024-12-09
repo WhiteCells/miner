@@ -28,8 +28,8 @@ func (dao *MinerDAO) GetMinerByID(id int) (*model.Miner, error) {
 // 获取矿场的所有矿机
 func (dao *MinerDAO) GetFarmMiners(farmID int) ([]model.Miner, error) {
 	var miners []model.Miner
-	err := utils.DB.Joins("JOIN farm_miners ON miners.id = farm_miners.miner_id").
-		Where("farm_miners.farm_id = ?", farmID).
+	err := utils.DB.Joins("JOIN farm_miner ON miner.id = farm_miner.miner_id").
+		Where("farm_miner.farm_id = ?", farmID).
 		Find(&miners).Error
 	return miners, err
 }

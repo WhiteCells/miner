@@ -21,13 +21,32 @@ const (
 	loginIPTimeout   = 24 * time.Hour
 )
 
-func (c *UserCache) SetUserInfoByID(ctx context.Context, user *model.User) error {
-	key := fmt.Sprintf("user:%d:info", user.ID)
+func (c *UserCache) SetUserInfo(ctx context.Context, user *model.User) error {
+	key1 := fmt.Sprintf("user:%d:info", user.ID)
+	key2 := fmt.Sprintf("user:%s:info", user.Name)
+	key3 := fmt.Sprintf("user:%s:info", user.Email)
+
 	userJSON, err := json.Marshal(user)
 	if err != nil {
 		return err
 	}
-	return utils.RDB.Set(ctx, key, string(userJSON), userInfoTimeout)
+
+	if err = utils.RDB.Set(ctx, key1, string(userJSON), userInfoTimeout); err != nil {
+		return err
+	}
+
+	if err = utils.RDB.Set(ctx, key2, string(userJSON), userInfoTimeout); err != nil {
+		utils.RDB.Del(ctx, key1)
+		return err
+	}
+
+	if err = utils.RDB.Set(ctx, key3, string(userJSON), userInfoTimeout); err != nil {
+		utils.RDB.Del(ctx, key1)
+		utils.RDB.Del(ctx, key2)
+		return err
+	}
+
+	return nil
 }
 
 func (c *UserCache) GetUserInfoByID(ctx context.Context, userID int) (*model.User, error) {
@@ -41,17 +60,28 @@ func (c *UserCache) GetUserInfoByID(ctx context.Context, userID int) (*model.Use
 	return &user, err
 }
 
-func (c *UserCache) SetUserInfoByName(ctx context.Context, user *model.User) error {
-	key := fmt.Sprintf("user:%s:info", user.Name)
-	userJSON, err := json.Marshal(user)
-	if err != nil {
-		return err
-	}
-	return utils.RDB.Set(ctx, key, userJSON, userInfoTimeout)
-}
+// func (c *UserCache) SetUserInfoByName(ctx context.Context, user *model.User) error {
+// 	key := fmt.Sprintf("user:%s:info", user.Name)
+// 	userJSON, err := json.Marshal(user)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	return utils.RDB.Set(ctx, key, userJSON, userInfoTimeout)
+// }
 
 func (c *UserCache) GetUserInfoByName(ctx context.Context, userName string) (*model.User, error) {
 	key := fmt.Sprintf("user:%s:info", userName)
+	userJSON, err := utils.RDB.Get(ctx, key)
+	if err != nil {
+		return nil, err
+	}
+	var user model.User
+	err = json.Unmarshal([]byte(userJSON), &user)
+	return &user, err
+}
+
+func (c *UserCache) GetUserInfoByEmail(ctx context.Context, email string) (*model.User, error) {
+	key := fmt.Sprintf("user:%s:info", email)
 	userJSON, err := utils.RDB.Get(ctx, key)
 	if err != nil {
 		return nil, err
