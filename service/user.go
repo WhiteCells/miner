@@ -82,7 +82,7 @@ func (s *UserService) Register(ctx *gin.Context, req *dto.RegisterReq) error {
 }
 
 // Login 用户登录
-func (s *UserService) Login(ctx *gin.Context, req *dto.LoginReq) (int, error) {
+func (s *UserService) Login(ctx *gin.Context, req *dto.LoginReq) (string, int, error) {
 	// 先读缓存
 	// ip, err := s.userCache.GetLoginIPByName(ctx, req.Username)
 	// if err != nil {
@@ -91,7 +91,7 @@ func (s *UserService) Login(ctx *gin.Context, req *dto.LoginReq) (int, error) {
 	// 获取用户信息
 	user, id, err := s.userDAO.GetUserByUsername(req.Username)
 	if err != nil {
-		return -1, errors.New("user not found")
+		return "", -1, errors.New("user not found")
 	}
 
 	// 验证 Google 验证码
@@ -101,28 +101,28 @@ func (s *UserService) Login(ctx *gin.Context, req *dto.LoginReq) (int, error) {
 
 	// 验证密码
 	if !s.validatePassword(user, req.Password) {
-		return -1, errors.New("invalid password")
+		return "", -1, errors.New("invalid password")
 	}
 
 	// 检查用户状态
 	if user.Status != status.UserOn {
-		return -1, errors.New("account is disabled")
+		return "", -1, errors.New("account is disabled")
 	}
 
 	// 检查积分是否欠费
 	if user.Points < 0 {
-		return -1, errors.New("insufficient points")
+		return "", -1, errors.New("insufficient points")
 	}
 
 	// 检查IP是否变化
 	if user.LastLoginIP != "" && user.LastLoginIP != ctx.ClientIP() {
-		return -1, errors.New("ip")
+		return "", -1, errors.New("ip")
 	}
 
 	// 生成 JWT token
 	token, err := utils.GenerateToken(user.ID, user.Name, user.Role, 24)
 	if err != nil {
-		return -1, err
+		return "", -1, err
 	}
 
 	// 更新登录 IP 信息
@@ -131,13 +131,13 @@ func (s *UserService) Login(ctx *gin.Context, req *dto.LoginReq) (int, error) {
 
 	// 缓存 info token
 	if err := s.userCache.SetUserInfoByID(ctx, user); err != nil {
-		return -1, err
+		return "", -1, err
 	}
 	if err := s.userCache.SetUserTokenByID(ctx, user.ID, token); err != nil {
-		return -1, err
+		return "", -1, err
 	}
 
-	return id, nil
+	return token, id, nil
 }
 
 // 更新用户信息
