@@ -11,7 +11,6 @@ import (
 	"miner/utils"
 	"time"
 
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -98,14 +97,15 @@ func (s *UserService) Register(ctx *gin.Context, req *dto.RegisterReq) error {
 }
 
 // Login 用户登录
-func (s *UserService) Login(ctx *gin.Context, req *dto.LoginReq) error {
+func (s *UserService) Login(ctx *gin.Context, req *dto.LoginReq) (string, *model.User, error) {
 	// 先读缓存
 	user, err := s.userCache.GetUserInfoByName(ctx, req.Username)
 	if err != nil {
 		user, err = s.userDAO.GetUserByName(req.Username)
 		if err != nil {
-			return errors.New("user not found")
+			return "", nil, errors.New("user not found")
 		}
+		return "", nil, errors.New("user not found")
 	}
 
 	// 验证 Google 验证码
@@ -115,28 +115,28 @@ func (s *UserService) Login(ctx *gin.Context, req *dto.LoginReq) error {
 
 	// 验证密码
 	if !s.validatePassword(user, req.Password) {
-		return errors.New("invalid password")
+		return "", nil, errors.New("invalid password")
 	}
 
 	// 检查用户状态
 	if user.Status != status.UserOn {
-		return errors.New("account is disabled")
+		return "", nil, errors.New("account is disabled")
 	}
 
 	// 检查积分是否欠费
 	if user.Points < 0 {
-		return errors.New("insufficient points")
+		return "", nil, errors.New("insufficient points")
 	}
 
 	// 检查IP是否变化
 	if user.LastLoginIP != "" && user.LastLoginIP != ctx.ClientIP() {
-		return errors.New("ip")
+		return "", nil, errors.New("ip")
 	}
 
 	// 生成 JWT token
 	token, err := utils.GenerateToken(user.ID, user.Name, user.Role, 24)
 	if err != nil {
-		return err
+		return "", nil, err
 	}
 
 	// 更新登录 IP 信息
@@ -144,23 +144,15 @@ func (s *UserService) Login(ctx *gin.Context, req *dto.LoginReq) error {
 	user.LastLoginAt = time.Now()
 	s.userDAO.UpdateUser(user)
 
-	// 缓存 info
+	// 缓存 info token
 	if err := s.userCache.SetUserInfo(ctx, user); err != nil {
-		return err
+		return "", nil, err
 	}
 	if err := s.userCache.SetUserTokenByID(ctx, user.ID, token); err != nil {
-		return err
+		return "", nil, err
 	}
 
-	ctx.Set("user_id", user.ID)
-
-	session := sessions.Default(ctx)
-	session.Set("user_id", user.ID)
-	if err := session.Save(); err != nil {
-		return err
-	}
-
-	return nil
+	return token, user, nil
 }
 
 // 更新用户信息

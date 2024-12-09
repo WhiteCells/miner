@@ -46,7 +46,7 @@ func (c *UserController) Login(ctx *gin.Context) {
 		})
 		return
 	}
-	err = c.userService.Login(ctx, &req)
+	token, user, err := c.userService.Login(ctx, &req)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"error": err.Error(),
@@ -55,6 +55,8 @@ func (c *UserController) Login(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"message": "login success",
+		"message":      "login success",
+		"access_token": token,
+		"user":         user,
 	})
 }

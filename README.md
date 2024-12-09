@@ -91,30 +91,6 @@ go mod tidy
 go run ./main.go
 ```
 
-### Q&A
-
-为什么有 model 中的有的文件前有个 2：
-
-> `2_farm_miner.go` 开头带 2 的为中间表模型（不知道肿么想的🤷‍♂️🤷‍♀️，一眼能快速分辨中间表吧
-> 原本想用下划线，但是 go 以下划线开始的文件似乎会被忽略
-
-每个对象的 Newxxx() 是否多于？
-
-> 
-> ```go
-> type FarmMinerDAO struct{}
-> 
-> func NewFarmMinerDAO() > *FarmMinerDAO {
-> 	return &FarmMinerDAO{}
-> }
-> ```
-> 
-> 统一构造函数，方便在其他结构中初始化对象
-
-为什么有的关键模块文件这么少：
-
-> 因为没写完（doge
-
 ### TODO
 
 - 表结构需要调整
