@@ -76,6 +76,7 @@ func (s *UserService) Register(ctx *gin.Context, req *dto.RegisterReq) error {
 		user.InvitedBy = inviter.ID
 
 		// 给邀请人增加积分
+		// TODO 记录日志
 		err = s.addInvitePoints(ctx, inviter.ID)
 		if err != nil {
 			return errors.New("add invite points failed")
@@ -101,16 +102,16 @@ func (s *UserService) Login(ctx *gin.Context, req *dto.LoginReq) (string, *model
 	// 先读缓存
 	user, err := s.userCache.GetUserInfoByName(ctx, req.Username)
 	if err != nil {
-		user, err = s.userDAO.GetUserByName(req.Username)
+		dbUser, err := s.userDAO.GetUserByName(req.Username)
 		if err != nil {
 			return "", nil, errors.New("user not found")
 		}
-		return "", nil, errors.New("user not found")
+		user = dbUser
 	}
 
 	// 验证 Google 验证码
 	// if ret, err := utils.VerifyCodeMoment(user.Secret, req.GoogleCode); ret || err != nil {
-	// 	return -1, errors.New("invalid GoogleCode")
+	// 	return "", nil, errors.New("invalid GoogleCode")
 	// }
 
 	// 验证密码
@@ -143,6 +144,8 @@ func (s *UserService) Login(ctx *gin.Context, req *dto.LoginReq) (string, *model
 	user.LastLoginIP = ctx.ClientIP()
 	user.LastLoginAt = time.Now()
 	s.userDAO.UpdateUser(user)
+
+	ctx.Set("user_id", user.ID)
 
 	// 缓存 info token
 	if err := s.userCache.SetUserInfo(ctx, user); err != nil {

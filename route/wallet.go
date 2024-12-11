@@ -24,9 +24,9 @@ func (wr *WalletRoute) InitWalletRoute(r *gin.Engine) {
 	route.Use(middleware.JWTAuth())
 	route.Use(middleware.RoleAuth(role.User))
 	{
-		route.POST("")
-		route.DELETE("")
-		route.PUT("")
-		route.GET("")
+		route.POST("", wr.walletController.CreateWallet)
+		route.DELETE("", wr.walletController.DeleteWallet)
+		route.PUT("", wr.walletController.UpdateWallet)
+		route.GET("", wr.walletController.GetUserAllWallet)
 	}
 }

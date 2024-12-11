@@ -27,5 +27,8 @@ func main() {
 	minerRoute.InitMinerRoute(ctx)
 	flightsheetRoute := route.NewFlightsheetRoute()
 	flightsheetRoute.InitFlightsheetRoute(ctx)
+	walletRoute := route.NewWalletRoute()
+	walletRoute.InitWalletRoute(ctx)
+
 	ctx.Run(":8080")
 }

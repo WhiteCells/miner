@@ -21,6 +21,11 @@ type UpdateMinerReq struct {
 	UpdateInfo map[string]interface{} `json:"update_info" binding:"required"`
 }
 
+type ApplyMinerFlightsheetReq struct {
+	MinerID       int `json:"miner_id"`
+	FlightsheetID int `json:"fs_id"`
+}
+
 type TransferMinerReq struct {
 	FromUserID int `json:"from_user_id" binding:"required"`
 	ToUserID   int `json:"to_user_id" binding:"required"`

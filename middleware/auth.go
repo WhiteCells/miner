@@ -10,22 +10,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// func AuthMiddleware(tokenService *service.TokenService) gin.HandlerFunc {
-// 	return func(ctx *gin.Context) {
-// 		// session
-// 		session := sessions.Default(ctx)
-// 		userID := session.Get("user_id")
-// 		if userID == nil {
-// 			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid session"})
-// 			ctx.Abort()
-// 			return
-// 		}
-
-// 		// jwt
-// 		if tokenService
-// 	}
-// }
-
 // JWT 认证
 func JWTAuth() gin.HandlerFunc {
 	return func(ctx *gin.Context) {

@@ -25,57 +25,38 @@ func NewFarmService() *FarmService {
 }
 
 // CreateFarm 创建矿场
-func (s *FarmService) CreateFarm(ctx context.Context, req *dto.CreateFarmReq) (int, error) {
+func (s *FarmService) CreateFarm(ctx context.Context, req *dto.CreateFarmReq) (*model.Farm, error) {
+	userID, exists := ctx.Value("user_id").(int)
+	if !exists {
+		return nil, errors.New("invalid user_id in context")
+	}
 	farm := &model.Farm{
 		Name:     req.Name,
 		TimeZone: req.TimeZone,
 	}
 
 	// 创建矿场
-	farmID, err := s.farmDAO.CreateFarm(farm)
-	if err != nil {
-		return -1, err
-	}
-
-	// 创建用户-矿场关联
-	userFarm := &model.UserFarm{
-		UserID: ctx.Value("user_id").(int),
-		FarmID: farmID,
-		Perm:   perm.FarmOwner,
-	}
-
-	return farmID, s.userFarmDAO.CreateUserFarm(userFarm)
-}
-
-// GetFarmInfo 获取矿场信息
-func (s *FarmService) GetFarmInfo(ctx context.Context, farmID int) (*model.Farm, error) {
-	// 缓存获取
-	farm, err := s.farmCache.GetFarmInfo(ctx, farmID)
-	if err == nil {
-		return farm, nil
-	}
-
-	// 缓存未命中，数据库获取
-	farm, err = s.farmDAO.GetFarmByID(farmID)
-	if err != nil {
-		return nil, err
-	}
-
-	// 更新缓存
-	if err := s.farmCache.SetFarmInfo(ctx, farm); err != nil {
+	if err := s.farmDAO.CreateFarm(farm, userID); err != nil {
 		return nil, err
 	}
 
 	return farm, nil
 }
 
-// GetAllFarmInfo 获取所有矿场信息
-func (s *FarmService) GetUserAllFarmInfo(ctx context.Context) (*[]model.Farm, error) {
+// DeleteFarm 删除矿场
+func (s *FarmService) DeleteFarm(ctx context.Context, req *dto.DeleteFarmReq) error {
 	userID, exists := ctx.Value("user_id").(int)
 	if !exists {
-		return nil, errors.New("invalid user_id in context")
+		return errors.New("invalid user_id in context")
 	}
-	return s.farmDAO.GetUserAllFarm(userID)
+	// 检查用户对矿场的权限
+	if !s.checkFarmPermission(userID, req.FarmID, []perm.FarmPerm{perm.FarmOwner}) {
+		return errors.New("permission denied")
+	}
+	if err := s.farmDAO.DeleteFarmByID(req.FarmID); err != nil {
+		return errors.New("delete farm failed")
+	}
+	return nil
 }
 
 // UpdateFarm 更新矿场信息
@@ -111,7 +92,6 @@ func (s *FarmService) UpdateFarm(ctx context.Context, req *dto.UpdateFarmReq) er
 		}
 	}
 
-	// todo bug，当缓存更新失败时，数据库回滚
 	// 更新数据库
 	if err := s.farmDAO.UpdateFarm(farm); err != nil {
 		return err
@@ -125,17 +105,50 @@ func (s *FarmService) UpdateFarm(ctx context.Context, req *dto.UpdateFarmReq) er
 	return nil
 }
 
-// DeleteFarm 删除矿场
-func (s *FarmService) DeleteFarm(ctx context.Context, req *dto.DeleteFarmReq) error {
-	// 检查用户对矿场的权限
+// GetAllFarmInfo 获取所有矿场信息
+func (s *FarmService) GetUserAllFarmInfo(ctx context.Context) (*[]model.Farm, error) {
 	userID, exists := ctx.Value("user_id").(int)
+	if !exists {
+		return nil, errors.New("invalid user_id in context")
+	}
+	farms, err := s.farmDAO.GetUserAllFarm(userID)
+	if err != nil {
+		return nil, errors.New("get user all farm failed")
+	}
+	return farms, err
+}
+
+// GetFarmInfo 获取矿场信息
+func (s *FarmService) GetFarmInfo(ctx context.Context, farmID int) (*model.Farm, error) {
+	// 缓存获取
+	farm, err := s.farmCache.GetFarmInfo(ctx, farmID)
+	if err == nil {
+		return farm, nil
+	}
+
+	// 缓存未命中，数据库获取
+	farm, err = s.farmDAO.GetFarmByID(farmID)
+	if err != nil {
+		return nil, err
+	}
+
+	// 更新缓存
+	if err := s.farmCache.SetFarmInfo(ctx, farm); err != nil {
+		return nil, err
+	}
+
+	return farm, nil
+}
+
+func (s *FarmService) ApplyFlightSheet(ctx context.Context, req *dto.ApplyFarmFlightsheetReq) error {
+	_, exists := ctx.Value("user_id").(int)
 	if !exists {
 		return errors.New("invalid user_id in context")
 	}
-	if !s.checkFarmPermission(userID, req.FarmID, []perm.FarmPerm{perm.FarmOwner}) {
-		return errors.New("permission denied")
+	if err := s.farmDAO.ApplyFlightSheet(req.FarmID, req.FlightsheetID); err != nil {
+		return errors.New("farm apply flightsheet faild")
 	}
-	return s.farmDAO.DeleteFarmByID(req.FarmID)
+	return nil
 }
 
 // TransferFarmOwnership 转移矿场所有权

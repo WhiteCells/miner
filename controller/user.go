@@ -22,18 +22,22 @@ func (c *UserController) Register(ctx *gin.Context) {
 	var req dto.RegisterReq
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{
+			"msg": err.Error(),
+		})
 		return
 	}
 
 	err = c.userService.Register(ctx, &req)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"msg": err.Error(),
+		})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"message": "login success",
+		"msg": "register success",
 	})
 }
 
@@ -42,21 +46,21 @@ func (c *UserController) Login(ctx *gin.Context) {
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
+			"msg": err.Error(),
 		})
 		return
 	}
 	token, user, err := c.userService.Login(ctx, &req)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
+			"msg": err.Error(),
 		})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"message":      "login success",
+		"msg":          "login success",
 		"access_token": token,
-		"user":         user,
+		"data":         user,
 	})
 }

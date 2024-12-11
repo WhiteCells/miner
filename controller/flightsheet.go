@@ -22,20 +22,22 @@ func (c *FlightsheetController) CreateFlightsheet(ctx *gin.Context) {
 	var req dto.CreateFlightsheetReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
+			"msg": err.Error(),
 		})
 		return
 	}
 
-	if err := c.flightsheetService.CreateFlightsheet(ctx, &req); err != nil {
+	flightsheet, err := c.flightsheetService.CreateFlightsheet(ctx, &req)
+	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
+			"msg": err.Error(),
 		})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"message": "create flightsheet success",
+		"data": flightsheet,
+		"msg":  "create flightsheet success",
 	})
 }
 
@@ -43,20 +45,20 @@ func (c *FlightsheetController) DeleteFlightsheet(ctx *gin.Context) {
 	var req dto.DeleteFlightsheetReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
+			"msg": err.Error(),
 		})
 		return
 	}
 
 	if err := c.flightsheetService.DeleteFlightSheet(ctx, &req); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
+			"msg": err.Error(),
 		})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"message": "delete flightsheet success",
+		"msg": "delete flightsheet success",
 	})
 }
 
@@ -64,20 +66,20 @@ func (c *FlightsheetController) UpdateFlightsheet(ctx *gin.Context) {
 	var req dto.UpdateFlightsheetReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{
-			"error": err.Error(),
+			"msg": err.Error(),
 		})
 		return
 	}
 
 	if err := c.flightsheetService.UpdateFlightSheet(ctx, &req); err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"error": err.Error(),
+			"msg": err.Error(),
 		})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"message": "update flightsheet success",
+		"msg": "update flightsheet success",
 	})
 }
 
@@ -85,12 +87,12 @@ func (c *FlightsheetController) GetUserAllFlightsheet(ctx *gin.Context) {
 	flightsheets, err := c.flightsheetService.GetUserAllFlightsheet(ctx)
 	if err != nil {
 		ctx.JSON(http.StatusInsufficientStorage, gin.H{
-			"error": err.Error(),
+			"msg": err.Error(),
 		})
 		return
 	}
 
 	ctx.JSON(http.StatusOK, gin.H{
-		"flightsheets": flightsheets,
+		"data": flightsheets,
 	})
 }

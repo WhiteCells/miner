@@ -13,18 +13,14 @@ func NewUserMinerDAO() *UserMinerDAO {
 	return &UserMinerDAO{}
 }
 
-// 建立用户与矿场的联系
+// 建立用户与矿机的联系
 func (dao *UserMinerDAO) CreateUserMiner(userFarm *model.UserMiner) error {
 	return utils.DB.Create(userFarm).Error
 }
 
-// 删除用户与矿场的联系
+// 删除用户与矿机的联系
 func (dao *UserMinerDAO) DeleteUserMiner(userID int, minerID int) error {
-	userMiner, err := dao.GetUserMiner(userID, minerID)
-	if err != nil {
-		return err
-	}
-	return utils.DB.Delete(userMiner).Error
+	return utils.DB.Where("user_id = ? AND miner_id = ?", userID, minerID).Delete(model.UserMiner{}).Error
 }
 
 func (dao *UserMinerDAO) GetUserMiner(userID int, minerID int) (*model.UserMiner, error) {

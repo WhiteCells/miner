@@ -95,13 +95,13 @@ func LoginLog() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		ctx.Next()
 
-		userID, exists := ctx.Get("user_id")
+		userID, exists := ctx.Value("user_id").(int)
 		if !exists {
 			return
 		}
 
 		loginLog := &model.LoginLog{
-			UserID: userID.(int),
+			UserID: userID,
 			Time:   time.Now(),
 			IP:     ctx.ClientIP(),
 			Status: ctx.Writer.Status(),

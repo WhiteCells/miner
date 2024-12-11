@@ -32,14 +32,14 @@ func NewMinerService() *MinerService {
 }
 
 // 创建矿机
-func (s *MinerService) CreateMiner(ctx context.Context, req *dto.CreateMinerReq) error {
+func (s *MinerService) CreateMiner(ctx context.Context, req *dto.CreateMinerReq) (*model.Miner, error) {
 	userID, exists := ctx.Value("user_id").(int)
 	if !exists {
-		return errors.New("invalid user_id in context")
+		return nil, errors.New("invalid user_id in context")
 	}
 	// 检查用户对矿场的权限
 	if !s.farmService.checkFarmPermission(userID, req.FarmID, []perm.FarmPerm{perm.FarmOwner, perm.FarmManager}) {
-		return errors.New("permission denied")
+		return nil, errors.New("permission denied")
 	}
 
 	// 创建矿机
@@ -52,34 +52,14 @@ func (s *MinerService) CreateMiner(ctx context.Context, req *dto.CreateMinerReq)
 		Status:      status.MinerOn,
 	}
 
-	// 测试连接 todo
+	// TODO 测试连接
 
 	// 创建矿机
-	if err := s.minerDAO.CreateMiner(miner); err != nil {
-		return err
+	if err := s.minerDAO.CreateMiner(miner, userID, req.FarmID); err != nil {
+		return nil, err
 	}
 
-	// todo 事务
-	// 创建矿场-矿机关联
-	farmMiner := &model.FarmMiner{
-		MinerID: miner.ID,
-		FarmID:  req.FarmID,
-	}
-	if err := s.farmMinerDAO.CreateFarmMiner(farmMiner); err != nil {
-		return err
-	}
-
-	// 创建用户-矿机关联
-	userMiner := &model.UserMiner{
-		UserID:  userID,
-		MinerID: miner.ID,
-		Perm:    perm.MinerOwner,
-	}
-	if err := s.userMinerDAO.CreateUserMiner(userMiner); err != nil {
-		// fallback
-		return err
-	}
-	return nil
+	return miner, nil
 }
 
 // 删除矿机
@@ -88,17 +68,16 @@ func (s *MinerService) DeleteMiner(ctx context.Context, req *dto.DeleteMinerReq)
 	if !exists {
 		return errors.New("invalid user_id in context")
 	}
-	if !s.checkMinerPermission(userID, req.FarmID, req.MinerID, []perm.MinerPerm{perm.MinerOwner}) {
+	// 检查用户对 Miner 的权限
+	if !s.checkMinerPermission(userID, req.MinerID, []perm.MinerPerm{perm.MinerOwner}) {
 		return errors.New("permission denied")
 	}
 
-	if err := s.minerDAO.DeleteMiner(req.MinerID); err != nil {
+	if err := s.minerDAO.DeleteMiner(req.MinerID, req.FarmID, userID); err != nil {
 		return errors.New("delete miner failed")
 	}
-	if err := s.userMinerDAO.DeleteUserMiner(userID, req.FarmID); err != nil {
-		return errors.New("delete user-miner failed")
-	}
-	return s.minerDAO.DeleteMiner(req.MinerID)
+
+	return nil
 }
 
 // 获取矿机信息
@@ -129,13 +108,13 @@ func (s *MinerService) UpdateMiner(ctx context.Context, req *dto.UpdateMinerReq)
 	if !exists {
 		return errors.New("invalid user_id in context")
 	}
-	if !s.checkMinerPermission(userID, req.FarmID, req.MinerID, []perm.MinerPerm{perm.MinerOwner, perm.MinerManager}) {
+	if !s.checkMinerPermission(userID, req.MinerID, []perm.MinerPerm{perm.MinerOwner, perm.MinerManager}) {
 		return errors.New("permission denied")
 	}
 
 	miner, err := s.minerDAO.GetMinerByID(req.MinerID)
 	if err != nil {
-		return err
+		return errors.New("miner not found")
 	}
 
 	// 更新矿机信息
@@ -180,23 +159,23 @@ func (s *MinerService) GetUserAllMinerInFarm(ctx context.Context, req *dto.GetUs
 }
 
 // 转移矿机到其他矿场
-func (s *MinerService) TransferMiner(ctx context.Context, userID, minerID, fromFarmID, toFarmID int) error {
-	// 检查源矿场权限
-	if !s.checkMinerPermission(userID, fromFarmID, minerID, []perm.MinerPerm{perm.MinerOwner}) {
-		return errors.New("permission denied")
-	}
+// func (s *MinerService) TransferMiner(ctx context.Context, userID, minerID, fromFarmID, toFarmID int) error {
+// 	// 检查源矿场权限
+// 	if !s.checkMinerPermission(userID, fromFarmID, minerID, []perm.MinerPerm{perm.MinerOwner}) {
+// 		return errors.New("permission denied")
+// 	}
 
-	// 检查目标矿场权限
-	if !s.farmService.checkFarmPermission(userID, toFarmID, []perm.FarmPerm{perm.FarmOwner, perm.FarmManager}) {
-		return errors.New("permission denied for target farm")
-	}
+// 	// 检查目标矿场权限
+// 	if !s.farmService.checkFarmPermission(userID, toFarmID, []perm.FarmPerm{perm.FarmOwner, perm.FarmManager}) {
+// 		return errors.New("permission denied for target farm")
+// 	}
 
-	// 更新矿场-矿机关联
+// 	// 更新矿场-矿机关联
 
-	// 清除缓存
-	// 更新缓存
-	return nil
-}
+// 	// 清除缓存
+// 	// 更新缓存
+// 	return nil
+// }
 
 // GetMinerStats 获取矿机状态信息
 func (s *MinerService) GetMinerStats(ctx context.Context, minerID int) (map[string]interface{}, error) {
@@ -214,36 +193,40 @@ func (s *MinerService) GetMinerStats(ctx context.Context, minerID int) (map[stri
 }
 
 // 应用飞行表到矿机
-// func (s *MinerService) ApplyFlightSheet(ctx context.Context, userID, minerID, flightSheetID int) error {
-// 	if !s.checkMinerPermission(userID, minerID, []perm.MinerPerm{perm.MinerOwner, perm.MinerManager}) {
-// 		return errors.New("permission denied")
-// 	}
+func (s *MinerService) ApplyFlightSheet(ctx context.Context, req *dto.ApplyMinerFlightsheetReq) error {
+	userID, exists := ctx.Value("user_id").(int)
+	if !exists {
+		return errors.New("invalid user_id in context")
+	}
+	if !s.checkMinerPermission(userID, req.MinerID, []perm.MinerPerm{perm.MinerOwner, perm.MinerManager}) {
+		return errors.New("permission denied")
+	}
 
-// 	// 获取矿机信息
+	// 获取矿机信息
 
-// 	// 获取飞行表信息
+	// 获取飞行表信息
 
-// 	// 应用飞行表配置
+	// 应用飞行表配置
 
-// 	// 更新关联关系
-// 	return nil
-// }
+	// 更新关联关系
+	return nil
+}
 
-func (s *MinerService) checkMinerPermission(userID int, FarmID int, minerID int, allowedPerms []perm.MinerPerm) bool {
+func (s *MinerService) checkMinerPermission(userID int, minerID int, allowedPerms []perm.MinerPerm) bool {
 	// user 对 farm 的权限
-	userFarmPerm, err := s.userFarmDAO.GetUserFarmPerm(userID, FarmID)
-	if err != nil {
-		return false
-	}
-	hasUserFarmPerm := false
-	for _, allowedPerm := range allowedPerms {
-		if perm.Perm(userFarmPerm) == perm.Perm(allowedPerm) {
-			hasUserFarmPerm = true
-		}
-	}
-	if !hasUserFarmPerm {
-		return false
-	}
+	// userFarmPerm, err := s.userFarmDAO.GetUserFarmPerm(userID, FarmID)
+	// if err != nil {
+	// 	return false
+	// }
+	// hasUserFarmPerm := false
+	// for _, allowedPerm := range allowedPerms {
+	// 	if perm.Perm(userFarmPerm) == perm.Perm(allowedPerm) {
+	// 		hasUserFarmPerm = true
+	// 	}
+	// }
+	// if !hasUserFarmPerm {
+	// 	return false
+	// }
 
 	// user 对 miner 的权限
 	userMinerPerm, err := s.userMinerDAO.GetUserMinerPerm(userID, minerID)

@@ -28,5 +28,6 @@ func (mr *MinerRoute) InitMinerRoute(r *gin.Engine) {
 		route.DELETE("", mr.minerController.DeleteMiner)
 		route.PUT("", mr.minerController.UpdateMiner)
 		route.GET("", mr.minerController.GetUserAllMinerInFarm)
+		route.POST("/apply_fs", mr.minerController.ApplyMinerFlightSheet)
 	}
 }

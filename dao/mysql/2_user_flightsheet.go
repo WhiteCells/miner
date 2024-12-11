@@ -16,12 +16,10 @@ func (dao *UserFlightsheetDAO) CreateUserFlightsheet(userFlightsheet *model.User
 }
 
 func (dao *UserFlightsheetDAO) DeleteUserFlightsheet(userID int, userFlightsheetID int) error {
-	var userFlightsheet model.UserFarm
-	err := utils.DB.Where("user_id = ? AND flightsheet_id = ?", userID, userFlightsheetID).First(&userFlightsheet).Error
-	if err != nil {
-		return err
-	}
-	return utils.DB.Delete(&userFlightsheet).Error
+	return utils.DB.
+		Where("user_id = ? AND flightsheet_id = ?", userID, userFlightsheetID).
+		Delete(model.UserFlightsheet{}).
+		Error
 }
 
 func (dao *UserFlightsheetDAO) UpdateUserFlightsheet(userFlightsheet *model.UserFlightsheet) error {

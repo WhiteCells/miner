@@ -24,4 +24,9 @@ func (ur *UserRoute) InitUserRoute(r *gin.Engine) {
 		route.POST("/login", ur.userController.Login, middleware.LoginLog())
 	}
 	// logout
+	route.Use(middleware.IPVerify())
+	route.Use(middleware.JWTAuth())
+	{
+		// route.POST("/logout", ur.userController.Logout)
+	}
 }

@@ -9,13 +9,17 @@ type CreateFlightsheetReq struct {
 }
 
 type DeleteFlightsheetReq struct {
-	FlightsheetID int `json:"flightsheet_id" binding:"required"`
+	FlightsheetID int `json:"fs_id" binding:"required"`
 }
 
 type UpdateFlightsheetReq struct {
-	FlightsheetID int                    `json:"flightsheet_id" binding:"required"`
+	FlightsheetID int                    `json:"fs_id" binding:"required"`
 	UpdateInfo    map[string]interface{} `json:"update_info" binding:"required"`
 }
 
 type GetUserAllFlightsheetReq struct {
+}
+
+type GetFlightByIDReq struct {
+	FlightsheetID int `json:"fs_id"`
 }
