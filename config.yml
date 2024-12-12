@@ -2,20 +2,11 @@ server:
   port: 8080
   mode: debug # debug/release
 
-# mysql:
-#   host: 45.119.55.22
-#   port: 3306
-#   user: miner
-#   password: "iRhPyszHSPC5LCXK"
-#   dbname: miner
-#   max_idle_conns: 10
-#   max_open_conns: 100
-
 mysql:
-  host: localhost
+  host: 45.119.55.22
   port: 3306
-  user: root
-  password: "3215"
+  user: miner
+  password: "iRhPyszHSPC5LCXK"
   dbname: miner
   max_idle_conns: 10
   max_open_conns: 100

@@ -2,6 +2,7 @@ package controller
 
 import (
 	"miner/common/dto"
+	"miner/common/rsp"
 	"miner/service"
 	"net/http"
 
@@ -22,45 +23,32 @@ func (c *UserController) Register(ctx *gin.Context) {
 	var req dto.RegisterReq
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"msg": err.Error(),
-		})
+		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
 
 	err = c.userService.Register(ctx, &req)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"msg": err.Error(),
-		})
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"msg": "register success",
-	})
+	rsp.Success(ctx, http.StatusOK, "register success", nil)
 }
 
 func (c *UserController) Login(ctx *gin.Context) {
 	var req dto.LoginReq
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"msg": err.Error(),
-		})
-		return
-	}
-	token, user, err := c.userService.Login(ctx, &req)
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"msg": err.Error(),
-		})
+		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"msg":          "login success",
-		"access_token": token,
-		"data":         user,
-	})
+	token, user, err := c.userService.Login(ctx, &req)
+	if err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
+		return
+	}
+
+	rsp.LoginSuccess(ctx, http.StatusOK, "login success", user, token)
 }

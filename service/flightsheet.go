@@ -34,36 +34,36 @@ func (s *FlightsheetService) CreateFlightsheet(ctx context.Context, req *dto.Cre
 		MineSoft: req.MineSoft,
 	}
 
-	if err := s.flightsheetDAO.CreateFlightSheet(flightsheet, userID); err != nil {
+	if err := s.flightsheetDAO.CreateFlightsheet(flightsheet, userID); err != nil {
 		return nil, errors.New("create flightsheet failed")
 	}
 
 	return flightsheet, nil
 }
 
-// DeleteFlightSheet 删除飞行表
-func (s *FlightsheetService) DeleteFlightSheet(ctx context.Context, req *dto.DeleteFlightsheetReq) error {
+// DeleteFlightsheet 删除飞行表
+func (s *FlightsheetService) DeleteFlightsheet(ctx context.Context, req *dto.DeleteFlightsheetReq) error {
 	userID, exists := ctx.Value("user_id").(int)
 	if !exists {
 		return errors.New("invalid user_id in context")
 	}
 
-	if err := s.flightsheetDAO.DeleteFlightSheet(req.FlightsheetID, userID); err != nil {
+	if err := s.flightsheetDAO.DeleteFlightsheet(req.FlightsheetID, userID); err != nil {
 		return errors.New("delete flightsheet failed")
 	}
 
 	return nil
 }
 
-// UpdateFlightSheet 更新飞行表
-func (s *FlightsheetService) UpdateFlightSheet(ctx context.Context, req *dto.UpdateFlightsheetReq) error {
+// UpdateFlightsheet 更新飞行表
+func (s *FlightsheetService) UpdateFlightsheet(ctx context.Context, req *dto.UpdateFlightsheetReq) error {
 	_, exists := ctx.Value("user_id").(int)
 	if !exists {
 		return errors.New("invalid user_id in context")
 	}
 
 	// 查找飞行表
-	flightsheet, err := s.flightsheetDAO.GetFlightSheetByID(req.FlightsheetID)
+	flightsheet, err := s.flightsheetDAO.GetFlightsheetByID(req.FlightsheetID)
 	if err != nil {
 		return errors.New("flightsheet not found")
 	}
@@ -84,13 +84,14 @@ func (s *FlightsheetService) UpdateFlightSheet(ctx context.Context, req *dto.Upd
 		}
 	}
 
-	if err := s.flightsheetDAO.UpdateFlightSheet(flightsheet); err != nil {
+	if err := s.flightsheetDAO.UpdateFlightsheet(flightsheet); err != nil {
 		return errors.New("delete flightsheet failed")
 	}
 
 	return nil
 }
 
+// GetUserAllFlightsheet 获取用户的所有飞行表
 func (s *FlightsheetService) GetUserAllFlightsheet(ctx context.Context) (*[]model.Flightsheet, error) {
 	userID, exists := ctx.Value("user_id").(int)
 	if !exists {
@@ -101,4 +102,12 @@ func (s *FlightsheetService) GetUserAllFlightsheet(ctx context.Context) (*[]mode
 		return nil, errors.New("get user all flightsheet failed")
 	}
 	return user, err
+}
+
+// ApplyWallet 飞行表应用钱包
+func (s *FlightsheetService) ApplyWallet(ctx context.Context, req *dto.ApplyFlightsheetWalletReq) error {
+	if err := s.flightsheetDAO.ApplyWallet(req.FlightsheetID, req.WaleltID); err != nil {
+		return err
+	}
+	return nil
 }

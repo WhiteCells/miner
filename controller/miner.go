@@ -2,6 +2,7 @@ package controller
 
 import (
 	"miner/common/dto"
+	"miner/common/rsp"
 	"miner/service"
 	"net/http"
 
@@ -21,94 +22,71 @@ func NewMinerController() *MinerController {
 func (c *MinerController) CreateMiner(ctx *gin.Context) {
 	var req dto.CreateMinerReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"msg": err.Error(),
-		})
+		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
 	miner, err := c.minerService.CreateMiner(ctx, &req)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"msg": err.Error(),
-		})
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{
-		"data": miner,
-		"msg":  "create success",
-	})
+
+	rsp.Success(ctx, http.StatusOK, "create miner success", miner)
 }
 
 func (c *MinerController) DeleteMiner(ctx *gin.Context) {
 	var req dto.DeleteMinerReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"msg": err.Error(),
-		})
+		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
 	if err := c.minerService.DeleteMiner(ctx, &req); err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"msg": err.Error(),
-		})
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{
-		"msg": "delete miner success",
-	})
+
+	rsp.Success(ctx, http.StatusOK, "delete miner success", nil)
 }
 
 func (c *MinerController) UpdateMiner(ctx *gin.Context) {
 	var req dto.UpdateMinerReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"msg": err.Error(),
-		})
+		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
 	if err := c.minerService.UpdateMiner(ctx, &req); err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"msg": err.Error(),
-		})
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{
-		"msg": "update miner success",
-	})
+
+	rsp.Success(ctx, http.StatusOK, "update miner success", nil)
 }
 
 func (c *MinerController) GetUserAllMinerInFarm(ctx *gin.Context) {
 	var req dto.GetUserAllMinerInFarmReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"msg": err.Error(),
-		})
+		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
 	miners, err := c.minerService.GetUserAllMinerInFarm(ctx, &req)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"msg": err.Error(),
-		})
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{
-		"data": miners,
-	})
+
+	rsp.Success(ctx, http.StatusOK, "get user all miner success", miners)
 }
 
-func (c *MinerController) ApplyMinerFlightSheet(ctx *gin.Context) {
+func (c *MinerController) ApplyFlightsheet(ctx *gin.Context) {
 	var req dto.ApplyMinerFlightsheetReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"msg": err.Error(),
-		})
+		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
-	if err := c.minerService.ApplyFlightSheet(ctx, &req); err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"msg": err.Error(),
-		})
+	if err := c.minerService.ApplyFlightsheet(ctx, &req); err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
+
+	rsp.Success(ctx, http.StatusOK, "apply miner flightsheet success", nil)
 }

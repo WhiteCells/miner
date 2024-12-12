@@ -33,6 +33,8 @@ func (s *FarmService) CreateFarm(ctx context.Context, req *dto.CreateFarmReq) (*
 	farm := &model.Farm{
 		Name:     req.Name,
 		TimeZone: req.TimeZone,
+		// TODO Hash
+		Hash: "",
 	}
 
 	// 创建矿场
@@ -53,7 +55,7 @@ func (s *FarmService) DeleteFarm(ctx context.Context, req *dto.DeleteFarmReq) er
 	if !s.checkFarmPermission(userID, req.FarmID, []perm.FarmPerm{perm.FarmOwner}) {
 		return errors.New("permission denied")
 	}
-	if err := s.farmDAO.DeleteFarmByID(req.FarmID); err != nil {
+	if err := s.farmDAO.DeleteFarmByID(req.FarmID, userID); err != nil {
 		return errors.New("delete farm failed")
 	}
 	return nil
@@ -140,24 +142,31 @@ func (s *FarmService) GetFarmInfo(ctx context.Context, farmID int) (*model.Farm,
 	return farm, nil
 }
 
-func (s *FarmService) ApplyFlightSheet(ctx context.Context, req *dto.ApplyFarmFlightsheetReq) error {
+func (s *FarmService) ApplyFlightsheet(ctx context.Context, req *dto.ApplyFarmFlightsheetReq) error {
 	_, exists := ctx.Value("user_id").(int)
 	if !exists {
 		return errors.New("invalid user_id in context")
 	}
-	if err := s.farmDAO.ApplyFlightSheet(req.FarmID, req.FlightsheetID); err != nil {
+	if err := s.farmDAO.ApplyFlightsheet(req.FarmID, req.FlightsheetID); err != nil {
 		return errors.New("farm apply flightsheet faild")
 	}
 	return nil
 }
 
-// TransferFarmOwnership 转移矿场所有权
-func (s *FarmService) TransferFarmOwnership(ctx context.Context, req *dto.TransferMinerReq) error {
-	// 检查当前用户是否是矿场所有者
-	if !s.checkFarmPermission(req.FromUserID, req.FarmID, []perm.FarmPerm{perm.FarmOwner}) {
+// Transfer 转移矿场所有权
+func (s *FarmService) Transfer(ctx context.Context, req *dto.TransferFarmReq) error {
+	userID, exists := ctx.Value("user_id").(int)
+	if !exists {
+		return errors.New("invalid user_id in context")
+	}
+	// 检查权限
+	if !s.checkFarmPermission(userID, req.FarmID, []perm.FarmPerm{perm.FarmOwner}) {
 		return errors.New("permission denied")
 	}
-	return s.userFarmDAO.TransferFarmOwnership(req.FromUserID, req.ToUserID, req.FarmID)
+	if err := s.farmDAO.TransferFarm(req.FarmID, userID, req.ToUserID); err != nil {
+		return errors.New("transfer farm failed")
+	}
+	return nil
 }
 
 // AddFarmMember 添加矿场成员

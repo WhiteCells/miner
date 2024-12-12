@@ -15,7 +15,7 @@ func (dao *PointsRecordDAO) CreatePointsRecord(record *model.PointsRecord) error
 	return utils.DB.Create(record).Error
 }
 
-func (dao *PointsRecordDAO) GetUserPointsRecords(userID int, page, pageSize int) ([]model.PointsRecord, int64, error) {
+func (dao *PointsRecordDAO) GetUserPointsRecords(userID int, page, pageSize int) (*[]model.PointsRecord, int64, error) {
 	var records []model.PointsRecord
 	var total int64
 
@@ -32,7 +32,7 @@ func (dao *PointsRecordDAO) GetUserPointsRecords(userID int, page, pageSize int)
 		Order("created_at DESC").
 		Find(&records).Error
 
-	return records, total, err
+	return &records, total, err
 }
 
 func (dao *PointsRecordDAO) GetUserPointsBalance(userID int) (int, error) {

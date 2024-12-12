@@ -193,7 +193,7 @@ func (s *MinerService) GetMinerStats(ctx context.Context, minerID int) (map[stri
 }
 
 // 应用飞行表到矿机
-func (s *MinerService) ApplyFlightSheet(ctx context.Context, req *dto.ApplyMinerFlightsheetReq) error {
+func (s *MinerService) ApplyFlightsheet(ctx context.Context, req *dto.ApplyMinerFlightsheetReq) error {
 	userID, exists := ctx.Value("user_id").(int)
 	if !exists {
 		return errors.New("invalid user_id in context")

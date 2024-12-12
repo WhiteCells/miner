@@ -2,6 +2,7 @@ package controller
 
 import (
 	"miner/common/dto"
+	"miner/common/rsp"
 	"miner/service"
 	"net/http"
 
@@ -21,78 +22,70 @@ func NewFlightsheetController() *FlightsheetController {
 func (c *FlightsheetController) CreateFlightsheet(ctx *gin.Context) {
 	var req dto.CreateFlightsheetReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"msg": err.Error(),
-		})
+		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
 
 	flightsheet, err := c.flightsheetService.CreateFlightsheet(ctx, &req)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"msg": err.Error(),
-		})
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"data": flightsheet,
-		"msg":  "create flightsheet success",
-	})
+	rsp.Success(ctx, http.StatusOK, "create flightsheet success", flightsheet)
 }
 
 func (c *FlightsheetController) DeleteFlightsheet(ctx *gin.Context) {
 	var req dto.DeleteFlightsheetReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"msg": err.Error(),
-		})
+		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
 
-	if err := c.flightsheetService.DeleteFlightSheet(ctx, &req); err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"msg": err.Error(),
-		})
+	if err := c.flightsheetService.DeleteFlightsheet(ctx, &req); err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"msg": "delete flightsheet success",
-	})
+	rsp.Success(ctx, http.StatusOK, "delete flightsheet success", nil)
 }
 
 func (c *FlightsheetController) UpdateFlightsheet(ctx *gin.Context) {
 	var req dto.UpdateFlightsheetReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"msg": err.Error(),
-		})
+		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
 
-	if err := c.flightsheetService.UpdateFlightSheet(ctx, &req); err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"msg": err.Error(),
-		})
+	if err := c.flightsheetService.UpdateFlightsheet(ctx, &req); err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"msg": "update flightsheet success",
-	})
+	rsp.Success(ctx, http.StatusOK, "update flightsheet success", nil)
 }
 
 func (c *FlightsheetController) GetUserAllFlightsheet(ctx *gin.Context) {
 	flightsheets, err := c.flightsheetService.GetUserAllFlightsheet(ctx)
 	if err != nil {
-		ctx.JSON(http.StatusInsufficientStorage, gin.H{
-			"msg": err.Error(),
-		})
+		rsp.Error(ctx, http.StatusInsufficientStorage, err.Error(), nil)
 		return
 	}
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"data": flightsheets,
-	})
+	rsp.Success(ctx, http.StatusOK, "get user all flightsheet success", flightsheets)
+}
+
+func (c *FlightsheetController) ApplyWallet(ctx *gin.Context) {
+	var req dto.ApplyFlightsheetWalletReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
+		return
+	}
+
+	if err := c.flightsheetService.ApplyWallet(ctx, &req); err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
+		return
+	}
+
+	rsp.Success(ctx, http.StatusOK, "apply wallet success", nil)
 }

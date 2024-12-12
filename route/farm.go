@@ -28,6 +28,7 @@ func (fr *FarmRoute) InitFarmRoute(rg *gin.Engine) {
 		route.DELETE("", fr.farmController.DeleteFarm)
 		route.PUT("", fr.farmController.UpdateFarm)
 		route.GET("", fr.farmController.GetUserAllFarm)
-		route.POST("/apply_fs", fr.farmController.ApplyFlightSheet)
+		route.POST("/apply_fs", fr.farmController.ApplyFlightsheet)
+		route.POST("/transfer", fr.farmController.Transfer)
 	}
 }

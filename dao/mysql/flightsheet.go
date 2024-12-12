@@ -1,6 +1,7 @@
 package mysql
 
 import (
+	"errors"
 	"miner/model"
 	"miner/utils"
 
@@ -13,8 +14,8 @@ func NewFlightsheetDAO() *FlightsheetDAO {
 	return &FlightsheetDAO{}
 }
 
-// CreateFlightSheet 创建飞行表
-func (dao *FlightsheetDAO) CreateFlightSheet(fs *model.Flightsheet, userID int) error {
+// CreateFlightsheet 创建飞行表
+func (dao *FlightsheetDAO) CreateFlightsheet(fs *model.Flightsheet, userID int) error {
 	err := utils.DB.Transaction(func(tx *gorm.DB) error {
 		// 创建 fs
 		if err := tx.Create(fs).Error; err != nil {
@@ -33,23 +34,23 @@ func (dao *FlightsheetDAO) CreateFlightSheet(fs *model.Flightsheet, userID int) 
 	return err
 }
 
-// DeleteFlightSheet 删除飞行表
-func (dao *FlightsheetDAO) DeleteFlightSheet(flightsheetID int, userID int) error {
+// DeleteFlightsheet 删除飞行表
+func (dao *FlightsheetDAO) DeleteFlightsheet(fsID int, userID int) error {
 	err := utils.DB.Transaction(func(tx *gorm.DB) error {
 		// 删除 user-flightsheet 关联
-		if err := tx.Where("flightsheet_id = ? ADN user_id = ?", flightsheetID, userID).Delete(&model.UserFlightsheet{}).Error; err != nil {
+		if err := tx.Where("flightsheet_id = ? ADN user_id = ?", fsID, userID).Delete(&model.UserFlightsheet{}).Error; err != nil {
 			return err
 		}
 		// 删除 miner-flightsheet 关联
-		if err := tx.Where("flightsheet_id = ?", flightsheetID).Delete(&model.MinerFlightsheet{}).Error; err != nil {
+		if err := tx.Where("flightsheet_id = ?", fsID).Delete(&model.MinerFlightsheet{}).Error; err != nil {
 			return err
 		}
 		// 删除 flightsheet-wallet 关联
-		if err := tx.Where("flightsheet_id = ?", flightsheetID).Delete(&model.FlightsheetWallet{}).Error; err != nil {
+		if err := tx.Where("flightsheet_id = ?", fsID).Delete(&model.FlightsheetWallet{}).Error; err != nil {
 			return err
 		}
 		// 删除飞行表
-		if err := tx.Delete(&model.Flightsheet{}, flightsheetID).Error; err != nil {
+		if err := tx.Delete(&model.Flightsheet{}, fsID).Error; err != nil {
 			return err
 		}
 		return nil
@@ -57,8 +58,8 @@ func (dao *FlightsheetDAO) DeleteFlightSheet(flightsheetID int, userID int) erro
 	return err
 }
 
-// UpdateFlightSheet 更新飞行表
-func (dao *FlightsheetDAO) UpdateFlightSheet(fs *model.Flightsheet) error {
+// UpdateFlightsheet 更新飞行表
+func (dao *FlightsheetDAO) UpdateFlightsheet(fs *model.Flightsheet) error {
 	// TODO 如果钱包更新了，需要更新 飞行表-钱包 的关联
 	return utils.DB.Save(fs).Error
 }
@@ -72,26 +73,70 @@ func (dao *FlightsheetDAO) GetUserAllFlightsheet(userID int) (*[]model.Flightshe
 	return &flightsheets, err
 }
 
-// GetFlightSheetByID 获取飞行表信息
-func (dao *FlightsheetDAO) GetFlightSheetByID(flightsheetID int) (*model.Flightsheet, error) {
+// GetFlightsheetByID 获取飞行表信息
+func (dao *FlightsheetDAO) GetFlightsheetByID(fsID int) (*model.Flightsheet, error) {
 	var fs model.Flightsheet
-	err := utils.DB.First(&fs, flightsheetID).Error
+	err := utils.DB.First(&fs, fsID).Error
 	return &fs, err
 }
 
-// ApplyFlightSheetToMiner 将飞行表应用到矿机
-func (dao *FlightsheetDAO) ApplyFlightSheetToMiner(fsID int, minerID int) error {
+// GetFlightsheetCoinTypeByID 获取飞行表货币类型
+func (dao *FlightsheetDAO) GetFlightsheetCoinTypeByID(fsID int) (string, error) {
+	var fs model.Flightsheet
+	err := utils.DB.First(&fs, fsID).Error
+	return fs.CoinType, err
+}
+
+// ApplyFlightsheetToMiner 将飞行表应用到矿机
+func (dao *FlightsheetDAO) ApplyFlightsheetToMiner(fsID int, minerID int) error {
 	return utils.DB.Transaction(func(tx *gorm.DB) error {
-		// 删除将原有的飞行表设置
+		// 删除原有 miner-flightsheet-wallet 联系
 		if err := tx.Model(&model.MinerFlightsheet{}).
 			Where("miner_id = ? AND flightsheet_id = ?", minerID, fsID).
 			Delete(&model.MinerFlightsheet{}).Error; err != nil {
 			return err
 		}
-		// 创建新的关联或更新现有关联
-		return tx.Where(model.MinerFlightsheet{
+		// 建立新的 miner-flightsheet-wallet 联系
+		minerFlightsheet := &model.MinerFlightsheet{
 			MinerID:       minerID,
 			FlightsheetID: fsID,
-		}).FirstOrCreate(&model.MinerFlightsheet{}).Error
+		}
+		if err := tx.Create(minerFlightsheet).Error; err != nil {
+			return err
+		}
+		return nil
+	})
+}
+
+// ApplyWallet 飞行表应用钱包
+func (dao *FlightsheetDAO) ApplyWallet(fsID int, walletID int) error {
+	return utils.DB.Transaction(func(tx *gorm.DB) error {
+		// 检查飞行表币种和钱包币种是否一致
+		var fs model.Flightsheet
+		if err := tx.First(&fs, fsID).Error; err != nil {
+			return err
+		}
+		var wallet model.Wallet
+		if err := tx.First(&wallet, walletID).Error; err != nil {
+			return err
+		}
+		if fs.CoinType != wallet.CoinType {
+			return errors.New("coin type inconsistent")
+		}
+		// 删除原有 flightsheet-wallet 联系
+		if err := tx.Model(&model.FlightsheetWallet{}).
+			Where("flightsheet_id = ? AND wallet_id = ?", fsID, walletID).
+			Delete(&model.FlightsheetWallet{}).Error; err != nil {
+			return err
+		}
+		// 建立新的 flightsheet-wallet 联系
+		flightsheetWallet := &model.FlightsheetWallet{
+			FlightsheetID: fsID,
+			WalletID:      walletID,
+		}
+		if err := tx.Create(&flightsheetWallet).Error; err != nil {
+			return err
+		}
+		return nil
 	})
 }

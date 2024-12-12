@@ -32,10 +32,10 @@ func (dao *OperLogDAO) GetOperLogs(query map[string]interface{}, page, pageSize 
 		db = db.Where("action = ?", action)
 	}
 	if startTime, ok := query["start_time"].(time.Time); ok {
-		db = db.Where("created_at >= ?", startTime)
+		db = db.Where("time >= ?", startTime)
 	}
 	if endTime, ok := query["end_time"].(time.Time); ok {
-		db = db.Where("created_at <= ?", endTime)
+		db = db.Where("time <= ?", endTime)
 	}
 
 	// 获取总数

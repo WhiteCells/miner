@@ -28,5 +28,6 @@ func (fr *FlightsheetRoute) InitFlightsheetRoute(r *gin.Engine) {
 		route.DELETE("", fr.flightsheetController.DeleteFlightsheet)
 		route.PUT("", fr.flightsheetController.UpdateFlightsheet)
 		route.GET("", fr.flightsheetController.GetUserAllFlightsheet)
+		route.POST("/apply_wallet", fr.flightsheetController.ApplyWallet)
 	}
 }

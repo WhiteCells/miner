@@ -20,5 +20,10 @@ type GetUserAllMinerInFarmReq struct {
 
 type ApplyFarmFlightsheetReq struct {
 	FarmID        int `json:"farm_id" binding:"required"`
-	FlightsheetID int `json:"flightsheet_id" binding:"required"`
+	FlightsheetID int `json:"fs_id" binding:"required"`
+}
+
+type TransferFarmReq struct {
+	FarmID   int `json:"farm_id" binding:"required"`
+	ToUserID int `json:"to_user_id" binding:"required"`
 }

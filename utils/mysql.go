@@ -77,5 +77,6 @@ func autoMigrate() error {
 		&model.LoginLog{},
 		&model.PointsRecord{},
 		&model.UserFlightsheet{},
+		&model.FarmFlightsheet{},
 	)
 }
