@@ -23,23 +23,26 @@ func (dao *UserMinerDAO) DeleteUserMiner(userID int, minerID int) error {
 	return utils.DB.Where("user_id = ? AND miner_id = ?", userID, minerID).Delete(model.UserMiner{}).Error
 }
 
-func (dao *UserMinerDAO) GetUserMiner(userID int, minerID int) (*model.UserMiner, error) {
+// GetUserMiner 通过 ID 获取矿机信息
+func (dao *UserMinerDAO) GetUserMinerByID(userID int, minerID int) (*model.UserMiner, error) {
 	var userMiner model.UserMiner
 	err := utils.DB.Where("user_id = ? AND miner_id = ?", userID, minerID).First(&userMiner).Error
 	return &userMiner, err
 }
 
-// 获取用户在矿机中的权限
+// GetUserMinerPerm 获取用户在矿机中的权限
 func (dao *UserMinerDAO) GetUserMinerPerm(userID int, minerID int) (perm.MinerPerm, error) {
 	var userFarm model.UserMiner
 	err := utils.DB.Where("user_id = ? AND miner_id = ?", userID, minerID).First(&userFarm).Error
 	return userFarm.Perm, err
 }
 
-// 获取矿场中指定用户的所有矿机
+// GetUserAllMinerInFarm 获取矿场中指定用户的所有矿机
 func (dao UserMinerDAO) GetUserAllMinerInFarm(userID int, farmID int) (*[]model.Miner, error) {
 	var miners []model.Miner
-	err := utils.DB.Joins("JOIN farm_miner ON miner.id = farm_miner.miner_id").
+	err := utils.DB.
+		Select("DISTINCT miner.*").
+		Joins("JOIN farm_miner ON farm_miner.miner_id = miner.id").
 		Joins("JOIN user_farm ON farm_miner.farm_id = user_farm.farm_id").
 		Where("user_farm.user_id = ? AND farm_miner.farm_id = ?", userID, farmID).
 		Find(&miners).Error

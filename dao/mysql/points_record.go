@@ -3,6 +3,7 @@ package mysql
 import (
 	"miner/model"
 	"miner/utils"
+	"time"
 )
 
 type PointsRecordDAO struct{}
@@ -11,25 +12,44 @@ func NewPointRecordDAO() *PointsRecordDAO {
 	return &PointsRecordDAO{}
 }
 
+// CreatePointsRecord 创建积分记录
 func (dao *PointsRecordDAO) CreatePointsRecord(record *model.PointsRecord) error {
 	return utils.DB.Create(record).Error
 }
 
-func (dao *PointsRecordDAO) GetUserPointsRecords(userID int, page, pageSize int) (*[]model.PointsRecord, int64, error) {
+// GetUserPointsRecords 获取用户积分记录
+func (dao *PointsRecordDAO) GetUserPointsRecords(query map[string]interface{}) (*[]model.PointsRecord, int64, error) {
 	var records []model.PointsRecord
 	var total int64
 
-	db := utils.DB.Model(&model.PointsRecord{}).Where("user_id = ?", userID)
+	db := utils.DB.Model(&model.PointsRecord{})
+
+	// 添加查询条件
+	if userID, ok := query["user_id"].(int); ok {
+		db = db.Where("user_id = ?", userID)
+	}
+	if action, ok := query["action"].(string); ok {
+		db = db.Where("action = ?", action)
+	}
+	if startTime, ok := query["start_time"].(time.Time); ok {
+		db = db.Where("time >= ?", startTime)
+	}
+	if endTime, ok := query["end_time"].(time.Time); ok {
+		db = db.Where("time <= ?", endTime)
+	}
 
 	// 获取总数
 	if err := db.Count(&total).Error; err != nil {
-		return nil, 0, err
+		return nil, -1, err
 	}
 
+	pageNum := query["page_num"].(int)
+	pageSize := query["page_size"].(int)
+
 	// 获取分页数据
-	err := db.Offset((page - 1) * pageSize).
+	err := db.Offset((pageNum - 1) * pageSize).
 		Limit(pageSize).
-		Order("created_at DESC").
+		Order("time").
 		Find(&records).Error
 
 	return &records, total, err

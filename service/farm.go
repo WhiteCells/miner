@@ -121,7 +121,7 @@ func (s *FarmService) GetUserAllFarmInfo(ctx context.Context) (*[]model.Farm, er
 }
 
 // GetFarmInfo 获取矿场信息
-func (s *FarmService) GetFarmInfo(ctx context.Context, farmID int) (*model.Farm, error) {
+func (s *FarmService) GetFarmByID(ctx context.Context, farmID int) (*model.Farm, error) {
 	// 缓存获取
 	farm, err := s.farmCache.GetFarmInfo(ctx, farmID)
 	if err == nil {
@@ -142,6 +142,7 @@ func (s *FarmService) GetFarmInfo(ctx context.Context, farmID int) (*model.Farm,
 	return farm, nil
 }
 
+// ApplyFlightsheet 矿机应用飞行表
 func (s *FarmService) ApplyFlightsheet(ctx context.Context, req *dto.ApplyFarmFlightsheetReq) error {
 	_, exists := ctx.Value("user_id").(int)
 	if !exists {

@@ -32,5 +32,4 @@ type AddPointsReq struct {
 }
 
 type GetUserInfoReq struct {
-	UserID int `json:"user_id" binding:"required"`
 }

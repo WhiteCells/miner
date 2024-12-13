@@ -60,7 +60,6 @@ func (dao *FlightsheetDAO) DeleteFlightsheet(fsID int, userID int) error {
 
 // UpdateFlightsheet 更新飞行表
 func (dao *FlightsheetDAO) UpdateFlightsheet(fs *model.Flightsheet) error {
-	// TODO 如果钱包更新了，需要更新 飞行表-钱包 的关联
 	return utils.DB.Save(fs).Error
 }
 

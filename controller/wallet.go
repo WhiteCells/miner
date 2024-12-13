@@ -19,6 +19,7 @@ func NewWalletController() *WalletController {
 	}
 }
 
+// CreateWallet 创建钱包
 func (c *WalletController) CreateWallet(ctx *gin.Context) {
 	var req dto.CreateWalletReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -35,6 +36,7 @@ func (c *WalletController) CreateWallet(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "create wallet succes", wallet)
 }
 
+// DeleteWallet 删除钱包
 func (c *WalletController) DeleteWallet(ctx *gin.Context) {
 	var req dto.DeleteWalletReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -50,6 +52,7 @@ func (c *WalletController) DeleteWallet(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "delete wallet success", nil)
 }
 
+// UpdateWallet 更新钱包
 func (c *WalletController) UpdateWallet(ctx *gin.Context) {
 	var req dto.UpdateWalletReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -65,6 +68,7 @@ func (c *WalletController) UpdateWallet(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "update wallet success", nil)
 }
 
+// GetUserAllWallet 获取用户所有钱包
 func (c *WalletController) GetUserAllWallet(ctx *gin.Context) {
 	wallets, err := c.walletService.GetUserAllWallet(ctx)
 	if err != nil {
@@ -75,6 +79,7 @@ func (c *WalletController) GetUserAllWallet(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "get user all wallet success", wallets)
 }
 
+// GetUserWalletByID 通过钱包 ID 获取指定钱包
 func (c *WalletController) GetUserWalletByID(ctx *gin.Context) {
 	var req dto.GetUserWalletByIDReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {

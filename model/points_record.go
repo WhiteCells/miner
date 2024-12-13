@@ -12,6 +12,7 @@ type PointsRecord struct {
 	Amount  int               `json:"amount" gorm:"column:amount;type:int;comment:数量"`
 	Balance int               `json:"balance" gorm:"column:balance;type:int;comment:余额"`
 	Time    time.Time         `json:"time" gorm:"column:time;type:datetime;comment:时间"`
+	Detail  string            `json:"detail" gorm:""`
 }
 
 func (PointsRecord) TableName() string {

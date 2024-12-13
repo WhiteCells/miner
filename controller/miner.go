@@ -5,6 +5,7 @@ import (
 	"miner/common/rsp"
 	"miner/service"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -19,6 +20,7 @@ func NewMinerController() *MinerController {
 	}
 }
 
+// CreateMiner 创建矿机
 func (c *MinerController) CreateMiner(ctx *gin.Context) {
 	var req dto.CreateMinerReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -34,6 +36,7 @@ func (c *MinerController) CreateMiner(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "create miner success", miner)
 }
 
+// DeleteMiner 删除矿机
 func (c *MinerController) DeleteMiner(ctx *gin.Context) {
 	var req dto.DeleteMinerReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -48,6 +51,7 @@ func (c *MinerController) DeleteMiner(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "delete miner success", nil)
 }
 
+// UpdateMiner 更新矿机
 func (c *MinerController) UpdateMiner(ctx *gin.Context) {
 	var req dto.UpdateMinerReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -62,13 +66,14 @@ func (c *MinerController) UpdateMiner(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "update miner success", nil)
 }
 
+// GetUserAllMinerInFarm 获取用户在矿场中的矿机
 func (c *MinerController) GetUserAllMinerInFarm(ctx *gin.Context) {
-	var req dto.GetUserAllMinerInFarmReq
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
+	farmID, err := strconv.Atoi(ctx.Query("farm_id"))
+	if err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
-	miners, err := c.minerService.GetUserAllMinerInFarm(ctx, &req)
+	miners, err := c.minerService.GetUserAllMinerInFarm(ctx, farmID)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
@@ -77,6 +82,7 @@ func (c *MinerController) GetUserAllMinerInFarm(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "get user all miner success", miners)
 }
 
+// ApplyFlightsheet 矿机应用飞行表
 func (c *MinerController) ApplyFlightsheet(ctx *gin.Context) {
 	var req dto.ApplyMinerFlightsheetReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -89,4 +95,19 @@ func (c *MinerController) ApplyFlightsheet(ctx *gin.Context) {
 	}
 
 	rsp.Success(ctx, http.StatusOK, "apply miner flightsheet success", nil)
+}
+
+// Transfer 转移矿机所有权
+func (c *MinerController) Transfer(ctx *gin.Context) {
+	var req dto.TransferMinerReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
+		return
+	}
+	if err := c.minerService.Transfer(ctx, &req); err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
+		return
+	}
+
+	rsp.Success(ctx, http.StatusOK, "transfer miner success", nil)
 }

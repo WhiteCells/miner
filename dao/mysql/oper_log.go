@@ -12,13 +12,8 @@ func NewOperLogDAO() *OperLogDAO {
 	return &OperLogDAO{}
 }
 
-// 创建操作日志
-func (dao *OperLogDAO) CreateOperLog(log *model.OperLog) error {
-	return utils.DB.Create(log).Error
-}
-
-// 获取操作日志列表
-func (dao *OperLogDAO) GetOperLogs(query map[string]interface{}, page, pageSize int) ([]model.OperLog, int64, error) {
+// GetOperLogs 获取操作日志
+func (dao *OperLogDAO) GetOperLogs(query map[string]interface{}) (*[]model.OperLog, int64, error) {
 	var logs []model.OperLog
 	var total int64
 
@@ -28,7 +23,7 @@ func (dao *OperLogDAO) GetOperLogs(query map[string]interface{}, page, pageSize 
 	if userID, ok := query["user_id"].(int); ok {
 		db = db.Where("user_id = ?", userID)
 	}
-	if action, ok := query["action"].(string); ok {
+	if action, ok := query["action"].(string); ok && action != "" {
 		db = db.Where("action = ?", action)
 	}
 	if startTime, ok := query["start_time"].(time.Time); ok {
@@ -43,11 +38,14 @@ func (dao *OperLogDAO) GetOperLogs(query map[string]interface{}, page, pageSize 
 		return nil, 0, err
 	}
 
+	pageNum := query["page_num"].(int)
+	pageSize := query["page_size"].(int)
+
 	// 获取分页数据
-	err := db.Offset((page - 1) * pageSize).
+	err := db.Offset((pageNum - 1) * pageSize).
 		Limit(pageSize).
-		Order("created_at DESC").
+		Order("time").
 		Find(&logs).Error
 
-	return logs, total, err
+	return &logs, total, err
 }

@@ -44,10 +44,6 @@ func (s *UserService) Register(ctx *gin.Context, req *dto.RegisterReq) error {
 		return errors.New("user Email " + req.Email + " exists")
 	}
 
-	// if _, _, err := s.userDAO.GetUserByName(req.Username); err == nil {
-	// 	return errors.New("username " + req.Username + " exists")
-	// }
-
 	// 生成邀请码
 	inviteCode := utils.GenerateInviteCode()
 
@@ -158,8 +154,21 @@ func (s *UserService) Login(ctx *gin.Context, req *dto.LoginReq) (string, *model
 	return token, user, nil
 }
 
+// Logout 用户注销
+func (s *UserService) Logout(ctx *gin.Context) error {
+	// 删除缓存中的用户信息
+	if err := s.userCache.DeleteUserCache(ctx); err != nil {
+		return err
+	}
+	return nil
+}
+
 // 更新用户信息
-func (s *UserService) UpdateUserInfo(ctx *gin.Context, userID int, req *dto.UpdateInfoReq) error {
+func (s *UserService) UpdateUserInfo(ctx *gin.Context, req *dto.UpdateInfoReq) error {
+	userID, exists := ctx.Value("user_id").(int)
+	if !exists {
+		return errors.New("invalid user_id in context")
+	}
 	user, err := s.userDAO.GetUserByID(userID)
 	if err != nil {
 		return err
@@ -195,6 +204,19 @@ func (s *UserService) UpdatePassword(ctx *gin.Context, userID int, oldPassword, 
 
 	// 清除缓存
 	return s.userCache.DeleteUserCache(ctx)
+}
+
+// GetPointsBalance 获取用户积分余额
+func (s *UserService) GetPointsBalance(ctx *gin.Context) (int, error) {
+	userID, exists := ctx.Value("user_id").(int)
+	if !exists {
+		return -1, errors.New("invalid user_id in context")
+	}
+	user, err := s.userDAO.GetUserByID(userID)
+	if err != nil {
+		return -1, errors.New("user not found")
+	}
+	return user.Points, err
 }
 
 // 添加积分
@@ -233,12 +255,12 @@ func (s *UserService) addInvitePoints(ctx *gin.Context, inviterID int) error {
 }
 
 // 获取用户信息
-func (s *UserService) GetUserInfo(ctx *gin.Context, req *dto.GetUserInfoReq) (*model.User, error) {
-	if user, err := s.userCache.GetUserInfoByID(ctx, req.UserID); err == nil {
-		return user, nil
-	}
-	return s.userDAO.GetUserByID(req.UserID)
-}
+// func (s *UserService) GetUserInfo(ctx *gin.Context, req *dto.GetUserInfoReq) (*model.User, error) {
+// 	if user, err := s.userCache.GetUserInfoByID(ctx, req.UserID); err == nil {
+// 		return user, nil
+// 	}
+// 	return s.userDAO.GetUserByID(req.UserID)
+// }
 
 // 验证密码
 func (s *UserService) validatePassword(user *model.User, password string) bool {

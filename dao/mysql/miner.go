@@ -14,7 +14,7 @@ func NewMinerDAO() *MinerDAO {
 	return &MinerDAO{}
 }
 
-// 创建矿机
+// CreateMiner 创建矿机
 func (dao *MinerDAO) CreateMiner(miner *model.Miner, userID int, farmID int) error {
 	// 创建矿机时就需要将用户与用户与矿机进行联系
 	err := utils.DB.Transaction(func(tx *gorm.DB) error {
@@ -46,41 +46,47 @@ func (dao *MinerDAO) CreateMiner(miner *model.Miner, userID int, farmID int) err
 	return err
 }
 
-// 获取矿机信息
-func (dao *MinerDAO) GetMinerByID(id int) (*model.Miner, error) {
+// GetMinerByID 通过矿机 ID 获取矿机信息
+func (dao *MinerDAO) GetMinerByID(minerID int) (*model.Miner, error) {
 	var miner model.Miner
-	err := utils.DB.First(&miner, id).Error
+	err := utils.DB.First(&miner, minerID).Error
 	return &miner, err
 }
 
-// 获取矿场的所有矿机
+// GetFarmMiners 获取矿场的所有矿机
 func (dao *MinerDAO) GetFarmMiners(farmID int) (*[]model.Miner, error) {
 	var miners []model.Miner
-	err := utils.DB.Joins("JOIN farm_miner ON miner.id = farm_miner.miner_id").
+	err := utils.DB.
+		Joins("JOIN farm_miner ON miner.id = farm_miner.miner_id").
 		Where("farm_miner.farm_id = ?", farmID).
 		Find(&miners).Error
 	return &miners, err
 }
 
-// 更新矿机信息
+// UpdateMiner 更新矿机信息
 func (dao *MinerDAO) UpdateMiner(miner *model.Miner) error {
-	// TODO
 	return utils.DB.Save(miner).Error
 }
 
-// 删除矿机
+// DeleteMiner 删除矿机
 func (dao *MinerDAO) DeleteMiner(minerID int, farmID int, userID int) error {
 	err := utils.DB.Transaction(func(tx *gorm.DB) error {
 		// 删除 user-miner 关联
-		if err := tx.Where("user_id = ? AND miner_id = ?", userID, minerID).Delete(&model.UserMiner{}).Error; err != nil {
+		if err := tx.
+			Where("user_id = ? AND miner_id = ?", userID, minerID).
+			Delete(&model.UserMiner{}).Error; err != nil {
 			return err
 		}
 		// 删除 farm-miner 关联
-		if err := tx.Where("miner_id = ?", minerID).Delete(&model.FarmMiner{}).Error; err != nil {
+		if err := tx.
+			Where("miner_id = ?", minerID).
+			Delete(&model.FarmMiner{}).Error; err != nil {
 			return err
 		}
 		// 删除 miner-flightsheet 关联
-		if err := tx.Where("miner_id = ?", minerID).Delete(&model.MinerFlightsheet{}).Error; err != nil {
+		if err := tx.
+			Where("miner_id = ?", minerID).
+			Delete(&model.MinerFlightsheet{}).Error; err != nil {
 			return err
 		}
 		// 删除 miner
@@ -92,7 +98,7 @@ func (dao *MinerDAO) DeleteMiner(minerID int, farmID int, userID int) error {
 	return err
 }
 
-// 更新矿机状态
+// UpdateMinerStatus 更新矿机状态
 func (dao *MinerDAO) UpdateMinerStatus(minerID int, status int) error {
 	return utils.DB.
 		Model(&model.Miner{}).
@@ -100,20 +106,21 @@ func (dao *MinerDAO) UpdateMinerStatus(minerID int, status int) error {
 		Update("status", status).Error
 }
 
-// 转移矿机所有权
-func (dao *MinerDAO) TransferMiner(minerID int, fromFarmID int, toFarmID int) error {
+// Transfer 转移矿机所有权
+func (dao *MinerDAO) Transfer(minerID int, fromFarmID int, farmHash string) error {
 	err := utils.DB.Transaction(func(tx *gorm.DB) error {
-		// 删除原矿场关联
-		if err := tx.Where("miner_id = ? AND farm_id = ?", minerID, fromFarmID).
-			Delete(&model.FarmMiner{}).Error; err != nil {
+		// 通过 Farm hash 找到矿场
+		var farm model.Farm
+		if err := tx.
+			Where("hash = ?", farmHash).
+			First(&farm).Error; err != nil {
 			return err
 		}
-		// 创建新矿场关联
-		farmMiner := &model.FarmMiner{
-			MinerID: minerID,
-			FarmID:  toFarmID,
-		}
-		if err := tx.Create(farmMiner).Error; err != nil {
+		// 更新 farm-miner 关联
+		if err := tx.
+			Model(&model.FarmMiner{}).
+			Where("farm_id = ? AND miner_id = ?", fromFarmID, minerID).
+			Update("farm_id", farm.ID).Error; err != nil {
 			return err
 		}
 		return nil

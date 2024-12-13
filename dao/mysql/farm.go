@@ -59,7 +59,6 @@ func (dao *FarmDAO) DeleteFarmByID(farmID int, userID int) error {
 
 // UpdateFarm 更新矿场信息
 func (dao *FarmDAO) UpdateFarm(farm *model.Farm) error {
-	// TODO 如果更新飞行表后，需要更新关联
 	return utils.DB.Save(farm).Error
 }
 
@@ -80,11 +79,11 @@ func (dao *FarmDAO) GetFarmByID(farmID int) (*model.Farm, error) {
 	return &farm, err
 }
 
-// ApplyFlightsheet 应用 Flightsheet
+// ApplyFlightsheet 矿场应用飞行表
 func (dao *FarmDAO) ApplyFlightsheet(farmID int, fsID int) error {
 	return utils.DB.Transaction(func(tx *gorm.DB) error {
 		// 删除原有 farm-flightsheet 关联
-		if err := tx.Delete(&model.FarmFlightsheet{}, "farm_id = ? AND flightsheet_id = ?", farmID, fsID).Error; err != nil {
+		if err := tx.Delete(&model.FarmFlightsheet{}, "farm_id = ?", farmID).Error; err != nil {
 			return err
 		}
 		// 建立新的 farm-flightsheet 关联
@@ -95,6 +94,7 @@ func (dao *FarmDAO) ApplyFlightsheet(farmID int, fsID int) error {
 		if err := tx.Create(farmFlightsheet).Error; err != nil {
 			return err
 		}
+		// TODO 对矿场下没有设置飞行表的矿机的应用
 		return nil
 	})
 }

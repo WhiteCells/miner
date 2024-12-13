@@ -22,12 +22,12 @@ type UpdateMinerReq struct {
 }
 
 type ApplyMinerFlightsheetReq struct {
-	MinerID       int `json:"miner_id"`
-	FlightsheetID int `json:"fs_id"`
+	MinerID       int `json:"miner_id" binding:"required"`
+	FlightsheetID int `json:"fs_id" binding:"required"`
 }
 
 type TransferMinerReq struct {
-	FromUserID int `json:"from_user_id" binding:"required"`
-	ToUserID   int `json:"to_user_id" binding:"required"`
-	FarmID     int `json:"farm_id" binding:"required"`
+	FarmID   int    `json:"farm_id" binding:"required"`
+	MinerID  int    `json:"miner_id" binding:"required"`
+	FarmHash string `json:"farm_hash" binding:"required"`
 }

@@ -19,6 +19,7 @@ func NewFarmController() *FarmController {
 	}
 }
 
+// CreateFarm 创建矿场
 func (c *FarmController) CreateFarm(ctx *gin.Context) {
 	var req dto.CreateFarmReq
 	err := ctx.ShouldBindJSON(&req)
@@ -36,6 +37,7 @@ func (c *FarmController) CreateFarm(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "create farm success", farm)
 }
 
+// DeleteFarm 删除矿场
 func (c *FarmController) DeleteFarm(ctx *gin.Context) {
 	var req dto.DeleteFarmReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -50,6 +52,7 @@ func (c *FarmController) DeleteFarm(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "delete farm success", nil)
 }
 
+// UpdateFarm 更新矿场
 func (c *FarmController) UpdateFarm(ctx *gin.Context) {
 	var req dto.UpdateFarmReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -65,6 +68,7 @@ func (c *FarmController) UpdateFarm(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "update farm success", nil)
 }
 
+// GetUserAllFarm 获取用户所有矿场
 func (c *FarmController) GetUserAllFarm(ctx *gin.Context) {
 	farms, err := c.farmService.GetUserAllFarmInfo(ctx)
 	if err != nil {
@@ -75,6 +79,7 @@ func (c *FarmController) GetUserAllFarm(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "get user all farm", farms)
 }
 
+// ApplyFlightsheet 矿场应用飞行表
 func (c *FarmController) ApplyFlightsheet(ctx *gin.Context) {
 	var req dto.ApplyFarmFlightsheetReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -89,6 +94,7 @@ func (c *FarmController) ApplyFlightsheet(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "get user all farm", nil)
 }
 
+// Transfer 转移矿场
 func (c *FarmController) Transfer(ctx *gin.Context) {
 	var req dto.TransferFarmReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -98,6 +104,7 @@ func (c *FarmController) Transfer(ctx *gin.Context) {
 
 	if err := c.farmService.Transfer(ctx, &req); err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
+		return
 	}
 
 	rsp.Success(ctx, http.StatusOK, "transfer farm success", nil)

@@ -18,8 +18,8 @@ func NewFarmRoute() *FarmRoute {
 	}
 }
 
-func (fr *FarmRoute) InitFarmRoute(rg *gin.Engine) {
-	route := rg.Group("/farm")
+func (fr *FarmRoute) InitFarmRoute(r *gin.Engine) {
+	route := r.Group("/farm")
 	route.Use(middleware.IPVerify())
 	route.Use(middleware.JWTAuth())
 	route.Use(middleware.RoleAuth(role.User))
@@ -28,7 +28,7 @@ func (fr *FarmRoute) InitFarmRoute(rg *gin.Engine) {
 		route.DELETE("", fr.farmController.DeleteFarm)
 		route.PUT("", fr.farmController.UpdateFarm)
 		route.GET("", fr.farmController.GetUserAllFarm)
-		route.POST("/apply_fs", fr.farmController.ApplyFlightsheet)
-		route.POST("/transfer", fr.farmController.Transfer)
+		route.PUT("/apply_fs", fr.farmController.ApplyFlightsheet)
+		route.PUT("/transfer", fr.farmController.Transfer)
 	}
 }

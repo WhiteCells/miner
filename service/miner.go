@@ -81,7 +81,7 @@ func (s *MinerService) DeleteMiner(ctx context.Context, req *dto.DeleteMinerReq)
 }
 
 // 获取矿机信息
-func (s *MinerService) GetMinerInfo(ctx context.Context, minerID int) (*model.Miner, error) {
+func (s *MinerService) GetMinerByID(ctx context.Context, minerID int) (*model.Miner, error) {
 	// 先从缓存获取
 	miner, err := s.minerCache.GetMinerInfoByID(ctx, minerID)
 	if err == nil {
@@ -143,19 +143,38 @@ func (s *MinerService) UpdateMiner(ctx context.Context, req *dto.UpdateMinerReq)
 	}
 
 	// 更新缓存
-	// return s.minerCache.DeleteMinerCache(ctx, minerID)
 	return err
 }
 
 // 获取用户在矿场的所有矿机
-func (s *MinerService) GetUserAllMinerInFarm(ctx context.Context, req *dto.GetUserAllMinerInFarmReq) (*[]model.Miner, error) {
+func (s *MinerService) GetUserAllMinerInFarm(ctx context.Context, farmID int) (*[]model.Miner, error) {
 	userID, exists := ctx.Value("user_id").(int)
 	if !exists {
 		return nil, errors.New("invalid user_id in context")
 	}
 	// 缓存
-	// 数据库
-	return s.userMinerDAO.GetUserAllMinerInFarm(userID, req.FarmID)
+	miners, err := s.userMinerDAO.GetUserAllMinerInFarm(userID, farmID)
+	if err != nil {
+		return nil, errors.New("get user all miner in farm failed")
+	}
+
+	return miners, err
+}
+
+// 转移矿机
+func (s *MinerService) Transfer(ctx context.Context, req *dto.TransferMinerReq) error {
+	userID, exists := ctx.Value("user_id").(int)
+	if !exists {
+		return errors.New("invalid user_id in context")
+	}
+	// 权限检查
+	if !s.checkMinerPermission(userID, req.MinerID, []perm.MinerPerm{perm.MinerOwner}) {
+		return errors.New("permission denied")
+	}
+	if err := s.minerDAO.Transfer(req.MinerID, userID, req.FarmHash); err != nil {
+		return errors.New("transfer miner failed")
+	}
+	return nil
 }
 
 // 转移矿机到其他矿场
@@ -192,7 +211,7 @@ func (s *MinerService) GetMinerStats(ctx context.Context, minerID int) (map[stri
 	return nil, nil
 }
 
-// 应用飞行表到矿机
+// ApplyFlightsheet 矿机应用飞行表
 func (s *MinerService) ApplyFlightsheet(ctx context.Context, req *dto.ApplyMinerFlightsheetReq) error {
 	userID, exists := ctx.Value("user_id").(int)
 	if !exists {
