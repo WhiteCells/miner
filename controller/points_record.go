@@ -26,5 +26,5 @@ func (c *PointsRecordController) GetPointsRecords(ctx *gin.Context) {
 		return
 	}
 
-	rsp.GetPointsRecordsSuccess(ctx, http.StatusOK, "get points records success", records, total)
+	rsp.QuerySuccess(ctx, http.StatusOK, "get points records success", records, total)
 }

@@ -20,3 +20,8 @@ const (
 
 type AdminPerm Perm
 type UserPerm Perm
+
+const (
+	AdminFS AdminPerm = "admin"
+	UserFS  UserPerm  = "user"
+)

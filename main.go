@@ -29,6 +29,8 @@ func main() {
 	flightsheetRoute.InitFlightsheetRoute(ctx)
 	walletRoute := route.NewWalletRoute()
 	walletRoute.InitWalletRoute(ctx)
+	adminRoute := route.NewAdminRoute()
+	adminRoute.InitAdminRoute(ctx)
 
 	ctx.Run(":8080")
 }

@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"miner/common/role"
+	"miner/common/rsp"
 	"miner/utils"
 
 	"github.com/gin-gonic/gin"
@@ -71,5 +72,20 @@ func RoleAuth(roles ...role.RoleType) gin.HandlerFunc {
 			"msg":  "Permission denied",
 		})
 		ctx.Abort()
+	}
+}
+
+// 状态验证
+func StatusAuth() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		_, exists := ctx.Value("user_id").(int)
+		if !exists {
+			rsp.Error(ctx, http.StatusForbidden, "user_id not in context", nil)
+			ctx.Abort()
+			return
+		}
+		// 通过 userID 查找用户状态
+		// 先从缓存中查找，缓存未命中再从数据库中查找
+
 	}
 }

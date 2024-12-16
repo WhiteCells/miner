@@ -1,14 +1,31 @@
 package dto
 
-import (
-	"miner/common/role"
-	"time"
-)
+import "miner/common/status"
 
-type AdmineGetUserReq struct {
-	Role      role.RoleType `json:"role"`
-	StartTime time.Time     `json:"start_time"`
-	EndTime   time.Time     `json:"end_time"`
-	PageNum   int           `json:"page_num"`
-	PageSize  int           `json:"page_size"`
+type AdminSwitchRegisterReq struct {
+	Status status.RegisterStatus `json:"status"`
+}
+
+type AdminSetGlobalFlightsheetReq struct {
+	Name      string `json:"name" binding:"required"`
+	CoinType  string `json:"coin_type" binding:"required"`
+	WalletID  string `json:"wallet_id" binding:"required"`
+	MinerPool string `json:"miner_pool" binding:"required"`
+	MineSoft  string `json:"mine_soft" binding:"required"`
+}
+
+type AdminSetInviteRewardReq struct {
+	Reward int `json:"reward" binding:"required"`
+}
+
+type AdminSetRechargeRewardReq struct {
+	Reward int `json:"reward" binding:"required"`
+}
+
+type AdminSetUserStatusReq struct {
+	Status status.UserStatus `json:"status" binding:"required"`
+}
+
+type AdminSetMinerPoolCostReq struct {
+	Cost float64 `json:"cost" binding:"required"`
 }

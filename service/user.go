@@ -255,7 +255,7 @@ func (s *UserService) addInvitePoints(ctx *gin.Context, inviterID int) error {
 }
 
 // 获取用户信息
-// func (s *UserService) GetUserInfo(ctx *gin.Context, req *dto.GetUserInfoReq) (*model.User, error) {
+// func (s *UserService) GetUserInfo(ctx *gin.Context) (*model.User, error) {
 // 	if user, err := s.userCache.GetUserInfoByID(ctx, req.UserID); err == nil {
 // 		return user, nil
 // 	}

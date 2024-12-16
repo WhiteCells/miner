@@ -186,7 +186,7 @@
         "msg": "",     // 信息
     }
     ```
-#### PUT   /miner/apply-fs               应用 Flightsheet
+#### PUT   /miner/apply_fs               应用 Flightsheet
 - request
     ```json
     {
@@ -442,7 +442,7 @@
         "msg": "",    // 信息
     }
     ```
-#### GET    /wallet/:fs_id                获取指定 Wallet 
+#### GET    /wallet/:wallet_id                获取指定 Wallet 
 - params
     ```
     ```
@@ -456,3 +456,11 @@
     ```
 
 ### Admin
+
+#### GET    /admin/user                   获取所有用户
+
+#### GET    /admin/oper_logs              获取所有用户操作日志 
+
+#### POST   /admin/invite_reward          设置邀请积分 
+
+#### POST    /admin/recharge               设置充值返现积分

@@ -15,3 +15,11 @@ const (
 	UserOn  UserStatus = 1
 	UserOff UserStatus = 0
 )
+
+// 注册状态
+type RegisterStatus int
+
+const (
+	RegisterOn  RegisterStatus = 1
+	RegisterOff RegisterStatus = 1
+)

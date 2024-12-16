@@ -15,9 +15,6 @@ type UpdateWalletReq struct {
 	UpdateInfo map[string]interface{} `json:"update_info" binding:"required"`
 }
 
-// type GetUserAllWalletReq struct {
-// }
-
 type GetUserWalletByIDReq struct {
 	WalletID int `json:"wallet_id" binding:"required"`
 }

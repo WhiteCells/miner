@@ -35,7 +35,7 @@ func (dao *OperLogDAO) GetOperLogs(query map[string]interface{}) (*[]model.OperL
 
 	// 获取总数
 	if err := db.Count(&total).Error; err != nil {
-		return nil, 0, err
+		return nil, -1, err
 	}
 
 	pageNum := query["page_num"].(int)
