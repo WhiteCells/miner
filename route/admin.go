@@ -20,8 +20,8 @@ func NewAdminRoute() *AdminRoute {
 
 func (ar *AdminRoute) InitAdminRoute(r *gin.Engine) {
 	route := r.Group("/admin")
-	route.Use(middleware.IPVerify())
 	route.Use(middleware.JWTAuth())
+	route.Use(middleware.IPVerify())
 	route.Use(middleware.RoleAuth(role.Admin))
 	{
 		// route.GET("/all_users", ar.adminController.GetAllUser)

@@ -6,6 +6,8 @@ import (
 
 	"miner/common/role"
 	"miner/common/rsp"
+	"miner/common/status"
+	"miner/model"
 	"miner/utils"
 
 	"github.com/gin-gonic/gin"
@@ -45,6 +47,8 @@ func JWTAuth() gin.HandlerFunc {
 		ctx.Set("user_id", claims.UserID)
 		ctx.Set("user_name", claims.Username)
 		ctx.Set("user_role", claims.Role)
+
+		ctx.Next()
 	}
 }
 
@@ -63,6 +67,7 @@ func RoleAuth(roles ...role.RoleType) gin.HandlerFunc {
 
 		for _, role := range roles {
 			if role == ctxRole {
+				ctx.Next()
 				return
 			}
 		}
@@ -78,7 +83,7 @@ func RoleAuth(roles ...role.RoleType) gin.HandlerFunc {
 // 状态验证
 func StatusAuth() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		_, exists := ctx.Value("user_id").(int)
+		userID, exists := ctx.Value("user_id").(int)
 		if !exists {
 			rsp.Error(ctx, http.StatusForbidden, "user_id not in context", nil)
 			ctx.Abort()
@@ -87,5 +92,19 @@ func StatusAuth() gin.HandlerFunc {
 		// 通过 userID 查找用户状态
 		// 先从缓存中查找，缓存未命中再从数据库中查找
 
+		var user model.User
+		if err := utils.DB.Where("id = ?", userID).Find(&user).Error; err != nil {
+			rsp.Error(ctx, http.StatusInternalServerError, "user not found", nil)
+			ctx.Abort()
+			return
+		}
+
+		if user.Status != status.UserOn {
+			rsp.Error(ctx, http.StatusBadRequest, "user status off", nil)
+			ctx.Abort()
+			return
+		}
+
+		ctx.Next()
 	}
 }

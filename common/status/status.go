@@ -21,5 +21,5 @@ type RegisterStatus int
 
 const (
 	RegisterOn  RegisterStatus = 1
-	RegisterOff RegisterStatus = 1
+	RegisterOff RegisterStatus = 0
 )

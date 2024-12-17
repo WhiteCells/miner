@@ -77,5 +77,5 @@ func (s *AdminService) SetUserStatus(ctx context.Context, req *dto.AdminSetUserS
 
 // SetMinerPoolCost 设置矿池消耗
 func (s *AdminService) SetMinerPoolCost(ctx context.Context, req *dto.AdminSetMinerPoolCostReq) error {
-	return s.adminDAO.SetMinerPoolCost(req.Cost)
+	return s.adminDAO.SetMinerPoolCost(req.MinePoolID, req.Cost)
 }

@@ -16,21 +16,22 @@ type UserRoute struct {
 
 func NewUserRoute() *UserRoute {
 	return &UserRoute{
-		userController:         controller.NewUserContorller(),
+		userController:         controller.NewUserController(),
 		operLogController:      controller.NewOperLogController(),
-		pointsRecordController: controller.NewPointRecordController(),
+		pointsRecordController: controller.NewPointsRecordController(),
 	}
 }
 
 func (ur *UserRoute) InitUserRoute(r *gin.Engine) {
 	route := r.Group("/user")
 	{
-		route.POST("/register", ur.userController.Register)
+		route.POST("/register", middleware.CheckSwitchRegister(), ur.userController.Register)
 		route.POST("/login", ur.userController.Login, middleware.LoginLog())
 	}
-	route.Use(middleware.IPVerify())
 	route.Use(middleware.JWTAuth())
+	route.Use(middleware.IPVerify()) // IP 验证要在 token 解析之后
 	route.Use(middleware.RoleAuth(role.User))
+	route.Use(middleware.StatusAuth())
 	{
 		route.POST("/logout", ur.userController.Logout)
 		route.GET("/balance", ur.userController.GetPointsBalance)

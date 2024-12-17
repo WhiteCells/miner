@@ -12,7 +12,7 @@ type PointsRecordController struct {
 	pointsRecordService *service.PointsRecordService
 }
 
-func NewPointRecordController() *PointsRecordController {
+func NewPointsRecordController() *PointsRecordController {
 	return &PointsRecordController{
 		pointsRecordService: service.NewPointRecordService(),
 	}

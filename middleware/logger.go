@@ -87,6 +87,8 @@ func OperLog() gin.HandlerFunc {
 				utils.Logger.Error("Failed to save operation log, " + err.Error())
 			}
 		}()
+
+		ctx.Next()
 	}
 }
 
@@ -112,5 +114,7 @@ func LoginLog() gin.HandlerFunc {
 				utils.Logger.Error("Failed to save login log, " + err.Error())
 			}
 		}()
+
+		ctx.Next()
 	}
 }

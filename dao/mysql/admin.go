@@ -181,6 +181,6 @@ func (dao *AdminDAO) SetUserStatus(status status.UserStatus) error {
 }
 
 // SetMinerPoolCost 设置矿池消耗
-func (dao *AdminDAO) SetMinerPoolCost(cost float64) error {
+func (dao *AdminDAO) SetMinerPoolCost(minePoolID int, cost float64) error {
 	return nil
 }

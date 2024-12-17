@@ -27,5 +27,6 @@ type AdminSetUserStatusReq struct {
 }
 
 type AdminSetMinerPoolCostReq struct {
-	Cost float64 `json:"cost" binding:"required"`
+	MinePoolID int     `json:"miner_pool_id" binding:"required"`
+	Cost       float64 `json:"cost" binding:"required"`
 }
