@@ -17,7 +17,7 @@ func NewFarmDAO() *FarmDAO {
 // CreateFarm 创建矿场
 func (dao *FarmDAO) CreateFarm(farm *model.Farm, userID int) error {
 	// 创建矿场时就需要将用户与矿场关联
-	err := utils.DB.Transaction(func(tx *gorm.DB) error {
+	return utils.DB.Transaction(func(tx *gorm.DB) error {
 		// 创建矿场
 		if err := tx.Create(farm).Error; err != nil {
 			return err
@@ -33,12 +33,11 @@ func (dao *FarmDAO) CreateFarm(farm *model.Farm, userID int) error {
 		}
 		return nil
 	})
-	return err
 }
 
 // DeleteFarmByID 删除矿场
 func (dao *FarmDAO) DeleteFarmByID(farmID int, userID int) error {
-	err := utils.DB.Transaction(func(tx *gorm.DB) error {
+	return utils.DB.Transaction(func(tx *gorm.DB) error {
 		// 删除 用户-矿场 关联
 		if err := tx.Delete(&model.UserFarm{}, "user_id = ? AND farm_id = ?", userID, farmID).Error; err != nil {
 			return err
@@ -54,7 +53,6 @@ func (dao *FarmDAO) DeleteFarmByID(farmID int, userID int) error {
 		}
 		return nil
 	})
-	return err
 }
 
 // UpdateFarm 更新矿场信息
@@ -62,14 +60,28 @@ func (dao *FarmDAO) UpdateFarm(farm *model.Farm) error {
 	return utils.DB.Save(farm).Error
 }
 
-// GetUserAllFarm 获取用户的所有矿场
-func (dao *FarmDAO) GetUserAllFarm(userID int) (*[]model.Farm, error) {
+// GetFarm 获取用户的矿场
+func (dao *FarmDAO) GetFarm(userID int, query map[string]interface{}) (*[]model.Farm, int64, error) {
 	var farms []model.Farm
+	var total int64
+
+	// 查询总数
+	if err := utils.DB.Model(model.UserFarm{}).Where("user_id = ?", userID).Count(&total).Error; err != nil {
+		return nil, -1, err
+	}
+
+	pageNum := query["page_num"].(int)
+	pageSize := query["page_size"].(int)
+
+	// 分页查询
 	err := utils.DB.
 		Joins("JOIN user_farm ON farm.id = user_farm.farm_id").
 		Where("user_farm.user_id = ?", userID).
+		Offset((pageNum - 1) * pageSize).
+		Limit(pageSize).
 		Find(&farms).Error
-	return &farms, err
+
+	return &farms, total, err
 }
 
 // GetFarmByID 获取指定矿场

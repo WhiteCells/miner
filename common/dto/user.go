@@ -30,6 +30,3 @@ type AddPointsReq struct {
 	Point  int               `json:"point" binding:"required"`
 	Time   time.Time         `json:"time" binding:"required"`
 }
-
-type GetUserInfoReq struct {
-}

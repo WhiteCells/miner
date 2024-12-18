@@ -136,18 +136,24 @@ func (c *AdminController) GetUserFarms(ctx *gin.Context) {
 		rsp.Error(ctx, http.StatusBadRequest, "invalid page_size", nil)
 		return
 	}
+	userID, err := strconv.Atoi(ctx.Query("user_id"))
+	if err != nil || userID <= 0 {
+		rsp.Error(ctx, http.StatusBadRequest, "invalid user_id", nil)
+		return
+	}
 	query := map[string]interface{}{
+		"user_id":   userID,
 		"page_num":  pageNum,
 		"page_size": pageSize,
 	}
 
-	users, total, err := c.adminService.GetUserFarms(ctx, query)
+	farms, total, err := c.adminService.GetUserFarms(ctx, query)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, "admin get user farms failed", nil)
 		return
 	}
 
-	rsp.QuerySuccess(ctx, http.StatusOK, "admin get user farms success", users, total)
+	rsp.QuerySuccess(ctx, http.StatusOK, "admin get user farms success", farms, total)
 }
 
 // GetUserMiners 获取用户的所有矿机
@@ -162,18 +168,30 @@ func (c *AdminController) GetUserMiners(ctx *gin.Context) {
 		rsp.Error(ctx, http.StatusBadRequest, "invalid page_size", nil)
 		return
 	}
+	userID, err := strconv.Atoi(ctx.Query("user_id"))
+	if err != nil || userID <= 0 {
+		rsp.Error(ctx, http.StatusBadRequest, "invalid user_id", nil)
+		return
+	}
+	farmID, err := strconv.Atoi(ctx.Query("farm_id"))
+	if err != nil || farmID <= 0 {
+		rsp.Error(ctx, http.StatusBadRequest, "invalid farm_id", nil)
+		return
+	}
 	query := map[string]interface{}{
+		"user_id":   userID,
+		"farm_id":   farmID,
 		"page_num":  pageNum,
 		"page_size": pageSize,
 	}
 
-	users, total, err := c.adminService.GetUserFarms(ctx, query)
+	miners, total, err := c.adminService.GetUserMiners(ctx, query)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, "admin get user miners failed", nil)
 		return
 	}
 
-	rsp.QuerySuccess(ctx, http.StatusOK, "admin get user miners success", users, total)
+	rsp.QuerySuccess(ctx, http.StatusOK, "admin get user miners success", miners, total)
 }
 
 // SwitchRegister 用户注册开关
@@ -264,7 +282,7 @@ func (c *AdminController) SetMinerPoolCost(ctx *gin.Context) {
 		return
 	}
 
-	if err := c.adminService.SetMinerPoolCost(ctx, &req); err != nil {
+	if err := c.adminService.SetMinePoolCost(ctx, &req); err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, "admin set miner poolCost faild", nil)
 		return
 	}

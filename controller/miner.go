@@ -66,20 +66,37 @@ func (c *MinerController) UpdateMiner(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "update miner success", nil)
 }
 
-// GetUserAllMinerInFarm 获取用户在矿场中的矿机
-func (c *MinerController) GetUserAllMinerInFarm(ctx *gin.Context) {
-	farmID, err := strconv.Atoi(ctx.Query("farm_id"))
-	if err != nil {
-		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
+// GetMiner 获取用户矿机
+func (c *MinerController) GetMiner(ctx *gin.Context) {
+	pageNum, err := strconv.Atoi(ctx.Query("page_num"))
+	if err != nil || pageNum <= 0 {
+		rsp.Error(ctx, http.StatusBadRequest, "invalid page_numt", nil)
 		return
 	}
-	miners, err := c.minerService.GetUserAllMinerInFarm(ctx, farmID)
+	pageSize, err := strconv.Atoi(ctx.Query("page_size"))
+	if err != nil || pageSize <= 0 {
+		rsp.Error(ctx, http.StatusBadRequest, "invalid page_size", nil)
+		return
+	}
+	farmID, err := strconv.Atoi(ctx.Query("farm_id"))
+	if err != nil || pageSize <= 0 {
+		rsp.Error(ctx, http.StatusBadRequest, "invalid farm_id", nil)
+		return
+	}
+
+	query := map[string]interface{}{
+		"page_num":  pageNum,
+		"page_size": pageSize,
+		"farm_id":   farmID,
+	}
+
+	miners, total, err := c.minerService.GetMiner(ctx, query)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
 
-	rsp.Success(ctx, http.StatusOK, "get user all miner success", miners)
+	rsp.QuerySuccess(ctx, http.StatusOK, "get user all miner success", miners, total)
 }
 
 // ApplyFlightsheet 矿机应用飞行表

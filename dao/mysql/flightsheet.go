@@ -64,12 +64,25 @@ func (dao *FlightsheetDAO) UpdateFlightsheet(fs *model.Flightsheet) error {
 }
 
 // GetUserAllFlightsheet 获取用户的所有飞行表
-func (dao *FlightsheetDAO) GetUserAllFlightsheet(userID int) (*[]model.Flightsheet, error) {
+func (dao *FlightsheetDAO) GetFlightsheet(userID int, query map[string]interface{}) (*[]model.Flightsheet, int64, error) {
 	var flightsheets []model.Flightsheet
-	err := utils.DB.Joins("JOIN user_flightsheet ON user.id = user_flightsheet").
+	var total int64
+
+	// 获取总数
+	if err := utils.DB.Model(model.UserFlightsheet{}).Where("user_id = ?", userID).Count(&total).Error; err != nil {
+		return nil, -1, err
+	}
+
+	pageNum := query["page_num"].(int)
+	pageSize := query["page_size"].(int)
+
+	err := utils.DB.
+		Joins("JOIN user_flightsheet ON user.id = user_flightsheet.user_id").
 		Where("user_flightsheet.user_id = ?", userID).
+		Offset((pageNum - 1) * pageSize).
+		Limit(pageSize).
 		Find(&flightsheets).Error
-	return &flightsheets, err
+	return &flightsheets, total, err
 }
 
 // GetFlightsheetByID 获取飞行表信息

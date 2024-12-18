@@ -28,6 +28,6 @@ func (wr *WalletRoute) InitWalletRoute(r *gin.Engine) {
 		route.POST("", wr.walletController.CreateWallet)
 		route.DELETE("", wr.walletController.DeleteWallet)
 		route.PUT("", wr.walletController.UpdateWallet)
-		route.GET("", wr.walletController.GetUserAllWallet)
+		route.GET("", wr.walletController.GetWallet)
 	}
 }

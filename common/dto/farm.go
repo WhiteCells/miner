@@ -14,10 +14,6 @@ type UpdateFarmReq struct {
 	UpdateInfo map[string]interface{} `json:"update_info" binding:"required"`
 }
 
-type GetUserAllMinerInFarmReq struct {
-	FarmID int `json:"farm_id" binding:"required"`
-}
-
 type ApplyFarmFlightsheetReq struct {
 	FarmID        int `json:"farm_id" binding:"required"`
 	FlightsheetID int `json:"fs_id" binding:"required"`

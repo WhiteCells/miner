@@ -18,27 +18,21 @@ func JWTAuth() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		authHeader := ctx.GetHeader("Authorization")
 		if authHeader == "" {
-			ctx.JSON(http.StatusUnauthorized, gin.H{
-				"error": "Authorization header is required",
-			})
+			rsp.Error(ctx, http.StatusUnauthorized, "authorization header is required", nil)
 			ctx.Abort()
 			return
 		}
 
 		parts := strings.SplitN(authHeader, " ", 2)
 		if !(len(parts) == 2 && parts[0] == "Bearer") {
-			ctx.JSON(http.StatusUnauthorized, gin.H{
-				"error": "Authorization header format error",
-			})
+			rsp.Error(ctx, http.StatusUnauthorized, "authorization header format error", nil)
 			ctx.Abort()
 			return
 		}
 
 		claims, err := utils.ParseToken(parts[1])
 		if err != nil {
-			ctx.JSON(http.StatusUnauthorized, gin.H{
-				"error": err.Error(),
-			})
+			rsp.Error(ctx, http.StatusUnauthorized, err.Error(), nil)
 			ctx.Abort()
 			return
 		}
@@ -57,10 +51,7 @@ func RoleAuth(roles ...role.RoleType) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		ctxRole, exists := ctx.Get("user_role")
 		if !exists || ctxRole == "" {
-			ctx.JSON(http.StatusForbidden, gin.H{
-				"code": 403,
-				"msg":  "Role information not found",
-			})
+			rsp.Error(ctx, http.StatusForbidden, "role information not found", nil)
 			ctx.Abort()
 			return
 		}
@@ -72,10 +63,7 @@ func RoleAuth(roles ...role.RoleType) gin.HandlerFunc {
 			}
 		}
 
-		ctx.JSON(http.StatusForbidden, gin.H{
-			"code": 403,
-			"msg":  "Permission denied",
-		})
+		rsp.Error(ctx, http.StatusForbidden, "permission denied", nil)
 		ctx.Abort()
 	}
 }

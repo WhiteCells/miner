@@ -16,10 +16,7 @@ func IPVerify() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		userID, exists := ctx.Value("user_id").(int)
 		if !exists {
-			ctx.JSON(http.StatusUnauthorized, gin.H{
-				"code": 401,
-				"msg":  "Unauthorized",
-			})
+			rsp.Error(ctx, http.StatusUnauthorized, "unauthorized", nil)
 			ctx.Abort()
 			return
 		}

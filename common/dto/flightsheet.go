@@ -17,13 +17,6 @@ type UpdateFlightsheetReq struct {
 	UpdateInfo    map[string]interface{} `json:"update_info" binding:"required"`
 }
 
-type GetUserAllFlightsheetReq struct {
-}
-
-type GetFlightByIDReq struct {
-	FlightsheetID int `json:"fs_id" binding:"required"`
-}
-
 type ApplyFlightsheetWalletReq struct {
 	FlightsheetID int `json:"fs_id" binding:"required"`
 	WaleltID      int `json:"walelt_id" binding:"required"`

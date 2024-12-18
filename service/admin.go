@@ -43,6 +43,11 @@ func (s *AdminService) GetUserFarms(ctx context.Context, query map[string]interf
 	return s.adminDAO.GetUserFarms(query)
 }
 
+// GetUserMiners 获取用户的矿机
+func (s *AdminService) GetUserMiners(ctx context.Context, query map[string]interface{}) (*[]model.Miner, int64, error) {
+	return s.adminDAO.GetUserMiners(query)
+}
+
 // SwitchRegister 用户注册开关
 func (s *AdminService) SwitchRegister(ctx context.Context, req *dto.AdminSwitchRegisterReq) error {
 	return s.adminDAO.SwitchRegister(req.Status)
@@ -72,10 +77,10 @@ func (s *AdminService) SetRechargeReward(ctx context.Context, req *dto.AdminSetR
 
 // SetUserStatus 设置用户状态
 func (s *AdminService) SetUserStatus(ctx context.Context, req *dto.AdminSetUserStatusReq) error {
-	return s.adminDAO.SetUserStatus(req.Status)
+	return s.adminDAO.SetUserStatus(req.UserID, req.Status)
 }
 
 // SetMinerPoolCost 设置矿池消耗
-func (s *AdminService) SetMinerPoolCost(ctx context.Context, req *dto.AdminSetMinerPoolCostReq) error {
-	return s.adminDAO.SetMinerPoolCost(req.MinePoolID, req.Cost)
+func (s *AdminService) SetMinePoolCost(ctx context.Context, req *dto.AdminSetMinerPoolCostReq) error {
+	return s.adminDAO.SetMinePoolCost(req.MinePoolID, req.Cost)
 }

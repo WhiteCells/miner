@@ -63,11 +63,6 @@ func (dao *MinerDAO) GetFarmMiners(farmID int) (*[]model.Miner, error) {
 	return &miners, err
 }
 
-// UpdateMiner 更新矿机信息
-func (dao *MinerDAO) UpdateMiner(miner *model.Miner) error {
-	return utils.DB.Save(miner).Error
-}
-
 // DeleteMiner 删除矿机
 func (dao *MinerDAO) DeleteMiner(minerID int, farmID int, userID int) error {
 	err := utils.DB.Transaction(func(tx *gorm.DB) error {
@@ -98,12 +93,51 @@ func (dao *MinerDAO) DeleteMiner(minerID int, farmID int, userID int) error {
 	return err
 }
 
+// UpdateMiner 更新矿机信息
+func (dao *MinerDAO) UpdateMiner(miner *model.Miner) error {
+	return utils.DB.Save(miner).Error
+}
+
 // UpdateMinerStatus 更新矿机状态
 func (dao *MinerDAO) UpdateMinerStatus(minerID int, status int) error {
 	return utils.DB.
 		Model(&model.Miner{}).
 		Where("id = ?", minerID).
 		Update("status", status).Error
+}
+
+// GetMiner 获取矿机
+func (dao *MinerDAO) GetMiner(userID int, query map[string]interface{}) (*[]model.Miner, int64, error) {
+	var miners []model.Miner
+	var total int64
+
+	pageNum := query["page_num"].(int)
+	pageSize := query["page_size"].(int)
+	farmID := query["farm_id"].(int)
+
+	// 查询总数
+	if err := utils.DB.
+		Model(&model.Miner{}).
+		Joins("JOIN farm_miner ON farm_miner.miner_id = miner.id").
+		Joins("JOIN user_miner ON user_miner.miner_id = miner.id").
+		Joins("JOIN user_farm ON user_farm.farm_id = farm_miner.farm_id").
+		Where("user_farm.user_id = ? AND user_farm.farm_id = ? AND user_miner.user_id = ?", userID, farmID, userID).
+		Count(&total).Error; err != nil {
+		return nil, -1, err
+	}
+
+	// 分页查询
+	err := utils.DB.
+		Model(&model.Miner{}).
+		Joins("JOIN farm_miner ON farm_miner.miner_id = miner.id").
+		Joins("JOIN user_miner ON user_miner.miner_id = miner.id").
+		Joins("JOIN user_farm ON user_farm.farm_id = farm_miner.farm_id").
+		Where("user_farm.user_id = ? AND user_farm.farm_id = ? AND user_miner.user_id = ?", userID, farmID, userID).
+		Limit(pageSize).
+		Offset((pageNum - 1) * pageSize).
+		Find(&miners).Error
+
+	return &miners, total, err
 }
 
 // Transfer 转移矿机所有权

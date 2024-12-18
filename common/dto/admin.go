@@ -23,6 +23,7 @@ type AdminSetRechargeRewardReq struct {
 }
 
 type AdminSetUserStatusReq struct {
+	UserID int               `json:"user_id" binding:"required"`
 	Status status.UserStatus `json:"status" binding:"required"`
 }
 

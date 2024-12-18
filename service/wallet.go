@@ -80,17 +80,17 @@ func (s *WalletService) UpdateWallet(ctx context.Context, req *dto.UpdateWalletR
 	return nil
 }
 
-func (s *WalletService) GetUserAllWallet(ctx context.Context) (*[]model.Wallet, error) {
+func (s *WalletService) GetWallet(ctx context.Context, query map[string]interface{}) (*[]model.Wallet, int64, error) {
 	userID, exists := ctx.Value("user_id").(int)
 	if !exists {
-		return nil, errors.New("invalid user_id in context")
+		return nil, -1, errors.New("invalid user_id in context")
 	}
 	var wallets *[]model.Wallet
-	wallets, err := s.walletDAO.GetUserAllWallet(userID)
+	wallets, total, err := s.walletDAO.GetWallet(userID, query)
 	if err != nil {
-		return nil, errors.New("get user all wallet failed")
+		return nil, -1, errors.New("get user all wallet failed")
 	}
-	return wallets, nil
+	return wallets, total, nil
 }
 
 func (s *WalletService) GetUserWalletByID(ctx context.Context, req *dto.GetUserWalletByIDReq) (*model.Wallet, error) {

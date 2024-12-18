@@ -91,17 +91,17 @@ func (s *FlightsheetService) UpdateFlightsheet(ctx context.Context, req *dto.Upd
 	return nil
 }
 
-// GetUserAllFlightsheet 获取用户的所有飞行表
-func (s *FlightsheetService) GetUserAllFlightsheet(ctx context.Context) (*[]model.Flightsheet, error) {
+// GetFlightsheet 获取用户的所有飞行表
+func (s *FlightsheetService) GetFlightsheet(ctx context.Context, query map[string]interface{}) (*[]model.Flightsheet, int64, error) {
 	userID, exists := ctx.Value("user_id").(int)
 	if !exists {
-		return nil, errors.New("invalid user_id in context")
+		return nil, -1, errors.New("invalid user_id in context")
 	}
-	user, err := s.userFlightsheetDAO.GetUserAllFlightsheet(userID)
+	user, total, err := s.flightsheetDAO.GetFlightsheet(userID, query)
 	if err != nil {
-		return nil, errors.New("get user all flightsheet failed")
+		return nil, -1, errors.New("get flightsheet failed")
 	}
-	return user, err
+	return user, total, err
 }
 
 // ApplyWallet 飞行表应用钱包

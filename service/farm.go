@@ -107,17 +107,17 @@ func (s *FarmService) UpdateFarm(ctx context.Context, req *dto.UpdateFarmReq) er
 	return nil
 }
 
-// GetAllFarmInfo 获取所有矿场信息
-func (s *FarmService) GetUserAllFarmInfo(ctx context.Context) (*[]model.Farm, error) {
+// GetFarm 获取所有矿场信息
+func (s *FarmService) GetFarm(ctx context.Context, query map[string]interface{}) (*[]model.Farm, int64, error) {
 	userID, exists := ctx.Value("user_id").(int)
 	if !exists {
-		return nil, errors.New("invalid user_id in context")
+		return nil, -1, errors.New("invalid user_id in context")
 	}
-	farms, err := s.farmDAO.GetUserAllFarm(userID)
+	farms, total, err := s.farmDAO.GetFarm(userID, query)
 	if err != nil {
-		return nil, errors.New("get user all farm failed")
+		return nil, -1, errors.New("get farm failed")
 	}
-	return farms, err
+	return farms, total, err
 }
 
 // GetFarmInfo 获取矿场信息

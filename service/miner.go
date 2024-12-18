@@ -31,7 +31,7 @@ func NewMinerService() *MinerService {
 	}
 }
 
-// 创建矿机
+// CreateMiner 创建矿机
 func (s *MinerService) CreateMiner(ctx context.Context, req *dto.CreateMinerReq) (*model.Miner, error) {
 	userID, exists := ctx.Value("user_id").(int)
 	if !exists {
@@ -62,7 +62,7 @@ func (s *MinerService) CreateMiner(ctx context.Context, req *dto.CreateMinerReq)
 	return miner, nil
 }
 
-// 删除矿机
+// DeleteMiner 删除矿机
 func (s *MinerService) DeleteMiner(ctx context.Context, req *dto.DeleteMinerReq) error {
 	userID, exists := ctx.Value("user_id").(int)
 	if !exists {
@@ -80,7 +80,7 @@ func (s *MinerService) DeleteMiner(ctx context.Context, req *dto.DeleteMinerReq)
 	return nil
 }
 
-// 获取矿机信息
+// GetMinerByID 获取矿机信息
 func (s *MinerService) GetMinerByID(ctx context.Context, minerID int) (*model.Miner, error) {
 	// 先从缓存获取
 	miner, err := s.minerCache.GetMinerInfoByID(ctx, minerID)
@@ -102,7 +102,7 @@ func (s *MinerService) GetMinerByID(ctx context.Context, minerID int) (*model.Mi
 	return miner, nil
 }
 
-// 更新矿机信息
+// UpdateMiner 更新矿机信息
 func (s *MinerService) UpdateMiner(ctx context.Context, req *dto.UpdateMinerReq) error {
 	userID, exists := ctx.Value("user_id").(int)
 	if !exists {
@@ -146,22 +146,22 @@ func (s *MinerService) UpdateMiner(ctx context.Context, req *dto.UpdateMinerReq)
 	return err
 }
 
-// 获取用户在矿场的所有矿机
-func (s *MinerService) GetUserAllMinerInFarm(ctx context.Context, farmID int) (*[]model.Miner, error) {
+// GetMiner 获取用户在矿场的所有矿机
+func (s *MinerService) GetMiner(ctx context.Context, query map[string]interface{}) (*[]model.Miner, int64, error) {
 	userID, exists := ctx.Value("user_id").(int)
 	if !exists {
-		return nil, errors.New("invalid user_id in context")
+		return nil, -1, errors.New("invalid user_id in context")
 	}
 	// 缓存
-	miners, err := s.userMinerDAO.GetUserAllMinerInFarm(userID, farmID)
+	miners, total, err := s.minerDAO.GetMiner(userID, query)
 	if err != nil {
-		return nil, errors.New("get user all miner in farm failed")
+		return nil, -1, errors.New("get user all miner in farm failed")
 	}
 
-	return miners, err
+	return miners, total, err
 }
 
-// 转移矿机
+// Transfer 转移矿机
 func (s *MinerService) Transfer(ctx context.Context, req *dto.TransferMinerReq) error {
 	userID, exists := ctx.Value("user_id").(int)
 	if !exists {

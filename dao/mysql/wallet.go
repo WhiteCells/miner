@@ -56,12 +56,27 @@ func (dao *WalletDAO) UpdateWallet(wallet *model.Wallet) error {
 	return utils.DB.Save(wallet).Error
 }
 
-func (dao *WalletDAO) GetUserAllWallet(userID int) (*[]model.Wallet, error) {
+func (dao *WalletDAO) GetWallet(userID int, query map[string]interface{}) (*[]model.Wallet, int64, error) {
 	var wallets []model.Wallet
-	err := utils.DB.Joins("JOIN user_wallet ON wallet.id = user_wallet.wallet_id").
+	var total int64
+
+	// 查询总数
+	if err := utils.DB.Model(model.UserWallet{}).Where("user_id = ?", userID).Count(&total).Error; err != nil {
+		return nil, -1, err
+	}
+
+	pageNum := query["page_num"].(int)
+	pageSize := query["page_size"].(int)
+
+	// 分页查询
+	err := utils.DB.
+		Joins("JOIN user_wallet ON wallet.id = user_wallet.wallet_id").
 		Where("user_wallet.user_id = ?", userID).
+		Offset((pageNum - 1) * pageSize).
+		Limit(pageSize).
 		Find(&wallets).Error
-	return &wallets, err
+
+	return &wallets, total, err
 }
 
 func (dao *WalletDAO) GetWalletByID(walletID int) (*model.Wallet, error) {

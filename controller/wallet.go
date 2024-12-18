@@ -5,6 +5,7 @@ import (
 	"miner/common/rsp"
 	"miner/service"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -69,14 +70,28 @@ func (c *WalletController) UpdateWallet(ctx *gin.Context) {
 }
 
 // GetUserAllWallet 获取用户所有钱包
-func (c *WalletController) GetUserAllWallet(ctx *gin.Context) {
-	wallets, err := c.walletService.GetUserAllWallet(ctx)
+func (c *WalletController) GetWallet(ctx *gin.Context) {
+	pageNum, err := strconv.Atoi(ctx.Query("page_num"))
+	if err != nil || pageNum <= 0 {
+		rsp.Error(ctx, http.StatusBadRequest, "invalid page_numt", nil)
+		return
+	}
+	pageSize, err := strconv.Atoi(ctx.Query("page_size"))
+	if err != nil || pageSize <= 0 {
+		rsp.Error(ctx, http.StatusBadRequest, "invalid page_size", nil)
+		return
+	}
+	query := map[string]interface{}{
+		"page_num":  pageNum,
+		"page_size": pageSize,
+	}
+	wallets, total, err := c.walletService.GetWallet(ctx, query)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
 
-	rsp.Success(ctx, http.StatusOK, "get user all wallet success", wallets)
+	rsp.QuerySuccess(ctx, http.StatusOK, "get user all wallet success", wallets, total)
 }
 
 // GetUserWalletByID 通过钱包 ID 获取指定钱包
