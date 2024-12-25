@@ -3,6 +3,7 @@ module miner
 go 1.23.3
 
 require (
+	github.com/bwmarrin/snowflake v0.3.0
 	github.com/gin-contrib/sessions v1.0.1
 	github.com/gin-gonic/gin v1.10.0
 	github.com/golang-jwt/jwt/v4 v4.5.1

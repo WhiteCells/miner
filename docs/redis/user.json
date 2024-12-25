@@ -1,0 +1,17 @@
+{
+    "id": 1,
+    "name": "name",
+    "email": "email",
+    "password": "password",
+    "secret": "secret",
+    "role": "role",
+    "points": 1,
+    "status": 1,
+    "last_login_at": "2024-12-24_17:13:11",
+    "last_login_ip": "127.0.0.1",
+    "invite_code": "invite_code",
+    "invite_by": 2,
+    "farms": [101, 202],
+    "fss": [1, 2],
+    "wallet": [111, 222]
+}

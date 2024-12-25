@@ -8,6 +8,7 @@ import (
 	"miner/dao/mysql"
 	"miner/dao/redis"
 	"miner/model"
+	"miner/model/info"
 	"miner/utils"
 	"time"
 
@@ -17,7 +18,7 @@ import (
 
 type UserService struct {
 	userDAO         *mysql.UserDAO
-	userCache       *redis.UserCache
+	userRDB         *redis.UserRDB
 	operLog         *mysql.OperLogDAO
 	pointsRecordDAO *mysql.PointsRecordDAO
 }
@@ -25,7 +26,7 @@ type UserService struct {
 func NewUserSerivce() *UserService {
 	return &UserService{
 		userDAO:         mysql.NewUserDAO(),
-		userCache:       redis.NewUserCache(),
+		userRDB:         redis.NewUserCache(),
 		operLog:         mysql.NewOperLogDAO(),
 		pointsRecordDAO: mysql.NewPointRecordDAO(),
 	}
@@ -34,15 +35,15 @@ func NewUserSerivce() *UserService {
 // Register 用户注册
 func (s *UserService) Register(ctx *gin.Context, req *dto.RegisterReq) error {
 	// 用户名
-	_, err := s.userCache.GetUserInfoByName(ctx, req.Username)
+	_, err := s.userRDB.GetByName(ctx, req.Username)
 	if err == nil {
 		return errors.New("user " + req.Username + " exists")
 	}
 	// 邮箱
-	_, err = s.userCache.GetUserInfoByEmail(ctx, req.Email)
-	if err == nil {
-		return errors.New("user Email " + req.Email + " exists")
-	}
+	// _, err = s.userRDB.GetByEmail(ctx, req.Email)
+	// if err == nil {
+	// 	return errors.New("user Email " + req.Email + " exists")
+	// }
 
 	// 生成邀请码
 	inviteCode := utils.GenerateInviteCode()
@@ -53,7 +54,13 @@ func (s *UserService) Register(ctx *gin.Context, req *dto.RegisterReq) error {
 		return errors.New("failed to create secret")
 	}
 
-	user := &model.User{
+	uid, err := utils.GenUID()
+	if err != nil {
+		return errors.New("uid create failed")
+	}
+
+	user := &info.User{
+		ID:         uid,
 		Name:       req.Username,
 		Password:   req.Password,
 		Email:      req.Email,
@@ -69,7 +76,7 @@ func (s *UserService) Register(ctx *gin.Context, req *dto.RegisterReq) error {
 		if err != nil {
 			return errors.New("invalid invite code")
 		}
-		user.InvitedBy = inviter.ID
+		user.InviteBy = inviter.ID
 
 		// 给邀请人增加积分
 		// TODO 记录日志
@@ -80,13 +87,13 @@ func (s *UserService) Register(ctx *gin.Context, req *dto.RegisterReq) error {
 	}
 
 	// 创建用户
-	err = s.userDAO.CreateUser(user)
-	if err != nil {
-		return errors.New("user create failed")
-	}
+	// err = s.userDAO.CreateUser(user)
+	// if err != nil {
+	// 	return errors.New("user create failed")
+	// }
 
 	// 缓存
-	if err = s.userCache.SetUserInfo(ctx, user); err != nil {
+	if err = s.userRDB.Set(ctx, user); err != nil {
 		return errors.New("user cached failed")
 	}
 
@@ -94,15 +101,15 @@ func (s *UserService) Register(ctx *gin.Context, req *dto.RegisterReq) error {
 }
 
 // Login 用户登录
-func (s *UserService) Login(ctx *gin.Context, req *dto.LoginReq) (string, *model.User, error) {
+func (s *UserService) Login(ctx *gin.Context, req *dto.LoginReq) (string, *info.User, error) {
 	// 先读缓存
-	user, err := s.userCache.GetUserInfoByName(ctx, req.Username)
+	user, err := s.userRDB.GetByName(ctx, req.Username)
 	if err != nil {
-		dbUser, err := s.userDAO.GetUserByName(req.Username)
+		// dbUser, err := s.userDAO.GetUserByName(req.Username)
 		if err != nil {
 			return "", nil, errors.New("user not found")
 		}
-		user = dbUser
+		// user = dbUser
 	}
 
 	// 验证 Google 验证码
@@ -139,17 +146,21 @@ func (s *UserService) Login(ctx *gin.Context, req *dto.LoginReq) (string, *model
 	// 更新登录 IP 信息
 	user.LastLoginIP = ctx.ClientIP()
 	user.LastLoginAt = time.Now()
-	s.userDAO.UpdateUser(user)
+	// s.userDAO.UpdateUser(user)
 
 	ctx.Set("user_id", user.ID)
 
-	// 缓存 info token
-	if err := s.userCache.SetUserInfo(ctx, user); err != nil {
-		return "", nil, err
+	if err := s.userRDB.Set(ctx, user); err != nil {
+		return "", nil, errors.New("RDB failed")
 	}
-	if err := s.userCache.SetUserTokenByID(ctx, user.ID, token); err != nil {
-		return "", nil, err
-	}
+
+	// // 缓存 info token
+	// if err := s.userCache.SetUser(ctx, user); err != nil {
+	// 	return "", nil, err
+	// }
+	// if err := s.userCache.SetUserTokenByID(ctx, user.ID, token); err != nil {
+	// 	return "", nil, err
+	// }
 
 	return token, user, nil
 }
@@ -157,54 +168,48 @@ func (s *UserService) Login(ctx *gin.Context, req *dto.LoginReq) (string, *model
 // Logout 用户注销
 func (s *UserService) Logout(ctx *gin.Context) error {
 	// 删除缓存中的用户信息
-	if err := s.userCache.DeleteUserCache(ctx); err != nil {
-		return err
-	}
+	// if err := s.userRDB.Del(ctx); err != nil {
+	// 	return err
+	// }
 	return nil
 }
 
 // 更新用户信息
 func (s *UserService) UpdateUserInfo(ctx *gin.Context, req *dto.UpdateInfoReq) error {
-	userID, exists := ctx.Value("user_id").(int)
+	userID, exists := ctx.Value("user_id").(string)
 	if !exists {
 		return errors.New("invalid user_id in context")
 	}
-	user, err := s.userDAO.GetUserByID(userID)
+	user, err := s.userRDB.Get(ctx, userID)
 	if err != nil {
 		return err
 	}
 
 	// todo 更新用户信息
 
-	// 保存更新
-	if err := s.userDAO.UpdateUser(user); err != nil {
-		return err
-	}
-
-	// 清除缓存
-	return s.userCache.DeleteUserCache(ctx)
+	return s.userRDB.Set(ctx, user)
 }
 
 // 更新密码
-func (s *UserService) UpdatePassword(ctx *gin.Context, userID int, oldPassword, newPassword string) error {
-	user, err := s.userDAO.GetUserByID(userID)
-	if err != nil {
-		return err
-	}
+// func (s *UserService) UpdatePassword(ctx *gin.Context, userID int, oldPassword, newPassword string) error {
+// 	user, err := s.userDAO.GetUserByID(userID)
+// 	if err != nil {
+// 		return err
+// 	}
 
-	// 验证旧密码
-	if !s.validatePassword(user, oldPassword) {
-		return errors.New("invalid old password")
-	}
+// 	// 验证旧密码
+// 	if !s.validatePassword(user, oldPassword) {
+// 		return errors.New("invalid old password")
+// 	}
 
-	// 更新密码
-	if err := s.userDAO.UpdatePassword(userID, newPassword); err != nil {
-		return err
-	}
+// 	// 更新密码
+// 	if err := s.userDAO.UpdatePassword(userID, newPassword); err != nil {
+// 		return err
+// 	}
 
-	// 清除缓存
-	return s.userCache.DeleteUserCache(ctx)
-}
+// 	// 清除缓存
+// 	return s.userCache.DeleteUserCache(ctx)
+// }
 
 // GetPointsBalance 获取用户积分余额
 func (s *UserService) GetPointsBalance(ctx *gin.Context) (int, error) {
@@ -263,7 +268,7 @@ func (s *UserService) addInvitePoints(ctx *gin.Context, inviterID int) error {
 // }
 
 // 验证密码
-func (s *UserService) validatePassword(user *model.User, password string) bool {
+func (s *UserService) validatePassword(user *info.User, password string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	return err == nil
 }

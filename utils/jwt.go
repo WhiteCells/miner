@@ -9,7 +9,7 @@ import (
 )
 
 type Claims struct {
-	UserID   int           `json:"user_id"`
+	UserID   string        `json:"user_id"`
 	Username string        `json:"user_name"`
 	Role     role.RoleType `json:"user_role"`
 	jwt.RegisteredClaims
@@ -25,7 +25,7 @@ func InitJWT() {
 // token 无状态
 // todo 防止删除的用户生成的 token 被应用于新用户，需要在表中进行确认
 // todo 表中确认效率太低了，维护一个黑名单，存放过期 token
-func GenerateToken(userID int, username string, role role.RoleType, expireHours int) (string, error) {
+func GenerateToken(userID string, username string, role role.RoleType, expireHours int) (string, error) {
 	nowTime := time.Now()
 	expireTime := nowTime.Add(time.Duration(expireHours) * time.Hour)
 

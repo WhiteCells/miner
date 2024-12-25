@@ -2,41 +2,37 @@ package redis
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
-	"miner/model"
-	"miner/utils"
-	"time"
+	"miner/model/info"
 )
 
-type WalletCache struct{}
+type WalletRDB struct{}
 
-func NewWalletCache() *WalletCache {
-	return &WalletCache{}
+func NewWalletRDB() *WalletRDB {
+	return &WalletRDB{}
 }
 
-const (
-	walletInfoTimeout = 30 * time.Minute
-)
-
-func (c *WalletCache) SetWalletInfoByID(ctx context.Context, wallet model.Wallet) error {
-	key := fmt.Sprintf("wallet:%d:info", wallet.ID)
-	walletJSON, err := json.Marshal(wallet)
-	if err != nil {
-		return err
-	}
-	return utils.RDB.Set(ctx, key, walletJSON, walletInfoTimeout)
+// 添加钱包
+// 更新钱包
+// +---------+-----------+-------+
+// | field   |    key    |  val  |
+// ----------+-----------+-------+
+// | wallet  | <user_id> |  info |
+// +---------+-----------+-------+
+func (c *WalletRDB) Set(ctx context.Context, userID string, wallet info.Wallet) error {
+	return nil
 }
 
-func (c *WalletCache) GetWalletInfoByID(ctx context.Context, walletID int) (*model.Wallet, error) {
-	key := fmt.Sprintf("wallet:%d:info", walletID)
-	walletJSON, err := utils.RDB.Get(ctx, key)
-	if err != nil {
-		return nil, err
-	}
-	var wallet model.Wallet
-	if err = json.Unmarshal([]byte(walletJSON), &wallet); err != nil {
-		return nil, err
-	}
-	return &wallet, nil
+// 删除钱包
+func (c *WalletRDB) Del(ctx context.Context, userID string, walletID string) error {
+	return nil
+}
+
+// 通过 ID 获取钱包
+func (c *WalletRDB) GetByID(ctx context.Context, userID string, walletID string) (*info.Wallet, error) {
+	return nil, nil
+}
+
+// 获取用户的所有钱包
+func (c *WalletRDB) GetAll(ctx context.Context, userID string) (*[]info.Wallet, error) {
+	return nil, nil
 }

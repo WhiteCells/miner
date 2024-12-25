@@ -13,14 +13,14 @@ import (
 type FarmService struct {
 	farmDAO     *mysql.FarmDAO
 	userFarmDAO *mysql.UserFarmDAO
-	farmCache   *redis.FarmCache
+	farmRDB     *redis.FarmRDB
 }
 
 func NewFarmService() *FarmService {
 	return &FarmService{
 		farmDAO:     mysql.NewFarmDAO(),
 		userFarmDAO: mysql.NewUserFarmDAO(),
-		farmCache:   redis.NewFarmCache(),
+		farmRDB:     redis.NewFarmCache(),
 	}
 }
 
@@ -100,9 +100,9 @@ func (s *FarmService) UpdateFarm(ctx context.Context, req *dto.UpdateFarmReq) er
 	}
 
 	// 更新缓存
-	if err = s.farmCache.SetFarmInfo(ctx, farm); err != nil {
-		return err
-	}
+	// if err = s.farmCache.SetFarmInfo(ctx, farm); err != nil {
+	// 	return err
+	// }
 
 	return nil
 }
@@ -123,23 +123,24 @@ func (s *FarmService) GetFarm(ctx context.Context, query map[string]interface{})
 // GetFarmInfo 获取矿场信息
 func (s *FarmService) GetFarmByID(ctx context.Context, farmID int) (*model.Farm, error) {
 	// 缓存获取
-	farm, err := s.farmCache.GetFarmInfo(ctx, farmID)
-	if err == nil {
-		return farm, nil
-	}
+	// farm, err := s.farmCache.GetFarmInfo(ctx, farmID)
+	// if err == nil {
+	// 	return farm, nil
+	// }
 
 	// 缓存未命中，数据库获取
-	farm, err = s.farmDAO.GetFarmByID(farmID)
-	if err != nil {
-		return nil, err
-	}
+	// farm, err = s.farmDAO.GetFarmByID(farmID)
+	// if err != nil {
+	// 	return nil, err
+	// }
 
-	// 更新缓存
-	if err := s.farmCache.SetFarmInfo(ctx, farm); err != nil {
-		return nil, err
-	}
+	// // 更新缓存
+	// if err := s.farmCache.SetFarmInfo(ctx, farm); err != nil {
+	// 	return nil, err
+	// }
 
-	return farm, nil
+	// return farm, nil
+	return nil, nil
 }
 
 // ApplyFlightsheet 矿机应用飞行表

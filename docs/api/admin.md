@@ -110,9 +110,18 @@
     }
     ```
 
+##### /admin/user_farms
+
+获取用户的矿场信息
+- params
+    ```
+    ?page_num=1   // 
+    &page_size=10 // 
+    ```
+
 #### POST   
 
-#####  /admin/invite_reward
+##### /admin/invite_reward
 
 设置邀请积分
 - params

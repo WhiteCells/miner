@@ -3,117 +3,112 @@ package redis
 import (
 	"context"
 	"encoding/json"
-	"fmt"
-	"miner/model"
+	"miner/model/info"
 	"miner/utils"
-	"time"
 )
 
-type UserCache struct{}
+type UserRDB struct{}
 
-func NewUserCache() *UserCache {
-	return &UserCache{}
+var userField = "user"
+
+func NewUserCache() *UserRDB {
+	return &UserRDB{}
 }
 
-const (
-	userInfoTimeout  = 30 * time.Minute
-	userTokenTimeout = 24 * time.Hour
-	loginIPTimeout   = 24 * time.Hour
-)
+// 添加 User
+// 更新 User
+// 更新 User id->name，将用户 name 映射到 用户 ID
+// +---------+-----------+-------+
+// | field   |    key    |  val  |
+// +---------+-----------+-------+
+// | user    | <user_id> |  info |
+// +---------+-----------+-------+
+// | name_id |   <name>  | <id>  |
+// +---------+-----------+-------+
+func (c *UserRDB) Set(ctx context.Context, user *info.User) error {
+	key := GenHField(UserField, user.ID)
 
-func (c *UserCache) SetUserInfo(ctx context.Context, user *model.User) error {
-	key1 := fmt.Sprintf("user:%d:info", user.ID)
-	key2 := fmt.Sprintf("user:%s:info", user.Name)
-	key3 := fmt.Sprintf("user:%s:info", user.Email)
-
+	// 转为 json
 	userJSON, err := json.Marshal(user)
 	if err != nil {
 		return err
 	}
 
-	if err = utils.RDB.Set(ctx, key1, string(userJSON), userInfoTimeout); err != nil {
+	//
+	if err = utils.RDB.HSet(ctx, userField, key, string(userJSON)); err != nil {
 		return err
 	}
 
-	if err = utils.RDB.Set(ctx, key2, string(userJSON), userInfoTimeout); err != nil {
-		utils.RDB.Del(ctx, key1)
+	// 将用户 name 映射到用户 ID
+	if err = utils.RDB.Set(ctx, user.Name, user.ID); err != nil {
 		return err
 	}
 
-	if err = utils.RDB.Set(ctx, key3, string(userJSON), userInfoTimeout); err != nil {
-		utils.RDB.Del(ctx, key1)
-		utils.RDB.Del(ctx, key2)
+	// 将用户邮箱 email 映射到用户 ID
+	if err = utils.RDB.Set(ctx, user.Email, user.ID); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (c *UserCache) GetUserInfoByID(ctx context.Context, userID int) (*model.User, error) {
-	key := fmt.Sprintf("user:%d:info", userID)
-	userJSON, err := utils.RDB.Get(ctx, key)
+// 删除用户信息
+func (c *UserRDB) Del(ctx context.Context, userID string) error {
+	key := GenHField(userField, userID)
+
+	user, err := c.GetByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+
+	pipe := utils.RDB.Client.TxPipeline()
+
+	// 删除用户信息
+	pipe.HDel(ctx, userField, key)
+	// 删除用户 name-id 关联
+	pipe.Del(ctx, user.Name)
+
+	_, err = pipe.Exec(ctx)
+
+	return err
+}
+
+// 获取用户信息
+func (c *UserRDB) GetByID(ctx context.Context, userID string) (*info.User, error) {
+	key := GenHField(UserField, userID)
+	userJSON, err := utils.RDB.HGet(ctx, userField, key)
 	if err != nil {
 		return nil, err
 	}
-	var user model.User
+	var user info.User
 	err = json.Unmarshal([]byte(userJSON), &user)
 	return &user, err
 }
 
-// func (c *UserCache) SetUserInfoByName(ctx context.Context, user *model.User) error {
-// 	key := fmt.Sprintf("user:%s:info", user.Name)
-// 	userJSON, err := json.Marshal(user)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	return utils.RDB.Set(ctx, key, userJSON, userInfoTimeout)
-// }
-
-func (c *UserCache) GetUserInfoByName(ctx context.Context, userName string) (*model.User, error) {
-	key := fmt.Sprintf("user:%s:info", userName)
-	userJSON, err := utils.RDB.Get(ctx, key)
+// 通过姓名获取用户信息
+func (c *UserRDB) GetByName(ctx context.Context, userName string) (*info.User, error) {
+	// 通过 name-id 找到对应 ID
+	id, err := utils.RDB.Get(ctx, userName)
 	if err != nil {
 		return nil, err
 	}
-	var user model.User
-	err = json.Unmarshal([]byte(userJSON), &user)
-	return &user, err
+	return c.GetByID(ctx, id)
 }
 
-func (c *UserCache) GetUserInfoByEmail(ctx context.Context, email string) (*model.User, error) {
-	key := fmt.Sprintf("user:%s:info", email)
-	userJSON, err := utils.RDB.Get(ctx, key)
+// 获取所用用户信息
+func (c *UserRDB) GetAll(ctx context.Context) (*[]info.User, error) {
+	idUser, err := utils.RDB.HGetAll(ctx, userField)
 	if err != nil {
 		return nil, err
 	}
-	var user model.User
-	err = json.Unmarshal([]byte(userJSON), &user)
-	return &user, err
-}
-
-func (c *UserCache) SetUserTokenByID(ctx context.Context, userID int, token string) error {
-	key := fmt.Sprintf("user:%d:token", userID)
-	return utils.RDB.Set(ctx, key, token, userTokenTimeout)
-}
-
-func (c *UserCache) GetUserTokenByID(ctx context.Context, userID int) (string, error) {
-	key := fmt.Sprintf("user:%d:token", userID)
-	return utils.RDB.Get(ctx, key)
-}
-
-func (c *UserCache) DeleteUserCache(ctx context.Context) error {
-	pattern := "user:*"
-
-	keys, err := utils.RDB.Scan(ctx, pattern)
-	if err != nil {
-		return fmt.Errorf("scan keys error: %w", err)
-	}
-
-	for _, key := range keys {
-		if err := utils.RDB.Del(ctx, key); err != nil {
-			return fmt.Errorf("failed to delete key %s: %w", key, err)
+	var users []info.User
+	for _, userJSON := range idUser {
+		var user info.User
+		err = json.Unmarshal([]byte(userJSON), &user)
+		if err != nil {
+			return nil, err
 		}
+		users = append(users, user)
 	}
-
-	return nil
+	return &users, err
 }
