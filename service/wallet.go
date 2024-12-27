@@ -4,54 +4,43 @@ import (
 	"context"
 	"errors"
 	"miner/common/dto"
-	"miner/dao/mysql"
 	"miner/dao/redis"
 	"miner/model"
+	"miner/model/info"
 )
 
 type WalletService struct {
-	walletDAO   *mysql.WalletDAO
-	walletCache *redis.WalletCache
+	walletRDB *redis.WalletRDB
 }
 
 func NewWalletService() *WalletService {
 	return &WalletService{
-		walletDAO:   mysql.NewWalletDAO(),
-		walletCache: redis.NewWalletCache(),
+		walletRDB: redis.NewWalletRDB(),
 	}
 }
 
-func (s *WalletService) CreateWallet(ctx context.Context, req *dto.CreateWalletReq) (*model.Wallet, error) {
-	userID, exists := ctx.Value("user_id").(int)
+func (s *WalletService) CreateWallet(ctx context.Context, req *dto.CreateWalletReq) (*info.Wallet, error) {
+	userID, exists := ctx.Value("user_id").(string)
 	if !exists {
 		return nil, errors.New("invalid user_id in context")
 	}
-
-	// TODO cache 检查钱包是否存在
-
-	wallet := &model.Wallet{
-		Name:     req.Name,
-		Address:  req.Address,
-		CoinType: req.CoinType,
+	// id
+	wallet := &info.Wallet{
+		Name: req.Name,
+		Addr: req.Addr,
+		Coin: req.Coin,
 	}
-	// 创建钱包
-	if err := s.walletDAO.CreateWallet(wallet, userID); err != nil {
-		return nil, errors.New("create wallet failed")
-	}
-
-	// TODO cache 钱包信息
+	s.walletRDB.Set(ctx, userID, wallet)
 
 	return wallet, nil
 }
 
 func (s *WalletService) DeleteWallet(ctx context.Context, req *dto.DeleteWalletReq) error {
-	userID, exists := ctx.Value("user_id").(int)
+	_, exists := ctx.Value("user_id").(int)
 	if !exists {
 		return errors.New("invalid user_id in context")
 	}
-	if err := s.walletDAO.DeleteWallet(req.WalletID, userID); err != nil {
-		return errors.New("delete wallet failed")
-	}
+
 	return nil
 }
 
@@ -60,48 +49,50 @@ func (s *WalletService) UpdateWallet(ctx context.Context, req *dto.UpdateWalletR
 	if !exists {
 		return errors.New("invalid user_id in context")
 	}
-	wallet, err := s.walletDAO.GetWalletByID(req.WalletID)
-	if err != nil {
-		return errors.New("wallet not found")
-	}
-	for key, value := range req.UpdateInfo {
-		switch key {
-		case "name":
-			wallet.Name = value.(string)
-		case "address":
-			wallet.Address = value.(string)
-		case "coin_type":
-			wallet.CoinType = value.(string)
-		}
-	}
-	if err := s.walletDAO.UpdateWallet(wallet); err != nil {
-		return errors.New("update wallet failed")
-	}
+	// wallet, err := s.walletDAO.GetWalletByID(req.WalletID)
+	// if err != nil {
+	// 	return errors.New("wallet not found")
+	// }
+	// for key, value := range req.UpdateInfo {
+	// 	switch key {
+	// 	case "name":
+	// 		wallet.Name = value.(string)
+	// 	case "address":
+	// 		wallet.Address = value.(string)
+	// 	case "coin_type":
+	// 		wallet.CoinType = value.(string)
+	// 	}
+	// }
+	// if err := s.walletDAO.UpdateWallet(wallet); err != nil {
+	// 	return errors.New("update wallet failed")
+	// }
 	return nil
 }
 
-func (s *WalletService) GetWallet(ctx context.Context, query map[string]interface{}) (*[]model.Wallet, int64, error) {
-	userID, exists := ctx.Value("user_id").(int)
-	if !exists {
-		return nil, -1, errors.New("invalid user_id in context")
-	}
-	var wallets *[]model.Wallet
-	wallets, total, err := s.walletDAO.GetWallet(userID, query)
-	if err != nil {
-		return nil, -1, errors.New("get user all wallet failed")
-	}
-	return wallets, total, nil
+func (s *WalletService) GetWallet(ctx context.Context, query map[string]interface{}) (*[]model.Wallet, error) {
+	// userID, exists := ctx.Value("user_id").(int)
+	// if !exists {
+	// 	return nil, -1, errors.New("invalid user_id in context")
+	// }
+	// var wallets *[]model.Wallet
+	// wallets, total, err := s.walletDAO.GetWallet(userID, query)
+	// if err != nil {
+	// 	return nil, -1, errors.New("get user all wallet failed")
+	// }
+	// return wallets, total, nil
+	return nil, nil
 }
 
 func (s *WalletService) GetUserWalletByID(ctx context.Context, req *dto.GetUserWalletByIDReq) (*model.Wallet, error) {
-	_, exists := ctx.Value("user_id").(int)
-	if !exists {
-		return nil, errors.New("invalid user_id in context")
-	}
-	var wallet *model.Wallet
-	wallet, err := s.walletDAO.GetWalletByID(req.WalletID)
-	if err != nil {
-		return nil, errors.New("get user wallet failed")
-	}
-	return wallet, nil
+	// _, exists := ctx.Value("user_id").(int)
+	// if !exists {
+	// 	return nil, errors.New("invalid user_id in context")
+	// }
+	// var wallet *model.Wallet
+	// wallet, err := s.walletDAO.GetWalletByID(req.WalletID)
+	// if err != nil {
+	// 	return nil, errors.New("get user wallet failed")
+	// }
+	// return wallet, nil
+	return nil, nil
 }

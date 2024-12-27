@@ -29,7 +29,7 @@ func (fr *FarmRoute) InitFarmRoute(r *gin.Engine) {
 		route.DELETE("", fr.farmController.DeleteFarm)
 		route.PUT("", fr.farmController.UpdateFarm)
 		route.GET("", fr.farmController.GetFarm)
-		route.PUT("/apply_fs", fr.farmController.ApplyFlightsheet)
+		route.PUT("/apply_fs", fr.farmController.ApplyFs)
 		route.PUT("/transfer", fr.farmController.Transfer)
 	}
 }

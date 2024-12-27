@@ -5,7 +5,6 @@ import (
 	"miner/common/rsp"
 	"miner/service"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -68,35 +67,15 @@ func (c *MinerController) UpdateMiner(ctx *gin.Context) {
 
 // GetMiner 获取用户矿机
 func (c *MinerController) GetMiner(ctx *gin.Context) {
-	pageNum, err := strconv.Atoi(ctx.Query("page_num"))
-	if err != nil || pageNum <= 0 {
-		rsp.Error(ctx, http.StatusBadRequest, "invalid page_numt", nil)
-		return
-	}
-	pageSize, err := strconv.Atoi(ctx.Query("page_size"))
-	if err != nil || pageSize <= 0 {
-		rsp.Error(ctx, http.StatusBadRequest, "invalid page_size", nil)
-		return
-	}
-	farmID, err := strconv.Atoi(ctx.Query("farm_id"))
-	if err != nil || pageSize <= 0 {
-		rsp.Error(ctx, http.StatusBadRequest, "invalid farm_id", nil)
-		return
-	}
-
-	query := map[string]interface{}{
-		"page_num":  pageNum,
-		"page_size": pageSize,
-		"farm_id":   farmID,
-	}
-
-	miners, total, err := c.minerService.GetMiner(ctx, query)
+	// farmID query
+	farmID := ""
+	miners, err := c.minerService.GetMiner(ctx, farmID)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
 
-	rsp.QuerySuccess(ctx, http.StatusOK, "get user all miner success", miners, total)
+	rsp.QuerySuccess(ctx, http.StatusOK, "get user all miner success", miners)
 }
 
 // ApplyFlightsheet 矿机应用飞行表
@@ -106,7 +85,7 @@ func (c *MinerController) ApplyFlightsheet(ctx *gin.Context) {
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
-	if err := c.minerService.ApplyFlightsheet(ctx, &req); err != nil {
+	if err := c.minerService.ApplyFs(ctx, &req); err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}

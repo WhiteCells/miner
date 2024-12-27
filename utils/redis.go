@@ -31,7 +31,7 @@ func InitRDB() error {
 				"127.0.0.1:7004",
 				"127.0.0.1:7005",
 			},
-			Password: "myredis",
+			Password: "m3i2n1e0r",
 			// DB:       Config.Redis.DB,
 			// PoolSize: Config.Redis.PoolSize,
 		})
@@ -76,8 +76,8 @@ func (r *RedisClient) Get(ctx context.Context, key string) (string, error) {
 	return r.Client.Get(ctx, key).Result()
 }
 
-func (r *RedisClient) Del(ctx context.Context, key string) error {
-	return r.Client.Del(ctx, key).Err()
+func (r *RedisClient) Del(ctx context.Context, key ...string) error {
+	return r.Client.Del(ctx, key...).Err()
 }
 
 func (r *RedisClient) Scan(ctx context.Context, pattern string) ([]string, error) {

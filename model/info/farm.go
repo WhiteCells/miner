@@ -7,7 +7,7 @@ type Farm struct {
 	Name     string `json:"name"`
 	TimeZone string `json:"time_zone"`
 	// Hash     string    `json:"hash"` // ID 可以作为唯一标识
-	Perm perm.Perm `json:"perm"` // 仅作返回
+	Perm perm.FarmPerm `json:"perm"`
 }
 
 /*

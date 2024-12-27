@@ -26,5 +26,5 @@ func (c *PointsRecordController) GetPointsRecords(ctx *gin.Context) {
 		return
 	}
 
-	rsp.QuerySuccess(ctx, http.StatusOK, "get points records success", records, total)
+	rsp.DBQuerySuccess(ctx, http.StatusOK, "get points records success", records, total)
 }

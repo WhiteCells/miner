@@ -1,0 +1,371 @@
+50441:C 24 Dec 2024 12:02:38.951 # WARNING: Changing databases number from 16 to 1 since we are in cluster mode
+50446:C 24 Dec 2024 12:02:38.952 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+50446:C 24 Dec 2024 12:02:38.952 * Redis version=7.2.5, bits=64, commit=00000000, modified=0, pid=50446, just started
+50446:C 24 Dec 2024 12:02:38.952 * Configuration loaded
+50446:M 24 Dec 2024 12:02:38.952 * monotonic clock: POSIX clock_gettime
+50446:M 24 Dec 2024 12:02:38.952 # Failed to write PID file: Permission denied
+50446:M 24 Dec 2024 12:02:38.952 * Running mode=cluster, port=7003.
+50446:M 24 Dec 2024 12:02:38.953 * No cluster configuration found, I'm e0a8d6062676183759f2d820b2aa895dd50f4150
+50446:M 24 Dec 2024 12:02:38.955 * Server initialized
+50446:M 24 Dec 2024 12:02:38.956 * Creating AOF base file appendonly.aof.1.base.rdb on server start
+50446:M 24 Dec 2024 12:02:38.958 * Creating AOF incr file appendonly.aof.1.incr.aof on server start
+50446:M 24 Dec 2024 12:02:38.958 * Ready to accept connections tcp
+50446:signal-handler (1735013140) Received SIGTERM scheduling shutdown...
+50446:M 24 Dec 2024 12:05:40.322 * User requested shutdown...
+50446:M 24 Dec 2024 12:05:40.322 * Calling fsync() on the AOF file.
+50446:M 24 Dec 2024 12:05:40.322 * Saving the final RDB snapshot before exiting.
+50446:M 24 Dec 2024 12:05:40.324 * DB saved on disk
+50446:M 24 Dec 2024 12:05:40.324 * Removing the pid file.
+50446:M 24 Dec 2024 12:05:40.324 # Redis is now ready to exit, bye bye...
+51997:C 24 Dec 2024 12:44:01.841 # WARNING: Changing databases number from 16 to 1 since we are in cluster mode
+52002:C 24 Dec 2024 12:44:01.841 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+52002:C 24 Dec 2024 12:44:01.841 * Redis version=7.2.5, bits=64, commit=00000000, modified=0, pid=52002, just started
+52002:C 24 Dec 2024 12:44:01.841 * Configuration loaded
+52002:M 24 Dec 2024 12:44:01.841 * monotonic clock: POSIX clock_gettime
+52002:M 24 Dec 2024 12:44:01.842 # Failed to write PID file: Permission denied
+52002:M 24 Dec 2024 12:44:01.842 * Running mode=cluster, port=7003.
+52002:M 24 Dec 2024 12:44:01.842 * Node configuration loaded, I'm e0a8d6062676183759f2d820b2aa895dd50f4150
+52002:M 24 Dec 2024 12:44:01.842 * Server initialized
+52002:M 24 Dec 2024 12:44:01.842 * Reading RDB base file on AOF loading...
+52002:M 24 Dec 2024 12:44:01.842 * Loading RDB produced by version 7.2.5
+52002:M 24 Dec 2024 12:44:01.842 * RDB age 2483 seconds
+52002:M 24 Dec 2024 12:44:01.842 * RDB memory usage when created 1.52 Mb
+52002:M 24 Dec 2024 12:44:01.842 * RDB is base AOF
+52002:M 24 Dec 2024 12:44:01.842 * Done loading RDB, keys loaded: 0, keys expired: 0.
+52002:M 24 Dec 2024 12:44:01.842 * DB loaded from base file appendonly.aof.1.base.rdb: 0.000 seconds
+52002:M 24 Dec 2024 12:44:01.842 * DB loaded from append only file: 0.000 seconds
+52002:M 24 Dec 2024 12:44:01.842 * Opening AOF incr file appendonly.aof.1.incr.aof on server start
+52002:M 24 Dec 2024 12:44:01.843 * Ready to accept connections tcp
+52002:signal-handler (1735015454) Received SIGTERM scheduling shutdown...
+52002:M 24 Dec 2024 12:44:14.680 * User requested shutdown...
+52002:M 24 Dec 2024 12:44:14.680 * Calling fsync() on the AOF file.
+52002:M 24 Dec 2024 12:44:14.680 * Saving the final RDB snapshot before exiting.
+52002:M 24 Dec 2024 12:44:14.682 * DB saved on disk
+52002:M 24 Dec 2024 12:44:14.682 * Removing the pid file.
+52002:M 24 Dec 2024 12:44:14.682 # Redis is now ready to exit, bye bye...
+52501:C 24 Dec 2024 12:49:24.668 # WARNING: Changing databases number from 16 to 1 since we are in cluster mode
+52506:C 24 Dec 2024 12:49:24.668 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+52506:C 24 Dec 2024 12:49:24.668 * Redis version=7.2.5, bits=64, commit=00000000, modified=0, pid=52506, just started
+52506:C 24 Dec 2024 12:49:24.668 * Configuration loaded
+52506:M 24 Dec 2024 12:49:24.668 * monotonic clock: POSIX clock_gettime
+52506:M 24 Dec 2024 12:49:24.669 # Failed to write PID file: Permission denied
+52506:M 24 Dec 2024 12:49:24.669 * Running mode=cluster, port=7003.
+52506:M 24 Dec 2024 12:49:24.669 * Node configuration loaded, I'm e0a8d6062676183759f2d820b2aa895dd50f4150
+52506:M 24 Dec 2024 12:49:24.669 * Server initialized
+52506:M 24 Dec 2024 12:49:24.669 * Reading RDB base file on AOF loading...
+52506:M 24 Dec 2024 12:49:24.669 * Loading RDB produced by version 7.2.5
+52506:M 24 Dec 2024 12:49:24.669 * RDB age 2806 seconds
+52506:M 24 Dec 2024 12:49:24.669 * RDB memory usage when created 1.52 Mb
+52506:M 24 Dec 2024 12:49:24.669 * RDB is base AOF
+52506:M 24 Dec 2024 12:49:24.669 * Done loading RDB, keys loaded: 0, keys expired: 0.
+52506:M 24 Dec 2024 12:49:24.669 * DB loaded from base file appendonly.aof.1.base.rdb: 0.000 seconds
+52506:M 24 Dec 2024 12:49:24.669 * DB loaded from append only file: 0.000 seconds
+52506:M 24 Dec 2024 12:49:24.669 * Opening AOF incr file appendonly.aof.1.incr.aof on server start
+52506:M 24 Dec 2024 12:49:24.670 * Ready to accept connections tcp
+52506:M 24 Dec 2024 13:44:12.661 * configEpoch set to 4 via CLUSTER SET-CONFIG-EPOCH
+52506:M 24 Dec 2024 13:44:12.727 * IP address for this node updated to 127.0.0.1
+52506:S 24 Dec 2024 13:44:13.664 * Before turning into a replica, using my own master parameters to synthesize a cached master: I may be able to synchronize with the new master with just a partial transfer.
+52506:S 24 Dec 2024 13:44:13.664 * Connecting to MASTER 127.0.0.1:7000
+52506:S 24 Dec 2024 13:44:13.664 * MASTER <-> REPLICA sync started
+52506:S 24 Dec 2024 13:44:13.664 * Cluster state changed: ok
+52506:S 24 Dec 2024 13:44:13.664 * Non blocking connect for SYNC fired the event.
+52506:S 24 Dec 2024 13:44:13.664 * Master replied to PING, replication can continue...
+52506:S 24 Dec 2024 13:44:13.664 * Trying a partial resynchronization (request 112c8b2b3acf845bbf236cfac5102df7ed078ac2:1).
+52506:S 24 Dec 2024 13:44:18.453 * Full resync from master: fa27eccbc59651f4773a8a3f1d7ec2aef2649c75:14
+52506:S 24 Dec 2024 13:44:18.454 * MASTER <-> REPLICA sync: receiving streamed RDB from master with EOF to disk
+52506:S 24 Dec 2024 13:44:18.455 * Discarding previously cached master state.
+52506:S 24 Dec 2024 13:44:18.455 * MASTER <-> REPLICA sync: Flushing old data
+52506:S 24 Dec 2024 13:44:18.455 * MASTER <-> REPLICA sync: Loading DB in memory
+52506:S 24 Dec 2024 13:44:18.457 * Loading RDB produced by version 7.2.5
+52506:S 24 Dec 2024 13:44:18.457 * RDB age 0 seconds
+52506:S 24 Dec 2024 13:44:18.457 * RDB memory usage when created 1.76 Mb
+52506:S 24 Dec 2024 13:44:18.457 * Done loading RDB, keys loaded: 0, keys expired: 0.
+52506:S 24 Dec 2024 13:44:18.457 * MASTER <-> REPLICA sync: Finished with success
+52506:S 24 Dec 2024 13:44:18.457 * Creating AOF incr file temp-appendonly.aof.incr on background rewrite
+52506:S 24 Dec 2024 13:44:18.457 * Background append only file rewriting started by pid 55020
+55020:C 24 Dec 2024 13:44:18.458 * Successfully created the temporary AOF base file temp-rewriteaof-bg-55020.aof
+55020:C 24 Dec 2024 13:44:18.459 * Fork CoW for AOF rewrite: current 0 MB, peak 0 MB, average 0 MB
+52506:S 24 Dec 2024 13:44:18.548 * Background AOF rewrite terminated with success
+52506:S 24 Dec 2024 13:44:18.548 * Successfully renamed the temporary AOF base file temp-rewriteaof-bg-55020.aof into appendonly.aof.2.base.rdb
+52506:S 24 Dec 2024 13:44:18.548 * Successfully renamed the temporary AOF incr file temp-appendonly.aof.incr into appendonly.aof.2.incr.aof
+52506:S 24 Dec 2024 13:44:18.549 * Removing the history file appendonly.aof.1.incr.aof in the background
+52506:S 24 Dec 2024 13:44:18.549 * Removing the history file appendonly.aof.1.base.rdb in the background
+52506:S 24 Dec 2024 13:44:18.551 * Background AOF rewrite finished successfully
+52506:S 24 Dec 2024 13:47:18.664 * DB saved on disk
+52506:S 24 Dec 2024 13:50:22.763 * DB saved on disk
+55408:C 24 Dec 2024 13:50:41.329 # WARNING: Changing databases number from 16 to 1 since we are in cluster mode
+55409:C 24 Dec 2024 13:50:41.329 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+55409:C 24 Dec 2024 13:50:41.329 * Redis version=7.2.5, bits=64, commit=00000000, modified=0, pid=55409, just started
+55409:C 24 Dec 2024 13:50:41.329 * Configuration loaded
+55409:M 24 Dec 2024 13:50:41.330 * monotonic clock: POSIX clock_gettime
+55409:M 24 Dec 2024 13:50:41.330 # Failed to write PID file: Permission denied
+55409:M 24 Dec 2024 13:50:41.330 * Running mode=cluster, port=7003.
+55409:M 24 Dec 2024 13:50:41.330 * Node configuration loaded, I'm e0a8d6062676183759f2d820b2aa895dd50f4150
+55409:M 24 Dec 2024 13:50:41.330 # Warning: Could not create server TCP listening socket 0.0.0.0:7003: bind: Address already in use
+55409:M 24 Dec 2024 13:50:41.330 # Failed listening on port 7003 (tcp), aborting.
+52506:signal-handler (1735019587) Received SIGTERM scheduling shutdown...
+52506:S 24 Dec 2024 13:53:07.152 * User requested shutdown...
+52506:S 24 Dec 2024 13:53:07.152 * Calling fsync() on the AOF file.
+52506:S 24 Dec 2024 13:53:07.152 * Saving the final RDB snapshot before exiting.
+52506:S 24 Dec 2024 13:53:07.154 * DB saved on disk
+52506:S 24 Dec 2024 13:53:07.154 * Removing the pid file.
+52506:S 24 Dec 2024 13:53:07.154 # Redis is now ready to exit, bye bye...
+55948:C 24 Dec 2024 13:53:18.484 # WARNING: Changing databases number from 16 to 1 since we are in cluster mode
+55953:C 24 Dec 2024 13:53:18.484 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+55953:C 24 Dec 2024 13:53:18.484 * Redis version=7.2.5, bits=64, commit=00000000, modified=0, pid=55953, just started
+55953:C 24 Dec 2024 13:53:18.484 * Configuration loaded
+55953:M 24 Dec 2024 13:53:18.485 * monotonic clock: POSIX clock_gettime
+55953:M 24 Dec 2024 13:53:18.485 # Failed to write PID file: Permission denied
+55953:M 24 Dec 2024 13:53:18.485 * Running mode=cluster, port=7003.
+55953:M 24 Dec 2024 13:53:18.485 * Node configuration loaded, I'm e0a8d6062676183759f2d820b2aa895dd50f4150
+55953:M 24 Dec 2024 13:53:18.486 * Server initialized
+55953:M 24 Dec 2024 13:53:18.486 * Reading RDB base file on AOF loading...
+55953:M 24 Dec 2024 13:53:18.486 * Loading RDB produced by version 7.2.5
+55953:M 24 Dec 2024 13:53:18.486 * RDB age 540 seconds
+55953:M 24 Dec 2024 13:53:18.486 * RDB memory usage when created 1.73 Mb
+55953:M 24 Dec 2024 13:53:18.486 * RDB is base AOF
+55953:M 24 Dec 2024 13:53:18.486 * Done loading RDB, keys loaded: 0, keys expired: 0.
+55953:M 24 Dec 2024 13:53:18.486 * DB loaded from base file appendonly.aof.2.base.rdb: 0.000 seconds
+55953:M 24 Dec 2024 13:53:18.487 * DB saved on disk
+55953:M 24 Dec 2024 13:53:18.489 * DB saved on disk
+55953:M 24 Dec 2024 13:53:18.489 * DB loaded from incr file appendonly.aof.2.incr.aof: 0.003 seconds
+55953:M 24 Dec 2024 13:53:18.489 * DB loaded from append only file: 0.003 seconds
+55953:M 24 Dec 2024 13:53:18.489 * Opening AOF incr file appendonly.aof.2.incr.aof on server start
+55953:M 24 Dec 2024 13:53:18.489 * Ready to accept connections tcp
+55953:S 24 Dec 2024 13:53:18.489 * Before turning into a replica, using my own master parameters to synthesize a cached master: I may be able to synchronize with the new master with just a partial transfer.
+55953:S 24 Dec 2024 13:53:18.489 * Connecting to MASTER 127.0.0.1:7000
+55953:S 24 Dec 2024 13:53:18.489 * MASTER <-> REPLICA sync started
+55953:S 24 Dec 2024 13:53:18.489 * Cluster state changed: ok
+55953:S 24 Dec 2024 13:53:18.489 * Non blocking connect for SYNC fired the event.
+55953:S 24 Dec 2024 13:53:18.497 * Master replied to PING, replication can continue...
+55953:S 24 Dec 2024 13:53:18.509 * Trying a partial resynchronization (request 975769a64f40146ff75b624c62e006568cc9a929:1).
+55953:S 24 Dec 2024 13:53:23.495 * Full resync from master: 08eeb070434872a79dd2fd5111569a43d9981087:0
+55953:S 24 Dec 2024 13:53:23.496 * MASTER <-> REPLICA sync: receiving streamed RDB from master with EOF to disk
+55953:S 24 Dec 2024 13:53:23.496 * Discarding previously cached master state.
+55953:S 24 Dec 2024 13:53:23.496 * MASTER <-> REPLICA sync: Flushing old data
+55953:S 24 Dec 2024 13:53:23.496 * MASTER <-> REPLICA sync: Loading DB in memory
+55953:S 24 Dec 2024 13:53:23.497 * Loading RDB produced by version 7.2.5
+55953:S 24 Dec 2024 13:53:23.497 * RDB age 0 seconds
+55953:S 24 Dec 2024 13:53:23.497 * RDB memory usage when created 1.77 Mb
+55953:S 24 Dec 2024 13:53:23.497 * Done loading RDB, keys loaded: 0, keys expired: 0.
+55953:S 24 Dec 2024 13:53:23.497 * MASTER <-> REPLICA sync: Finished with success
+55953:S 24 Dec 2024 13:53:23.497 * Creating AOF incr file temp-appendonly.aof.incr on background rewrite
+55953:S 24 Dec 2024 13:53:23.498 * Background append only file rewriting started by pid 56004
+56004:C 24 Dec 2024 13:53:23.498 * Successfully created the temporary AOF base file temp-rewriteaof-bg-56004.aof
+56004:C 24 Dec 2024 13:53:23.499 * Fork CoW for AOF rewrite: current 0 MB, peak 0 MB, average 0 MB
+55953:S 24 Dec 2024 13:53:23.505 * Background AOF rewrite terminated with success
+55953:S 24 Dec 2024 13:53:23.505 * Successfully renamed the temporary AOF base file temp-rewriteaof-bg-56004.aof into appendonly.aof.3.base.rdb
+55953:S 24 Dec 2024 13:53:23.505 * Successfully renamed the temporary AOF incr file temp-appendonly.aof.incr into appendonly.aof.3.incr.aof
+55953:S 24 Dec 2024 13:53:23.508 * Removing the history file appendonly.aof.2.incr.aof in the background
+55953:S 24 Dec 2024 13:53:23.508 * Removing the history file appendonly.aof.2.base.rdb in the background
+55953:S 24 Dec 2024 13:53:23.510 * Background AOF rewrite finished successfully
+55953:signal-handler (1735019954) Received SIGTERM scheduling shutdown...
+55953:S 24 Dec 2024 13:59:14.531 * User requested shutdown...
+55953:S 24 Dec 2024 13:59:14.531 * Calling fsync() on the AOF file.
+55953:S 24 Dec 2024 13:59:14.531 * Saving the final RDB snapshot before exiting.
+55953:S 24 Dec 2024 13:59:14.533 * DB saved on disk
+55953:S 24 Dec 2024 13:59:14.533 * Removing the pid file.
+55953:S 24 Dec 2024 13:59:14.533 # Redis is now ready to exit, bye bye...
+56817:C 24 Dec 2024 14:01:40.822 # WARNING: Changing databases number from 16 to 1 since we are in cluster mode
+56822:C 24 Dec 2024 14:01:40.822 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+56822:C 24 Dec 2024 14:01:40.822 * Redis version=7.2.5, bits=64, commit=00000000, modified=0, pid=56822, just started
+56822:C 24 Dec 2024 14:01:40.822 * Configuration loaded
+56822:M 24 Dec 2024 14:01:40.822 * monotonic clock: POSIX clock_gettime
+56822:M 24 Dec 2024 14:01:40.823 # Failed to write PID file: Permission denied
+56822:M 24 Dec 2024 14:01:40.823 * Running mode=cluster, port=7003.
+56822:M 24 Dec 2024 14:01:40.823 * Node configuration loaded, I'm e0a8d6062676183759f2d820b2aa895dd50f4150
+56822:M 24 Dec 2024 14:01:40.824 * Server initialized
+56822:M 24 Dec 2024 14:01:40.824 * Reading RDB base file on AOF loading...
+56822:M 24 Dec 2024 14:01:40.824 * Loading RDB produced by version 7.2.5
+56822:M 24 Dec 2024 14:01:40.824 * RDB age 497 seconds
+56822:M 24 Dec 2024 14:01:40.824 * RDB memory usage when created 1.64 Mb
+56822:M 24 Dec 2024 14:01:40.824 * RDB is base AOF
+56822:M 24 Dec 2024 14:01:40.824 * Done loading RDB, keys loaded: 0, keys expired: 0.
+56822:M 24 Dec 2024 14:01:40.824 * DB loaded from base file appendonly.aof.3.base.rdb: 0.000 seconds
+56822:M 24 Dec 2024 14:01:40.824 * DB loaded from append only file: 0.000 seconds
+56822:M 24 Dec 2024 14:01:40.824 * Opening AOF incr file appendonly.aof.3.incr.aof on server start
+56822:M 24 Dec 2024 14:01:40.824 * Ready to accept connections tcp
+56822:S 24 Dec 2024 14:01:40.824 * Before turning into a replica, using my own master parameters to synthesize a cached master: I may be able to synchronize with the new master with just a partial transfer.
+56822:S 24 Dec 2024 14:01:40.824 * Connecting to MASTER 127.0.0.1:7000
+56822:S 24 Dec 2024 14:01:40.824 * MASTER <-> REPLICA sync started
+56822:S 24 Dec 2024 14:01:40.824 * Cluster state changed: ok
+56822:S 24 Dec 2024 14:01:40.825 * Non blocking connect for SYNC fired the event.
+56822:S 24 Dec 2024 14:01:40.833 * Master replied to PING, replication can continue...
+56822:S 24 Dec 2024 14:01:40.833 * Trying a partial resynchronization (request eca5dec3458ef4940c1fce7d000af05e872ba3b1:1).
+56822:S 24 Dec 2024 14:01:45.838 * Full resync from master: 8a6b1b6e0a13e703a110fbd64f72a9eb4be98a4e:0
+56822:S 24 Dec 2024 14:01:45.840 * MASTER <-> REPLICA sync: receiving streamed RDB from master with EOF to disk
+56822:S 24 Dec 2024 14:01:45.841 * Discarding previously cached master state.
+56822:S 24 Dec 2024 14:01:45.841 * MASTER <-> REPLICA sync: Flushing old data
+56822:S 24 Dec 2024 14:01:45.842 * MASTER <-> REPLICA sync: Loading DB in memory
+56822:S 24 Dec 2024 14:01:45.844 * Loading RDB produced by version 7.2.5
+56822:S 24 Dec 2024 14:01:45.844 * RDB age 0 seconds
+56822:S 24 Dec 2024 14:01:45.844 * RDB memory usage when created 1.83 Mb
+56822:S 24 Dec 2024 14:01:45.844 * Done loading RDB, keys loaded: 0, keys expired: 0.
+56822:S 24 Dec 2024 14:01:45.844 * MASTER <-> REPLICA sync: Finished with success
+56822:S 24 Dec 2024 14:01:45.844 * Creating AOF incr file temp-appendonly.aof.incr on background rewrite
+56822:S 24 Dec 2024 14:01:45.844 * Background append only file rewriting started by pid 56885
+56885:C 24 Dec 2024 14:01:45.846 * Successfully created the temporary AOF base file temp-rewriteaof-bg-56885.aof
+56885:C 24 Dec 2024 14:01:45.847 * Fork CoW for AOF rewrite: current 0 MB, peak 0 MB, average 0 MB
+56822:S 24 Dec 2024 14:01:45.852 * Background AOF rewrite terminated with success
+56822:S 24 Dec 2024 14:01:45.852 * Successfully renamed the temporary AOF base file temp-rewriteaof-bg-56885.aof into appendonly.aof.4.base.rdb
+56822:S 24 Dec 2024 14:01:45.852 * Successfully renamed the temporary AOF incr file temp-appendonly.aof.incr into appendonly.aof.4.incr.aof
+56822:S 24 Dec 2024 14:01:45.855 * Removing the history file appendonly.aof.3.incr.aof in the background
+56822:S 24 Dec 2024 14:01:45.855 * Removing the history file appendonly.aof.3.base.rdb in the background
+56822:S 24 Dec 2024 14:01:45.857 * Background AOF rewrite finished successfully
+57923:C 24 Dec 2024 14:15:47.498 # WARNING: Changing databases number from 16 to 1 since we are in cluster mode
+57924:C 24 Dec 2024 14:15:47.498 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+57924:C 24 Dec 2024 14:15:47.498 * Redis version=7.2.5, bits=64, commit=00000000, modified=0, pid=57924, just started
+57924:C 24 Dec 2024 14:15:47.498 * Configuration loaded
+57924:M 24 Dec 2024 14:15:47.499 * Increased maximum number of open files to 10032 (it was originally set to 1024).
+57924:M 24 Dec 2024 14:15:47.499 * monotonic clock: POSIX clock_gettime
+57924:M 24 Dec 2024 14:15:47.499 # Failed to write PID file: Permission denied
+57924:M 24 Dec 2024 14:15:47.499 * Running mode=cluster, port=7003.
+57924:M 24 Dec 2024 14:15:47.500 * Node configuration loaded, I'm e0a8d6062676183759f2d820b2aa895dd50f4150
+57924:M 24 Dec 2024 14:15:47.500 # Warning: Could not create server TCP listening socket 0.0.0.0:7003: bind: Address already in use
+57924:M 24 Dec 2024 14:15:47.500 # Failed listening on port 7003 (tcp), aborting.
+72149:C 24 Dec 2024 17:54:19.190 # WARNING: Changing databases number from 16 to 1 since we are in cluster mode
+72150:C 24 Dec 2024 17:54:19.190 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+72150:C 24 Dec 2024 17:54:19.190 * Redis version=7.2.5, bits=64, commit=00000000, modified=0, pid=72150, just started
+72150:C 24 Dec 2024 17:54:19.190 * Configuration loaded
+72150:M 24 Dec 2024 17:54:19.191 * monotonic clock: POSIX clock_gettime
+72150:M 24 Dec 2024 17:54:19.191 # Failed to write PID file: Permission denied
+72150:M 24 Dec 2024 17:54:19.191 * Running mode=cluster, port=7003.
+72150:M 24 Dec 2024 17:54:19.191 * Node configuration loaded, I'm e0a8d6062676183759f2d820b2aa895dd50f4150
+72150:M 24 Dec 2024 17:54:19.191 # Warning: Could not create server TCP listening socket 0.0.0.0:7003: bind: Address already in use
+72150:M 24 Dec 2024 17:54:19.191 # Failed listening on port 7003 (tcp), aborting.
+56822:S 24 Dec 2024 18:00:05.985 * DB saved on disk
+56822:S 24 Dec 2024 18:00:27.722 * DB saved on disk
+56822:signal-handler (1735034752) Received SIGTERM scheduling shutdown...
+56822:S 24 Dec 2024 18:05:52.968 * User requested shutdown...
+56822:S 24 Dec 2024 18:05:52.968 * Calling fsync() on the AOF file.
+56822:S 24 Dec 2024 18:05:52.968 * Saving the final RDB snapshot before exiting.
+56822:S 24 Dec 2024 18:05:52.969 * DB saved on disk
+56822:S 24 Dec 2024 18:05:52.969 * Removing the pid file.
+56822:S 24 Dec 2024 18:05:52.970 # Redis is now ready to exit, bye bye...
+74053:C 26 Dec 2024 10:51:54.681 # WARNING: Changing databases number from 16 to 1 since we are in cluster mode
+74053:C 26 Dec 2024 10:51:54.681 # WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+74058:C 26 Dec 2024 10:51:54.682 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+74058:C 26 Dec 2024 10:51:54.682 * Redis version=7.2.5, bits=64, commit=00000000, modified=0, pid=74058, just started
+74058:C 26 Dec 2024 10:51:54.682 * Configuration loaded
+74058:M 26 Dec 2024 10:51:54.682 * monotonic clock: POSIX clock_gettime
+74058:M 26 Dec 2024 10:51:54.683 # Failed to write PID file: Permission denied
+74058:M 26 Dec 2024 10:51:54.683 * Running mode=cluster, port=7003.
+74058:M 26 Dec 2024 10:51:54.683 * Node configuration loaded, I'm e0a8d6062676183759f2d820b2aa895dd50f4150
+74058:M 26 Dec 2024 10:51:54.683 * Server initialized
+74058:M 26 Dec 2024 10:51:54.683 * Reading RDB base file on AOF loading...
+74058:M 26 Dec 2024 10:51:54.683 * Loading RDB produced by version 7.2.5
+74058:M 26 Dec 2024 10:51:54.683 * RDB age 161409 seconds
+74058:M 26 Dec 2024 10:51:54.683 * RDB memory usage when created 1.64 Mb
+74058:M 26 Dec 2024 10:51:54.683 * RDB is base AOF
+74058:M 26 Dec 2024 10:51:54.683 * Done loading RDB, keys loaded: 0, keys expired: 0.
+74058:M 26 Dec 2024 10:51:54.683 * DB loaded from base file appendonly.aof.4.base.rdb: 0.000 seconds
+74058:M 26 Dec 2024 10:51:54.685 * DB saved on disk
+74058:M 26 Dec 2024 10:51:54.686 * DB saved on disk
+74058:M 26 Dec 2024 10:51:54.687 * DB loaded from incr file appendonly.aof.4.incr.aof: 0.003 seconds
+74058:M 26 Dec 2024 10:51:54.687 * DB loaded from append only file: 0.003 seconds
+74058:M 26 Dec 2024 10:51:54.687 * Opening AOF incr file appendonly.aof.4.incr.aof on server start
+74058:M 26 Dec 2024 10:51:54.687 * Ready to accept connections tcp
+74058:S 26 Dec 2024 10:51:54.687 * Before turning into a replica, using my own master parameters to synthesize a cached master: I may be able to synchronize with the new master with just a partial transfer.
+74058:S 26 Dec 2024 10:51:54.687 * Connecting to MASTER 127.0.0.1:7000
+74058:S 26 Dec 2024 10:51:54.687 * MASTER <-> REPLICA sync started
+74058:S 26 Dec 2024 10:51:54.687 * Cluster state changed: ok
+74058:S 26 Dec 2024 10:51:54.687 * Non blocking connect for SYNC fired the event.
+74058:S 26 Dec 2024 10:51:54.692 * Master replied to PING, replication can continue...
+74058:S 26 Dec 2024 10:51:54.698 * Trying a partial resynchronization (request ebd51b9ac5c311fb90efb10b1af891183ed2eb10:1).
+74058:S 26 Dec 2024 10:51:59.690 * Full resync from master: e65366503e5b524ff351f8dd3ef7f6aa36c23f83:0
+74058:S 26 Dec 2024 10:51:59.691 * MASTER <-> REPLICA sync: receiving streamed RDB from master with EOF to disk
+74058:S 26 Dec 2024 10:51:59.691 * Discarding previously cached master state.
+74058:S 26 Dec 2024 10:51:59.691 * MASTER <-> REPLICA sync: Flushing old data
+74058:S 26 Dec 2024 10:51:59.691 * MASTER <-> REPLICA sync: Loading DB in memory
+74058:S 26 Dec 2024 10:51:59.693 * Loading RDB produced by version 7.2.5
+74058:S 26 Dec 2024 10:51:59.693 * RDB age 0 seconds
+74058:S 26 Dec 2024 10:51:59.693 * RDB memory usage when created 1.78 Mb
+74058:S 26 Dec 2024 10:51:59.693 * Done loading RDB, keys loaded: 0, keys expired: 0.
+74058:S 26 Dec 2024 10:51:59.693 * MASTER <-> REPLICA sync: Finished with success
+74058:S 26 Dec 2024 10:51:59.694 * Creating AOF incr file temp-appendonly.aof.incr on background rewrite
+74058:S 26 Dec 2024 10:51:59.694 * Background append only file rewriting started by pid 74118
+74118:C 26 Dec 2024 10:51:59.695 * Successfully created the temporary AOF base file temp-rewriteaof-bg-74118.aof
+74118:C 26 Dec 2024 10:51:59.695 * Fork CoW for AOF rewrite: current 0 MB, peak 0 MB, average 0 MB
+74058:S 26 Dec 2024 10:51:59.706 * Background AOF rewrite terminated with success
+74058:S 26 Dec 2024 10:51:59.706 * Successfully renamed the temporary AOF base file temp-rewriteaof-bg-74118.aof into appendonly.aof.5.base.rdb
+74058:S 26 Dec 2024 10:51:59.706 * Successfully renamed the temporary AOF incr file temp-appendonly.aof.incr into appendonly.aof.5.incr.aof
+74058:S 26 Dec 2024 10:51:59.707 * Removing the history file appendonly.aof.4.incr.aof in the background
+74058:S 26 Dec 2024 10:51:59.707 * Removing the history file appendonly.aof.4.base.rdb in the background
+74058:S 26 Dec 2024 10:51:59.710 * Background AOF rewrite finished successfully
+74058:S 26 Dec 2024 11:51:55.054 * 1 changes in 3600 seconds. Saving...
+74058:S 26 Dec 2024 11:51:55.055 * Background saving started by pid 122320
+122320:C 26 Dec 2024 11:51:55.057 * DB saved on disk
+122320:C 26 Dec 2024 11:51:55.057 * Fork CoW for RDB: current 0 MB, peak 0 MB, average 0 MB
+74058:S 26 Dec 2024 11:51:55.155 * Background saving terminated with success
+74058:signal-handler (1735188501) Received SIGTERM scheduling shutdown...
+74058:S 26 Dec 2024 12:48:21.499 * Connection with master lost.
+74058:S 26 Dec 2024 12:48:21.499 * Caching the disconnected master state.
+74058:S 26 Dec 2024 12:48:21.499 * Reconnecting to MASTER 127.0.0.1:7000
+74058:S 26 Dec 2024 12:48:21.499 * MASTER <-> REPLICA sync started
+74058:S 26 Dec 2024 12:48:21.499 # Error condition on socket for SYNC: Connection refused
+74058:S 26 Dec 2024 12:48:21.540 * User requested shutdown...
+74058:S 26 Dec 2024 12:48:21.540 * Calling fsync() on the AOF file.
+74058:S 26 Dec 2024 12:48:21.540 * Saving the final RDB snapshot before exiting.
+74058:S 26 Dec 2024 12:48:21.543 * DB saved on disk
+74058:S 26 Dec 2024 12:48:21.543 * Removing the pid file.
+74058:S 26 Dec 2024 12:48:21.543 # Redis is now ready to exit, bye bye...
+3487:C 27 Dec 2024 09:06:57.046 # WARNING: Changing databases number from 16 to 1 since we are in cluster mode
+3487:C 27 Dec 2024 09:06:57.046 # WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+3492:C 27 Dec 2024 09:06:57.046 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+3492:C 27 Dec 2024 09:06:57.047 * Redis version=7.2.5, bits=64, commit=00000000, modified=0, pid=3492, just started
+3492:C 27 Dec 2024 09:06:57.047 * Configuration loaded
+3492:M 27 Dec 2024 09:06:57.047 * monotonic clock: POSIX clock_gettime
+3492:M 27 Dec 2024 09:06:57.047 # Failed to write PID file: Permission denied
+3492:M 27 Dec 2024 09:06:57.047 * Running mode=cluster, port=7003.
+3492:M 27 Dec 2024 09:06:57.048 * Node configuration loaded, I'm e0a8d6062676183759f2d820b2aa895dd50f4150
+3492:M 27 Dec 2024 09:06:57.048 * Server initialized
+3492:M 27 Dec 2024 09:06:57.048 * Reading RDB base file on AOF loading...
+3492:M 27 Dec 2024 09:06:57.048 * Loading RDB produced by version 7.2.5
+3492:M 27 Dec 2024 09:06:57.048 * RDB age 80098 seconds
+3492:M 27 Dec 2024 09:06:57.048 * RDB memory usage when created 1.56 Mb
+3492:M 27 Dec 2024 09:06:57.048 * RDB is base AOF
+3492:M 27 Dec 2024 09:06:57.048 * Done loading RDB, keys loaded: 0, keys expired: 0.
+3492:M 27 Dec 2024 09:06:57.048 * DB loaded from base file appendonly.aof.5.base.rdb: 0.000 seconds
+3492:M 27 Dec 2024 09:06:57.048 * DB loaded from incr file appendonly.aof.5.incr.aof: 0.000 seconds
+3492:M 27 Dec 2024 09:06:57.048 * DB loaded from append only file: 0.000 seconds
+3492:M 27 Dec 2024 09:06:57.048 * Opening AOF incr file appendonly.aof.5.incr.aof on server start
+3492:M 27 Dec 2024 09:06:57.048 * Ready to accept connections tcp
+3492:S 27 Dec 2024 09:06:57.048 * Before turning into a replica, using my own master parameters to synthesize a cached master: I may be able to synchronize with the new master with just a partial transfer.
+3492:S 27 Dec 2024 09:06:57.048 * Connecting to MASTER 127.0.0.1:7000
+3492:S 27 Dec 2024 09:06:57.049 * MASTER <-> REPLICA sync started
+3492:S 27 Dec 2024 09:06:57.049 * Cluster state changed: ok
+3492:S 27 Dec 2024 09:06:57.049 * Non blocking connect for SYNC fired the event.
+3492:S 27 Dec 2024 09:06:57.051 * Master replied to PING, replication can continue...
+3492:S 27 Dec 2024 09:06:57.052 * Trying a partial resynchronization (request ca2f56decd409018d032140f3b8f220710c37bb3:1).
+3492:S 27 Dec 2024 09:07:02.056 * Full resync from master: a437289cfffd747e4637ae8dd0daaf94945913e7:0
+3492:S 27 Dec 2024 09:07:02.057 * MASTER <-> REPLICA sync: receiving streamed RDB from master with EOF to disk
+3492:S 27 Dec 2024 09:07:02.057 * Discarding previously cached master state.
+3492:S 27 Dec 2024 09:07:02.057 * MASTER <-> REPLICA sync: Flushing old data
+3492:S 27 Dec 2024 09:07:02.057 * MASTER <-> REPLICA sync: Loading DB in memory
+3492:S 27 Dec 2024 09:07:02.063 * Loading RDB produced by version 7.2.5
+3492:S 27 Dec 2024 09:07:02.063 * RDB age 0 seconds
+3492:S 27 Dec 2024 09:07:02.063 * RDB memory usage when created 1.62 Mb
+3492:S 27 Dec 2024 09:07:02.063 * Done loading RDB, keys loaded: 1, keys expired: 0.
+3492:S 27 Dec 2024 09:07:02.063 * MASTER <-> REPLICA sync: Finished with success
+3492:S 27 Dec 2024 09:07:02.064 * Creating AOF incr file temp-appendonly.aof.incr on background rewrite
+3492:S 27 Dec 2024 09:07:02.064 * Background append only file rewriting started by pid 3563
+3563:C 27 Dec 2024 09:07:02.065 * Successfully created the temporary AOF base file temp-rewriteaof-bg-3563.aof
+3563:C 27 Dec 2024 09:07:02.065 * Fork CoW for AOF rewrite: current 0 MB, peak 0 MB, average 0 MB
+3492:S 27 Dec 2024 09:07:02.068 * Background AOF rewrite terminated with success
+3492:S 27 Dec 2024 09:07:02.068 * Successfully renamed the temporary AOF base file temp-rewriteaof-bg-3563.aof into appendonly.aof.6.base.rdb
+3492:S 27 Dec 2024 09:07:02.068 * Successfully renamed the temporary AOF incr file temp-appendonly.aof.incr into appendonly.aof.6.incr.aof
+3492:S 27 Dec 2024 09:07:02.070 * Removing the history file appendonly.aof.5.incr.aof in the background
+3492:S 27 Dec 2024 09:07:02.070 * Removing the history file appendonly.aof.5.base.rdb in the background
+3492:S 27 Dec 2024 09:07:02.071 * Background AOF rewrite finished successfully
+3492:S 27 Dec 2024 10:06:58.078 * 1 changes in 3600 seconds. Saving...
+3492:S 27 Dec 2024 10:06:58.078 * Background saving started by pid 28151
+28151:C 27 Dec 2024 10:06:58.100 * DB saved on disk
+28151:C 27 Dec 2024 10:06:58.101 * Fork CoW for RDB: current 0 MB, peak 0 MB, average 0 MB
+3492:S 27 Dec 2024 10:06:58.179 * Background saving terminated with success
+3492:signal-handler (1735265969) Received SIGTERM scheduling shutdown...
+3492:S 27 Dec 2024 10:19:29.339 * User requested shutdown...
+3492:S 27 Dec 2024 10:19:29.339 * Calling fsync() on the AOF file.
+3492:S 27 Dec 2024 10:19:29.340 * Saving the final RDB snapshot before exiting.
+3492:S 27 Dec 2024 10:19:29.349 * DB saved on disk
+3492:S 27 Dec 2024 10:19:29.349 * Removing the pid file.
+3492:S 27 Dec 2024 10:19:29.349 # Redis is now ready to exit, bye bye...

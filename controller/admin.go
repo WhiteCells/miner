@@ -22,28 +22,13 @@ func NewAdminController() *AdminController {
 
 // AdminGetUser 获取所有用户
 func (c *AdminController) GetAllUser(ctx *gin.Context) {
-	pageNum, err := strconv.Atoi(ctx.Query("page_num"))
-	if err != nil || pageNum <= 0 {
-		rsp.Error(ctx, http.StatusBadRequest, "invalid page_numt", nil)
-		return
-	}
-	pageSize, err := strconv.Atoi(ctx.Query("page_size"))
-	if err != nil || pageSize <= 0 {
-		rsp.Error(ctx, http.StatusBadRequest, "invalid page_size", nil)
-		return
-	}
-	query := map[string]interface{}{
-		"page_num":  pageNum,
-		"page_size": pageSize,
-	}
-
-	users, total, err := c.adminService.GetAllUser(ctx, query)
+	users, err := c.adminService.GetAllUser(ctx)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, "admin get all user failed", nil)
 		return
 	}
 
-	rsp.QuerySuccess(ctx, http.StatusOK, "admin get all user success", users, total)
+	rsp.QuerySuccess(ctx, http.StatusOK, "admin get all user success", users)
 }
 
 // AdminGetOperLog 获取所有用户操作日志
@@ -69,7 +54,7 @@ func (c *AdminController) GetUserOperLogs(ctx *gin.Context) {
 		return
 	}
 
-	rsp.QuerySuccess(ctx, http.StatusOK, "admin get all user success", users, total)
+	rsp.DBQuerySuccess(ctx, http.StatusOK, "admin get all user success", users, total)
 }
 
 // GetUserLoginLogs 获取用户登陆日志
@@ -95,7 +80,7 @@ func (c *AdminController) GetUserLoginLogs(ctx *gin.Context) {
 		return
 	}
 
-	rsp.QuerySuccess(ctx, http.StatusOK, "admin get user login logs success", users, total)
+	rsp.DBQuerySuccess(ctx, http.StatusOK, "admin get user login logs success", users, total)
 }
 
 // GetUserPointsRecords 获取用户的积分记录
@@ -121,77 +106,30 @@ func (c *AdminController) GetUserPointsRecords(ctx *gin.Context) {
 		return
 	}
 
-	rsp.QuerySuccess(ctx, http.StatusOK, "admin get user points records success", users, total)
+	rsp.DBQuerySuccess(ctx, http.StatusOK, "admin get user points records success", users, total)
 }
 
 // GetUserFarms 获取用户的所有矿场
 func (c *AdminController) GetUserFarms(ctx *gin.Context) {
-	pageNum, err := strconv.Atoi(ctx.Query("page_num"))
-	if err != nil || pageNum <= 0 {
-		rsp.Error(ctx, http.StatusBadRequest, "invalid page_numt", nil)
-		return
-	}
-	pageSize, err := strconv.Atoi(ctx.Query("page_size"))
-	if err != nil || pageSize <= 0 {
-		rsp.Error(ctx, http.StatusBadRequest, "invalid page_size", nil)
-		return
-	}
-	userID, err := strconv.Atoi(ctx.Query("user_id"))
-	if err != nil || userID <= 0 {
-		rsp.Error(ctx, http.StatusBadRequest, "invalid user_id", nil)
-		return
-	}
-	query := map[string]interface{}{
-		"user_id":   userID,
-		"page_num":  pageNum,
-		"page_size": pageSize,
-	}
-
-	farms, total, err := c.adminService.GetUserFarms(ctx, query)
+	farms, err := c.adminService.GetUserFarms(ctx)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, "admin get user farms failed", nil)
 		return
 	}
 
-	rsp.QuerySuccess(ctx, http.StatusOK, "admin get user farms success", farms, total)
+	rsp.QuerySuccess(ctx, http.StatusOK, "admin get user farms success", farms)
 }
 
 // GetUserMiners 获取用户的所有矿机
 func (c *AdminController) GetUserMiners(ctx *gin.Context) {
-	pageNum, err := strconv.Atoi(ctx.Query("page_num"))
-	if err != nil || pageNum <= 0 {
-		rsp.Error(ctx, http.StatusBadRequest, "invalid page_numt", nil)
-		return
-	}
-	pageSize, err := strconv.Atoi(ctx.Query("page_size"))
-	if err != nil || pageSize <= 0 {
-		rsp.Error(ctx, http.StatusBadRequest, "invalid page_size", nil)
-		return
-	}
-	userID, err := strconv.Atoi(ctx.Query("user_id"))
-	if err != nil || userID <= 0 {
-		rsp.Error(ctx, http.StatusBadRequest, "invalid user_id", nil)
-		return
-	}
-	farmID, err := strconv.Atoi(ctx.Query("farm_id"))
-	if err != nil || farmID <= 0 {
-		rsp.Error(ctx, http.StatusBadRequest, "invalid farm_id", nil)
-		return
-	}
-	query := map[string]interface{}{
-		"user_id":   userID,
-		"farm_id":   farmID,
-		"page_num":  pageNum,
-		"page_size": pageSize,
-	}
-
-	miners, total, err := c.adminService.GetUserMiners(ctx, query)
+	farmID := ""
+	miners, err := c.adminService.GetUserMiners(ctx, farmID)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, "admin get user miners failed", nil)
 		return
 	}
 
-	rsp.QuerySuccess(ctx, http.StatusOK, "admin get user miners success", miners, total)
+	rsp.QuerySuccess(ctx, http.StatusOK, "admin get user miners success", miners)
 }
 
 // SwitchRegister 用户注册开关
@@ -210,15 +148,15 @@ func (c *AdminController) SwitchRegister(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "admin switch register success", nil)
 }
 
-// SetGlobalFlightsheet 设置全局飞行表
-func (c *AdminController) SetGlobalFlightsheet(ctx *gin.Context) {
-	var req dto.AdminSetGlobalFlightsheetReq
+// SetGlobalFs 设置全局飞行表
+func (c *AdminController) SetGlobalFs(ctx *gin.Context) {
+	var req dto.AdminSetGlobalFsReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		rsp.Error(ctx, http.StatusBadRequest, "invalid request", nil)
 		return
 	}
 
-	if err := c.adminService.SetGlobalFlightsheet(ctx, &req); err != nil {
+	if err := c.adminService.SetGlobalFs(ctx, &req); err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, "admin set global flightsheet faild", nil)
 		return
 	}
@@ -234,7 +172,7 @@ func (c *AdminController) SetInviteReward(ctx *gin.Context) {
 		return
 	}
 
-	if err := c.adminService.SetInviteReward(ctx, &req); err != nil {
+	if err := c.adminService.RewardInvite(ctx, &req); err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, "admin set invite reward faild", nil)
 		return
 	}
@@ -250,7 +188,7 @@ func (c *AdminController) SetRechargeReward(ctx *gin.Context) {
 		return
 	}
 
-	if err := c.adminService.SetRechargeReward(ctx, &req); err != nil {
+	if err := c.adminService.RewardRecharge(ctx, &req); err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, "admin set recharge reward faild", nil)
 		return
 	}

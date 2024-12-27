@@ -5,7 +5,6 @@ import (
 	"miner/common/rsp"
 	"miner/service"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -69,40 +68,26 @@ func (c *FarmController) UpdateFarm(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "update farm success", nil)
 }
 
-// GetFarm 获取用户矿场
+// GetFarm 获取用户所有的矿场
 func (c *FarmController) GetFarm(ctx *gin.Context) {
-	pageNum, err := strconv.Atoi(ctx.Query("page_num"))
-	if err != nil || pageNum <= 0 {
-		rsp.Error(ctx, http.StatusBadRequest, "invalid page_numt", nil)
-		return
-	}
-	pageSize, err := strconv.Atoi(ctx.Query("page_size"))
-	if err != nil || pageSize <= 0 {
-		rsp.Error(ctx, http.StatusBadRequest, "invalid page_size", nil)
-		return
-	}
-	query := map[string]interface{}{
-		"page_num":  pageNum,
-		"page_size": pageSize,
-	}
-	farms, total, err := c.farmService.GetFarm(ctx, query)
+	farms, err := c.farmService.GetFarm(ctx)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
 
-	rsp.QuerySuccess(ctx, http.StatusOK, "get farm success", farms, total)
+	rsp.QuerySuccess(ctx, http.StatusOK, "get farm success", farms)
 }
 
-// ApplyFlightsheet 矿场应用飞行表
-func (c *FarmController) ApplyFlightsheet(ctx *gin.Context) {
+// ApplyFs 矿场应用飞行表
+func (c *FarmController) ApplyFs(ctx *gin.Context) {
 	var req dto.ApplyFarmFlightsheetReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
 
-	if err := c.farmService.ApplyFlightsheet(ctx, &req); err != nil {
+	if err := c.farmService.ApplyFs(ctx, &req); err != nil {
 		return
 	}
 

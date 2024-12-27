@@ -78,5 +78,5 @@ func (c *OperLogController) GetOperLogs(ctx *gin.Context) {
 		return
 	}
 
-	rsp.QuerySuccess(ctx, http.StatusOK, "get oper logs success", logs, total)
+	rsp.DBQuerySuccess(ctx, http.StatusOK, "get oper logs success", logs, total)
 }

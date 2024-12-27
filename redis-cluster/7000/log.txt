@@ -1,0 +1,313 @@
+50427:C 24 Dec 2024 12:02:38.934 # WARNING: Changing databases number from 16 to 1 since we are in cluster mode
+50428:C 24 Dec 2024 12:02:38.934 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+50428:C 24 Dec 2024 12:02:38.934 * Redis version=7.2.5, bits=64, commit=00000000, modified=0, pid=50428, just started
+50428:C 24 Dec 2024 12:02:38.934 * Configuration loaded
+50428:M 24 Dec 2024 12:02:38.935 * monotonic clock: POSIX clock_gettime
+50428:M 24 Dec 2024 12:02:38.935 # Failed to write PID file: Permission denied
+50428:M 24 Dec 2024 12:02:38.935 * Running mode=cluster, port=7000.
+50428:M 24 Dec 2024 12:02:38.935 * No cluster configuration found, I'm a97c00d6edbb11d135341be5afa237ada668ccdb
+50428:M 24 Dec 2024 12:02:38.942 * Server initialized
+50428:M 24 Dec 2024 12:02:38.942 * Reading RDB base file on AOF loading...
+50428:M 24 Dec 2024 12:02:38.942 * Loading RDB produced by version 7.2.5
+50428:M 24 Dec 2024 12:02:38.942 * RDB age 6267 seconds
+50428:M 24 Dec 2024 12:02:38.942 * RDB memory usage when created 1.52 Mb
+50428:M 24 Dec 2024 12:02:38.942 * RDB is base AOF
+50428:M 24 Dec 2024 12:02:38.942 * Done loading RDB, keys loaded: 0, keys expired: 0.
+50428:M 24 Dec 2024 12:02:38.942 * DB loaded from base file appendonly.aof.1.base.rdb: 0.000 seconds
+50428:M 24 Dec 2024 12:02:38.942 * DB loaded from append only file: 0.000 seconds
+50428:M 24 Dec 2024 12:02:38.942 * Opening AOF incr file appendonly.aof.1.incr.aof on server start
+50428:M 24 Dec 2024 12:02:38.942 * Ready to accept connections tcp
+50428:signal-handler (1735013140) Received SIGTERM scheduling shutdown...
+50428:M 24 Dec 2024 12:05:40.310 * User requested shutdown...
+50428:M 24 Dec 2024 12:05:40.310 * Calling fsync() on the AOF file.
+50428:M 24 Dec 2024 12:05:40.310 * Saving the final RDB snapshot before exiting.
+50428:M 24 Dec 2024 12:05:40.312 * DB saved on disk
+50428:M 24 Dec 2024 12:05:40.312 * Removing the pid file.
+50428:M 24 Dec 2024 12:05:40.312 # Redis is now ready to exit, bye bye...
+51983:C 24 Dec 2024 12:44:01.824 # WARNING: Changing databases number from 16 to 1 since we are in cluster mode
+51984:C 24 Dec 2024 12:44:01.824 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+51984:C 24 Dec 2024 12:44:01.824 * Redis version=7.2.5, bits=64, commit=00000000, modified=0, pid=51984, just started
+51984:C 24 Dec 2024 12:44:01.824 * Configuration loaded
+51984:M 24 Dec 2024 12:44:01.825 * monotonic clock: POSIX clock_gettime
+51984:M 24 Dec 2024 12:44:01.825 # Failed to write PID file: Permission denied
+51984:M 24 Dec 2024 12:44:01.825 * Running mode=cluster, port=7000.
+51984:M 24 Dec 2024 12:44:01.825 * Node configuration loaded, I'm a97c00d6edbb11d135341be5afa237ada668ccdb
+51984:M 24 Dec 2024 12:44:01.826 * Server initialized
+51984:M 24 Dec 2024 12:44:01.826 * Reading RDB base file on AOF loading...
+51984:M 24 Dec 2024 12:44:01.826 * Loading RDB produced by version 7.2.5
+51984:M 24 Dec 2024 12:44:01.826 * RDB age 8750 seconds
+51984:M 24 Dec 2024 12:44:01.826 * RDB memory usage when created 1.52 Mb
+51984:M 24 Dec 2024 12:44:01.826 * RDB is base AOF
+51984:M 24 Dec 2024 12:44:01.826 * Done loading RDB, keys loaded: 0, keys expired: 0.
+51984:M 24 Dec 2024 12:44:01.826 * DB loaded from base file appendonly.aof.1.base.rdb: 0.000 seconds
+51984:M 24 Dec 2024 12:44:01.826 * DB loaded from append only file: 0.000 seconds
+51984:M 24 Dec 2024 12:44:01.826 * Opening AOF incr file appendonly.aof.1.incr.aof on server start
+51984:M 24 Dec 2024 12:44:01.826 * Ready to accept connections tcp
+51984:signal-handler (1735015454) Received SIGTERM scheduling shutdown...
+51984:M 24 Dec 2024 12:44:14.713 * User requested shutdown...
+51984:M 24 Dec 2024 12:44:14.713 * Calling fsync() on the AOF file.
+51984:M 24 Dec 2024 12:44:14.714 * Saving the final RDB snapshot before exiting.
+51984:M 24 Dec 2024 12:44:14.715 * DB saved on disk
+51984:M 24 Dec 2024 12:44:14.715 * Removing the pid file.
+51984:M 24 Dec 2024 12:44:14.715 # Redis is now ready to exit, bye bye...
+52487:C 24 Dec 2024 12:49:24.646 # WARNING: Changing databases number from 16 to 1 since we are in cluster mode
+52488:C 24 Dec 2024 12:49:24.646 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+52488:C 24 Dec 2024 12:49:24.646 * Redis version=7.2.5, bits=64, commit=00000000, modified=0, pid=52488, just started
+52488:C 24 Dec 2024 12:49:24.646 * Configuration loaded
+52488:M 24 Dec 2024 12:49:24.647 * monotonic clock: POSIX clock_gettime
+52488:M 24 Dec 2024 12:49:24.647 # Failed to write PID file: Permission denied
+52488:M 24 Dec 2024 12:49:24.647 * Running mode=cluster, port=7000.
+52488:M 24 Dec 2024 12:49:24.647 * Node configuration loaded, I'm a97c00d6edbb11d135341be5afa237ada668ccdb
+52488:M 24 Dec 2024 12:49:24.648 * Server initialized
+52488:M 24 Dec 2024 12:49:24.648 * Reading RDB base file on AOF loading...
+52488:M 24 Dec 2024 12:49:24.648 * Loading RDB produced by version 7.2.5
+52488:M 24 Dec 2024 12:49:24.648 * RDB age 9073 seconds
+52488:M 24 Dec 2024 12:49:24.648 * RDB memory usage when created 1.52 Mb
+52488:M 24 Dec 2024 12:49:24.648 * RDB is base AOF
+52488:M 24 Dec 2024 12:49:24.648 * Done loading RDB, keys loaded: 0, keys expired: 0.
+52488:M 24 Dec 2024 12:49:24.648 * DB loaded from base file appendonly.aof.1.base.rdb: 0.000 seconds
+52488:M 24 Dec 2024 12:49:24.648 * DB loaded from append only file: 0.000 seconds
+52488:M 24 Dec 2024 12:49:24.648 * Opening AOF incr file appendonly.aof.1.incr.aof on server start
+52488:M 24 Dec 2024 12:49:24.648 * Ready to accept connections tcp
+52488:M 24 Dec 2024 13:44:12.661 * configEpoch set to 1 via CLUSTER SET-CONFIG-EPOCH
+52488:M 24 Dec 2024 13:44:12.726 * IP address for this node updated to 127.0.0.1
+52488:M 24 Dec 2024 13:44:13.665 * Replica 127.0.0.1:7003 asks for synchronization
+52488:M 24 Dec 2024 13:44:13.665 * Partial resynchronization not accepted: Replication ID mismatch (Replica asked for '112c8b2b3acf845bbf236cfac5102df7ed078ac2', my replication IDs are 'fa2625520d242a9194b7e50f21017c1f1470ca2a' and '0000000000000000000000000000000000000000')
+52488:M 24 Dec 2024 13:44:13.665 * Replication backlog created, my new replication IDs are 'fa27eccbc59651f4773a8a3f1d7ec2aef2649c75' and '0000000000000000000000000000000000000000'
+52488:M 24 Dec 2024 13:44:13.665 * Delay next BGSAVE for diskless SYNC
+52488:M 24 Dec 2024 13:44:17.651 * Cluster state changed: ok
+52488:M 24 Dec 2024 13:44:18.453 * Starting BGSAVE for SYNC with target: replicas sockets
+52488:M 24 Dec 2024 13:44:18.453 * Background RDB transfer started by pid 55017
+55017:C 24 Dec 2024 13:44:18.454 * Fork CoW for RDB: current 0 MB, peak 0 MB, average 0 MB
+52488:M 24 Dec 2024 13:44:18.454 * Diskless rdb transfer, done reading from pipe, 1 replicas still up.
+52488:M 24 Dec 2024 13:44:18.457 * Background RDB transfer terminated with success
+52488:M 24 Dec 2024 13:44:18.457 * Streamed RDB transfer with replica 127.0.0.1:7003 succeeded (socket). Waiting for REPLCONF ACK from replica to enable streaming
+52488:M 24 Dec 2024 13:44:18.457 * Synchronization with replica 127.0.0.1:7003 succeeded
+52488:M 24 Dec 2024 13:47:18.661 * DB saved on disk
+52488:M 24 Dec 2024 13:50:22.761 * DB saved on disk
+55402:C 24 Dec 2024 13:50:41.309 # WARNING: Changing databases number from 16 to 1 since we are in cluster mode
+55403:C 24 Dec 2024 13:50:41.310 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+55403:C 24 Dec 2024 13:50:41.310 * Redis version=7.2.5, bits=64, commit=00000000, modified=0, pid=55403, just started
+55403:C 24 Dec 2024 13:50:41.310 * Configuration loaded
+55403:M 24 Dec 2024 13:50:41.310 * monotonic clock: POSIX clock_gettime
+55403:M 24 Dec 2024 13:50:41.311 # Failed to write PID file: Permission denied
+55403:M 24 Dec 2024 13:50:41.311 * Running mode=cluster, port=7000.
+55403:M 24 Dec 2024 13:50:41.311 * Node configuration loaded, I'm a97c00d6edbb11d135341be5afa237ada668ccdb
+55403:M 24 Dec 2024 13:50:41.312 # Warning: Could not create server TCP listening socket 0.0.0.0:7000: bind: Address already in use
+55403:M 24 Dec 2024 13:50:41.312 # Failed listening on port 7000 (tcp), aborting.
+52488:signal-handler (1735019587) Received SIGTERM scheduling shutdown...
+52488:M 24 Dec 2024 13:53:07.122 * User requested shutdown...
+52488:M 24 Dec 2024 13:53:07.122 * Waiting for replicas before shutting down.
+52488:M 24 Dec 2024 13:53:07.155 * Connection with replica 127.0.0.1:7003 lost.
+52488:M 24 Dec 2024 13:53:07.223 * Calling fsync() on the AOF file.
+52488:M 24 Dec 2024 13:53:07.223 * Saving the final RDB snapshot before exiting.
+52488:M 24 Dec 2024 13:53:07.224 * DB saved on disk
+52488:M 24 Dec 2024 13:53:07.224 * Removing the pid file.
+52488:M 24 Dec 2024 13:53:07.224 # Redis is now ready to exit, bye bye...
+55934:C 24 Dec 2024 13:53:18.465 # WARNING: Changing databases number from 16 to 1 since we are in cluster mode
+55935:C 24 Dec 2024 13:53:18.466 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+55935:C 24 Dec 2024 13:53:18.466 * Redis version=7.2.5, bits=64, commit=00000000, modified=0, pid=55935, just started
+55935:C 24 Dec 2024 13:53:18.466 * Configuration loaded
+55935:M 24 Dec 2024 13:53:18.466 * monotonic clock: POSIX clock_gettime
+55935:M 24 Dec 2024 13:53:18.467 # Failed to write PID file: Permission denied
+55935:M 24 Dec 2024 13:53:18.467 * Running mode=cluster, port=7000.
+55935:M 24 Dec 2024 13:53:18.467 * Node configuration loaded, I'm a97c00d6edbb11d135341be5afa237ada668ccdb
+55935:M 24 Dec 2024 13:53:18.468 * Server initialized
+55935:M 24 Dec 2024 13:53:18.468 * Reading RDB base file on AOF loading...
+55935:M 24 Dec 2024 13:53:18.468 * Loading RDB produced by version 7.2.5
+55935:M 24 Dec 2024 13:53:18.468 * RDB age 12907 seconds
+55935:M 24 Dec 2024 13:53:18.468 * RDB memory usage when created 1.52 Mb
+55935:M 24 Dec 2024 13:53:18.468 * RDB is base AOF
+55935:M 24 Dec 2024 13:53:18.468 * Done loading RDB, keys loaded: 0, keys expired: 0.
+55935:M 24 Dec 2024 13:53:18.468 * DB loaded from base file appendonly.aof.1.base.rdb: 0.000 seconds
+55935:M 24 Dec 2024 13:53:18.474 * DB saved on disk
+55935:M 24 Dec 2024 13:53:18.476 * DB saved on disk
+55935:M 24 Dec 2024 13:53:18.476 * DB loaded from incr file appendonly.aof.1.incr.aof: 0.008 seconds
+55935:M 24 Dec 2024 13:53:18.476 * DB loaded from append only file: 0.008 seconds
+55935:M 24 Dec 2024 13:53:18.476 * Opening AOF incr file appendonly.aof.1.incr.aof on server start
+55935:M 24 Dec 2024 13:53:18.476 * Ready to accept connections tcp
+55935:M 24 Dec 2024 13:53:18.509 * Replica 127.0.0.1:7003 asks for synchronization
+55935:M 24 Dec 2024 13:53:18.509 * Partial resynchronization not accepted: Replication ID mismatch (Replica asked for '975769a64f40146ff75b624c62e006568cc9a929', my replication IDs are 'efd95c51ca2c49dff752d112ccddf60bb38138ac' and '0000000000000000000000000000000000000000')
+55935:M 24 Dec 2024 13:53:18.509 * Replication backlog created, my new replication IDs are '08eeb070434872a79dd2fd5111569a43d9981087' and '0000000000000000000000000000000000000000'
+55935:M 24 Dec 2024 13:53:18.509 * Delay next BGSAVE for diskless SYNC
+55935:M 24 Dec 2024 13:53:20.482 * Cluster state changed: ok
+55935:M 24 Dec 2024 13:53:23.495 * Starting BGSAVE for SYNC with target: replicas sockets
+55935:M 24 Dec 2024 13:53:23.495 * Background RDB transfer started by pid 56001
+56001:C 24 Dec 2024 13:53:23.496 * Fork CoW for RDB: current 0 MB, peak 0 MB, average 0 MB
+55935:M 24 Dec 2024 13:53:23.496 * Diskless rdb transfer, done reading from pipe, 1 replicas still up.
+55935:M 24 Dec 2024 13:53:23.498 * Background RDB transfer terminated with success
+55935:M 24 Dec 2024 13:53:23.498 * Streamed RDB transfer with replica 127.0.0.1:7003 succeeded (socket). Waiting for REPLCONF ACK from replica to enable streaming
+55935:M 24 Dec 2024 13:53:23.498 * Synchronization with replica 127.0.0.1:7003 succeeded
+55935:signal-handler (1735019954) Received SIGTERM scheduling shutdown...
+55935:M 24 Dec 2024 13:59:14.522 * User requested shutdown...
+55935:M 24 Dec 2024 13:59:14.522 * 1 of 1 replicas are in sync when shutting down.
+55935:M 24 Dec 2024 13:59:14.522 * Calling fsync() on the AOF file.
+55935:M 24 Dec 2024 13:59:14.522 * Saving the final RDB snapshot before exiting.
+55935:M 24 Dec 2024 13:59:14.530 * DB saved on disk
+55935:M 24 Dec 2024 13:59:14.530 * Removing the pid file.
+55935:M 24 Dec 2024 13:59:14.530 # Redis is now ready to exit, bye bye...
+56803:C 24 Dec 2024 14:01:40.798 # WARNING: Changing databases number from 16 to 1 since we are in cluster mode
+56804:C 24 Dec 2024 14:01:40.798 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+56804:C 24 Dec 2024 14:01:40.798 * Redis version=7.2.5, bits=64, commit=00000000, modified=0, pid=56804, just started
+56804:C 24 Dec 2024 14:01:40.798 * Configuration loaded
+56804:M 24 Dec 2024 14:01:40.799 * monotonic clock: POSIX clock_gettime
+56804:M 24 Dec 2024 14:01:40.800 # Failed to write PID file: Permission denied
+56804:M 24 Dec 2024 14:01:40.800 * Running mode=cluster, port=7000.
+56804:M 24 Dec 2024 14:01:40.800 * Node configuration loaded, I'm a97c00d6edbb11d135341be5afa237ada668ccdb
+56804:M 24 Dec 2024 14:01:40.801 * Server initialized
+56804:M 24 Dec 2024 14:01:40.801 * Reading RDB base file on AOF loading...
+56804:M 24 Dec 2024 14:01:40.801 * Loading RDB produced by version 7.2.5
+56804:M 24 Dec 2024 14:01:40.801 * RDB age 13409 seconds
+56804:M 24 Dec 2024 14:01:40.801 * RDB memory usage when created 1.52 Mb
+56804:M 24 Dec 2024 14:01:40.801 * RDB is base AOF
+56804:M 24 Dec 2024 14:01:40.801 * Done loading RDB, keys loaded: 0, keys expired: 0.
+56804:M 24 Dec 2024 14:01:40.801 * DB loaded from base file appendonly.aof.1.base.rdb: 0.000 seconds
+56804:M 24 Dec 2024 14:01:40.808 * DB saved on disk
+56804:M 24 Dec 2024 14:01:40.810 * DB saved on disk
+56804:M 24 Dec 2024 14:01:40.810 * DB loaded from incr file appendonly.aof.1.incr.aof: 0.009 seconds
+56804:M 24 Dec 2024 14:01:40.810 * DB loaded from append only file: 0.009 seconds
+56804:M 24 Dec 2024 14:01:40.810 * Opening AOF incr file appendonly.aof.1.incr.aof on server start
+56804:M 24 Dec 2024 14:01:40.810 * Ready to accept connections tcp
+56804:M 24 Dec 2024 14:01:40.833 * Replica 127.0.0.1:7003 asks for synchronization
+56804:M 24 Dec 2024 14:01:40.833 * Partial resynchronization not accepted: Replication ID mismatch (Replica asked for 'eca5dec3458ef4940c1fce7d000af05e872ba3b1', my replication IDs are '9a6b0d61291aded11cbd569af69ca31c59d9605f' and '0000000000000000000000000000000000000000')
+56804:M 24 Dec 2024 14:01:40.833 * Replication backlog created, my new replication IDs are '8a6b1b6e0a13e703a110fbd64f72a9eb4be98a4e' and '0000000000000000000000000000000000000000'
+56804:M 24 Dec 2024 14:01:40.833 * Delay next BGSAVE for diskless SYNC
+56804:M 24 Dec 2024 14:01:42.819 * Cluster state changed: ok
+56804:M 24 Dec 2024 14:01:45.838 * Starting BGSAVE for SYNC with target: replicas sockets
+56804:M 24 Dec 2024 14:01:45.839 * Background RDB transfer started by pid 56881
+56881:C 24 Dec 2024 14:01:45.841 * Fork CoW for RDB: current 0 MB, peak 0 MB, average 0 MB
+56804:M 24 Dec 2024 14:01:45.841 * Diskless rdb transfer, done reading from pipe, 1 replicas still up.
+56804:M 24 Dec 2024 14:01:45.845 * Background RDB transfer terminated with success
+56804:M 24 Dec 2024 14:01:45.845 * Streamed RDB transfer with replica 127.0.0.1:7003 succeeded (socket). Waiting for REPLCONF ACK from replica to enable streaming
+56804:M 24 Dec 2024 14:01:45.845 * Synchronization with replica 127.0.0.1:7003 succeeded
+57913:C 24 Dec 2024 14:15:47.479 # WARNING: Changing databases number from 16 to 1 since we are in cluster mode
+57918:C 24 Dec 2024 14:15:47.479 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+57918:C 24 Dec 2024 14:15:47.480 * Redis version=7.2.5, bits=64, commit=00000000, modified=0, pid=57918, just started
+57918:C 24 Dec 2024 14:15:47.480 * Configuration loaded
+57918:M 24 Dec 2024 14:15:47.480 * Increased maximum number of open files to 10032 (it was originally set to 1024).
+57918:M 24 Dec 2024 14:15:47.480 * monotonic clock: POSIX clock_gettime
+57918:M 24 Dec 2024 14:15:47.480 # Failed to write PID file: Permission denied
+57918:M 24 Dec 2024 14:15:47.480 * Running mode=cluster, port=7000.
+57918:M 24 Dec 2024 14:15:47.481 * Node configuration loaded, I'm a97c00d6edbb11d135341be5afa237ada668ccdb
+57918:M 24 Dec 2024 14:15:47.481 # Warning: Could not create server TCP listening socket 0.0.0.0:7000: bind: Address already in use
+57918:M 24 Dec 2024 14:15:47.481 # Failed listening on port 7000 (tcp), aborting.
+72143:C 24 Dec 2024 17:54:19.173 # WARNING: Changing databases number from 16 to 1 since we are in cluster mode
+72144:C 24 Dec 2024 17:54:19.174 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+72144:C 24 Dec 2024 17:54:19.174 * Redis version=7.2.5, bits=64, commit=00000000, modified=0, pid=72144, just started
+72144:C 24 Dec 2024 17:54:19.174 * Configuration loaded
+72144:M 24 Dec 2024 17:54:19.174 * monotonic clock: POSIX clock_gettime
+72144:M 24 Dec 2024 17:54:19.174 # Failed to write PID file: Permission denied
+72144:M 24 Dec 2024 17:54:19.174 * Running mode=cluster, port=7000.
+72144:M 24 Dec 2024 17:54:19.175 * Node configuration loaded, I'm a97c00d6edbb11d135341be5afa237ada668ccdb
+72144:M 24 Dec 2024 17:54:19.175 # Warning: Could not create server TCP listening socket 0.0.0.0:7000: bind: Address already in use
+72144:M 24 Dec 2024 17:54:19.175 # Failed listening on port 7000 (tcp), aborting.
+56804:M 24 Dec 2024 18:00:05.981 * DB saved on disk
+56804:M 24 Dec 2024 18:00:27.720 * DB saved on disk
+56804:signal-handler (1735034752) Received SIGTERM scheduling shutdown...
+56804:M 24 Dec 2024 18:05:52.973 * User requested shutdown...
+56804:M 24 Dec 2024 18:05:52.973 * 1 of 1 replicas are in sync when shutting down.
+56804:M 24 Dec 2024 18:05:52.973 * Calling fsync() on the AOF file.
+56804:M 24 Dec 2024 18:05:52.973 * Saving the final RDB snapshot before exiting.
+56804:M 24 Dec 2024 18:05:52.982 * DB saved on disk
+56804:M 24 Dec 2024 18:05:52.982 * Removing the pid file.
+56804:M 24 Dec 2024 18:05:52.982 # Redis is now ready to exit, bye bye...
+74039:C 26 Dec 2024 10:51:54.659 # WARNING: Changing databases number from 16 to 1 since we are in cluster mode
+74039:C 26 Dec 2024 10:51:54.664 # WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+74040:C 26 Dec 2024 10:51:54.664 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+74040:C 26 Dec 2024 10:51:54.665 * Redis version=7.2.5, bits=64, commit=00000000, modified=0, pid=74040, just started
+74040:C 26 Dec 2024 10:51:54.665 * Configuration loaded
+74040:M 26 Dec 2024 10:51:54.665 * monotonic clock: POSIX clock_gettime
+74040:M 26 Dec 2024 10:51:54.665 # Failed to write PID file: Permission denied
+74040:M 26 Dec 2024 10:51:54.665 * Running mode=cluster, port=7000.
+74040:M 26 Dec 2024 10:51:54.666 * Node configuration loaded, I'm a97c00d6edbb11d135341be5afa237ada668ccdb
+74040:M 26 Dec 2024 10:51:54.666 * Server initialized
+74040:M 26 Dec 2024 10:51:54.666 * Reading RDB base file on AOF loading...
+74040:M 26 Dec 2024 10:51:54.666 * Loading RDB produced by version 7.2.5
+74040:M 26 Dec 2024 10:51:54.666 * RDB age 174823 seconds
+74040:M 26 Dec 2024 10:51:54.666 * RDB memory usage when created 1.52 Mb
+74040:M 26 Dec 2024 10:51:54.666 * RDB is base AOF
+74040:M 26 Dec 2024 10:51:54.666 * Done loading RDB, keys loaded: 0, keys expired: 0.
+74040:M 26 Dec 2024 10:51:54.666 * DB loaded from base file appendonly.aof.1.base.rdb: 0.000 seconds
+74040:M 26 Dec 2024 10:51:54.669 * DB saved on disk
+74040:M 26 Dec 2024 10:51:54.671 * DB saved on disk
+74040:M 26 Dec 2024 10:51:54.672 * DB saved on disk
+74040:M 26 Dec 2024 10:51:54.674 * DB saved on disk
+74040:M 26 Dec 2024 10:51:54.674 * DB loaded from incr file appendonly.aof.1.incr.aof: 0.007 seconds
+74040:M 26 Dec 2024 10:51:54.674 * DB loaded from append only file: 0.007 seconds
+74040:M 26 Dec 2024 10:51:54.674 * Opening AOF incr file appendonly.aof.1.incr.aof on server start
+74040:M 26 Dec 2024 10:51:54.674 * Ready to accept connections tcp
+74040:M 26 Dec 2024 10:51:54.698 * Replica 127.0.0.1:7003 asks for synchronization
+74040:M 26 Dec 2024 10:51:54.698 * Partial resynchronization not accepted: Replication ID mismatch (Replica asked for 'ebd51b9ac5c311fb90efb10b1af891183ed2eb10', my replication IDs are 'df5b2c438b553e19558f8202c2289b19da07c699' and '0000000000000000000000000000000000000000')
+74040:M 26 Dec 2024 10:51:54.698 * Replication backlog created, my new replication IDs are 'e65366503e5b524ff351f8dd3ef7f6aa36c23f83' and '0000000000000000000000000000000000000000'
+74040:M 26 Dec 2024 10:51:54.698 * Delay next BGSAVE for diskless SYNC
+74040:M 26 Dec 2024 10:51:56.680 * Cluster state changed: ok
+74040:M 26 Dec 2024 10:51:59.690 * Starting BGSAVE for SYNC with target: replicas sockets
+74040:M 26 Dec 2024 10:51:59.690 * Background RDB transfer started by pid 74114
+74114:C 26 Dec 2024 10:51:59.691 * Fork CoW for RDB: current 0 MB, peak 0 MB, average 0 MB
+74040:M 26 Dec 2024 10:51:59.691 * Diskless rdb transfer, done reading from pipe, 1 replicas still up.
+74040:M 26 Dec 2024 10:51:59.695 * Background RDB transfer terminated with success
+74040:M 26 Dec 2024 10:51:59.695 * Streamed RDB transfer with replica 127.0.0.1:7003 succeeded (socket). Waiting for REPLCONF ACK from replica to enable streaming
+74040:M 26 Dec 2024 10:51:59.695 * Synchronization with replica 127.0.0.1:7003 succeeded
+74040:M 26 Dec 2024 11:51:55.034 * 1 changes in 3600 seconds. Saving...
+74040:M 26 Dec 2024 11:51:55.035 * Background saving started by pid 122319
+122319:C 26 Dec 2024 11:51:55.042 * DB saved on disk
+122319:C 26 Dec 2024 11:51:55.042 * Fork CoW for RDB: current 0 MB, peak 0 MB, average 0 MB
+74040:M 26 Dec 2024 11:51:55.135 * Background saving terminated with success
+74040:signal-handler (1735188501) Received SIGTERM scheduling shutdown...
+74040:M 26 Dec 2024 12:48:21.489 * User requested shutdown...
+74040:M 26 Dec 2024 12:48:21.489 * 1 of 1 replicas are in sync when shutting down.
+74040:M 26 Dec 2024 12:48:21.489 * Calling fsync() on the AOF file.
+74040:M 26 Dec 2024 12:48:21.489 * Saving the final RDB snapshot before exiting.
+74040:M 26 Dec 2024 12:48:21.498 * DB saved on disk
+74040:M 26 Dec 2024 12:48:21.498 * Removing the pid file.
+74040:M 26 Dec 2024 12:48:21.498 # Redis is now ready to exit, bye bye...
+3473:C 27 Dec 2024 09:06:57.024 # WARNING: Changing databases number from 16 to 1 since we are in cluster mode
+3473:C 27 Dec 2024 09:06:57.029 # WARNING Memory overcommit must be enabled! Without it, a background save or replication may fail under low memory condition. Being disabled, it can also cause failures without low memory condition, see https://github.com/jemalloc/jemalloc/issues/1328. To fix this issue add 'vm.overcommit_memory = 1' to /etc/sysctl.conf and then reboot or run the command 'sysctl vm.overcommit_memory=1' for this to take effect.
+3474:C 27 Dec 2024 09:06:57.030 * oO0OoO0OoO0Oo Redis is starting oO0OoO0OoO0Oo
+3474:C 27 Dec 2024 09:06:57.030 * Redis version=7.2.5, bits=64, commit=00000000, modified=0, pid=3474, just started
+3474:C 27 Dec 2024 09:06:57.030 * Configuration loaded
+3474:M 27 Dec 2024 09:06:57.030 * monotonic clock: POSIX clock_gettime
+3474:M 27 Dec 2024 09:06:57.031 # Failed to write PID file: Permission denied
+3474:M 27 Dec 2024 09:06:57.031 * Running mode=cluster, port=7000.
+3474:M 27 Dec 2024 09:06:57.031 * Node configuration loaded, I'm a97c00d6edbb11d135341be5afa237ada668ccdb
+3474:M 27 Dec 2024 09:06:57.032 * Server initialized
+3474:M 27 Dec 2024 09:06:57.032 * Reading RDB base file on AOF loading...
+3474:M 27 Dec 2024 09:06:57.032 * Loading RDB produced by version 7.2.5
+3474:M 27 Dec 2024 09:06:57.032 * RDB age 254926 seconds
+3474:M 27 Dec 2024 09:06:57.032 * RDB memory usage when created 1.52 Mb
+3474:M 27 Dec 2024 09:06:57.032 * RDB is base AOF
+3474:M 27 Dec 2024 09:06:57.032 * Done loading RDB, keys loaded: 0, keys expired: 0.
+3474:M 27 Dec 2024 09:06:57.032 * DB loaded from base file appendonly.aof.1.base.rdb: 0.000 seconds
+3474:M 27 Dec 2024 09:06:57.034 * DB saved on disk
+3474:M 27 Dec 2024 09:06:57.035 * DB saved on disk
+3474:M 27 Dec 2024 09:06:57.037 * DB saved on disk
+3474:M 27 Dec 2024 09:06:57.038 * DB saved on disk
+3474:M 27 Dec 2024 09:06:57.038 * DB loaded from incr file appendonly.aof.1.incr.aof: 0.007 seconds
+3474:M 27 Dec 2024 09:06:57.038 * DB loaded from append only file: 0.007 seconds
+3474:M 27 Dec 2024 09:06:57.038 * Opening AOF incr file appendonly.aof.1.incr.aof on server start
+3474:M 27 Dec 2024 09:06:57.038 * Ready to accept connections tcp
+3474:M 27 Dec 2024 09:06:57.052 * Replica 127.0.0.1:7003 asks for synchronization
+3474:M 27 Dec 2024 09:06:57.052 * Partial resynchronization not accepted: Replication ID mismatch (Replica asked for 'ca2f56decd409018d032140f3b8f220710c37bb3', my replication IDs are '7fa0f1c9206a289b5e37b7fa3a817792eebb8de7' and '0000000000000000000000000000000000000000')
+3474:M 27 Dec 2024 09:06:57.052 * Replication backlog created, my new replication IDs are 'a437289cfffd747e4637ae8dd0daaf94945913e7' and '0000000000000000000000000000000000000000'
+3474:M 27 Dec 2024 09:06:57.052 * Delay next BGSAVE for diskless SYNC
+3474:M 27 Dec 2024 09:06:59.046 * Cluster state changed: ok
+3474:M 27 Dec 2024 09:07:02.055 * Starting BGSAVE for SYNC with target: replicas sockets
+3474:M 27 Dec 2024 09:07:02.056 * Background RDB transfer started by pid 3561
+3561:C 27 Dec 2024 09:07:02.057 * Fork CoW for RDB: current 0 MB, peak 0 MB, average 0 MB
+3474:M 27 Dec 2024 09:07:02.057 * Diskless rdb transfer, done reading from pipe, 1 replicas still up.
+3474:M 27 Dec 2024 09:07:02.064 * Background RDB transfer terminated with success
+3474:M 27 Dec 2024 09:07:02.064 * Streamed RDB transfer with replica 127.0.0.1:7003 succeeded (socket). Waiting for REPLCONF ACK from replica to enable streaming
+3474:M 27 Dec 2024 09:07:02.064 * Synchronization with replica 127.0.0.1:7003 succeeded
+3474:M 27 Dec 2024 10:06:58.048 * 1 changes in 3600 seconds. Saving...
+3474:M 27 Dec 2024 10:06:58.048 * Background saving started by pid 28148
+28148:C 27 Dec 2024 10:06:58.100 * DB saved on disk
+28148:C 27 Dec 2024 10:06:58.101 * Fork CoW for RDB: current 0 MB, peak 0 MB, average 0 MB
+3474:M 27 Dec 2024 10:06:58.149 * Background saving terminated with success
+3474:signal-handler (1735265969) Received SIGTERM scheduling shutdown...
+3474:M 27 Dec 2024 10:19:29.340 * User requested shutdown...
+3474:M 27 Dec 2024 10:19:29.340 * 1 of 1 replicas are in sync when shutting down.
+3474:M 27 Dec 2024 10:19:29.340 * Calling fsync() on the AOF file.
+3474:M 27 Dec 2024 10:19:29.343 * Saving the final RDB snapshot before exiting.
+3474:M 27 Dec 2024 10:19:29.351 * DB saved on disk
+3474:M 27 Dec 2024 10:19:29.351 * Removing the pid file.
+3474:M 27 Dec 2024 10:19:29.351 # Redis is now ready to exit, bye bye...

@@ -1,16 +1,39 @@
 package redis
 
-import "fmt"
-
 var UserField = "user"
 var FarmField = "farm"
 var MinerField = "miner"
 var FsField = "fs"
 var WalletField = "wallet"
 
-var UserFarmField = "user_farm"
-var FarmMinerField = "farm_miner"
+var MinerFsField = "miner_fs"
+var FsWalletField = "fs_wallet"
+var FsMinepoolField = "fs_minepool"
 
-func GenHField(str1 string, str2 string) string {
-	return fmt.Sprintf("%s:%s", str1, str2)
+func MakeKey(str ...string) string {
+	b := false
+	res := ""
+	for _, s := range str {
+		if b {
+			res += ":" + s
+		} else {
+			res += s
+			b = true
+		}
+	}
+	return res
+}
+
+func MakeField(str ...string) string {
+	b := false
+	res := ""
+	for _, s := range str {
+		if b {
+			res += ":" + s
+		} else {
+			res += s
+			b = true
+		}
+	}
+	return res
 }

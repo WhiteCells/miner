@@ -70,7 +70,7 @@ func (c *FlightsheetController) UpdateFlightsheet(ctx *gin.Context) {
 }
 
 // GetFlightsheet 获取所有飞行表
-func (c *FlightsheetController) GetFlightsheet(ctx *gin.Context) {
+func (c *FlightsheetController) GetFs(ctx *gin.Context) {
 	pageNum, err := strconv.Atoi(ctx.Query("page_num"))
 	if err != nil || pageNum <= 0 {
 		rsp.Error(ctx, http.StatusBadRequest, "invalid page_numt", nil)
@@ -85,13 +85,13 @@ func (c *FlightsheetController) GetFlightsheet(ctx *gin.Context) {
 		"page_num":  pageNum,
 		"page_size": pageSize,
 	}
-	flightsheets, total, err := c.flightsheetService.GetFlightsheet(ctx, query)
+	flightsheets, err := c.flightsheetService.GetFlightsheet(ctx, query)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInsufficientStorage, err.Error(), nil)
 		return
 	}
 
-	rsp.QuerySuccess(ctx, http.StatusOK, "get user all flightsheet success", flightsheets, total)
+	rsp.QuerySuccess(ctx, http.StatusOK, "get user all flightsheet success", flightsheets)
 }
 
 // ApplyWallet 飞行表应用钱包

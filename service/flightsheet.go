@@ -4,37 +4,35 @@ import (
 	"context"
 	"errors"
 	"miner/common/dto"
-	"miner/dao/mysql"
-	"miner/model"
+	"miner/dao/redis"
+	"miner/model/info"
 )
 
 type FlightsheetService struct {
-	flightsheetDAO     *mysql.FlightsheetDAO
-	userFlightsheetDAO *mysql.UserFlightsheetDAO
+	fsRDB *redis.FsRDB
 }
 
 func NewFlightsheetService() *FlightsheetService {
 	return &FlightsheetService{
-		flightsheetDAO:     mysql.NewFlightsheetDAO(),
-		userFlightsheetDAO: mysql.NewUserFlightsheetDAO(),
+		fsRDB: redis.NewFsRDB(),
 	}
 }
 
 // CreateFlightsheet 创建飞行表
-func (s *FlightsheetService) CreateFlightsheet(ctx context.Context, req *dto.CreateFlightsheetReq) (*model.Flightsheet, error) {
-	userID, exists := ctx.Value("user_id").(int)
+func (s *FlightsheetService) CreateFlightsheet(ctx context.Context, req *dto.CreateFlightsheetReq) (*info.Fs, error) {
+	userID, exists := ctx.Value("user_id").(string)
 	if !exists {
 		return nil, errors.New("invalid user_id in context")
 	}
 
-	flightsheet := &model.Flightsheet{
-		Name:     req.Name,
-		CoinType: req.CoinType,
-		MinePool: req.MinePool,
-		MineSoft: req.MineSoft,
+	flightsheet := &info.Fs{
+		Name: req.Name,
+		Coin: req.CoinType,
+		Mine: req.MinePool,
+		Soft: req.MineSoft,
 	}
 
-	if err := s.flightsheetDAO.CreateFlightsheet(flightsheet, userID); err != nil {
+	if err := s.fsRDB.Set(ctx, userID, flightsheet); err != nil {
 		return nil, errors.New("create flightsheet failed")
 	}
 
@@ -43,12 +41,12 @@ func (s *FlightsheetService) CreateFlightsheet(ctx context.Context, req *dto.Cre
 
 // DeleteFlightsheet 删除飞行表
 func (s *FlightsheetService) DeleteFlightsheet(ctx context.Context, req *dto.DeleteFlightsheetReq) error {
-	userID, exists := ctx.Value("user_id").(int)
+	userID, exists := ctx.Value("user_id").(string)
 	if !exists {
 		return errors.New("invalid user_id in context")
 	}
 
-	if err := s.flightsheetDAO.DeleteFlightsheet(req.FlightsheetID, userID); err != nil {
+	if err := s.fsRDB.Del(ctx, userID, req.FsID); err != nil {
 		return errors.New("delete flightsheet failed")
 	}
 
@@ -57,13 +55,13 @@ func (s *FlightsheetService) DeleteFlightsheet(ctx context.Context, req *dto.Del
 
 // UpdateFlightsheet 更新飞行表
 func (s *FlightsheetService) UpdateFlightsheet(ctx context.Context, req *dto.UpdateFlightsheetReq) error {
-	_, exists := ctx.Value("user_id").(int)
+	userID, exists := ctx.Value("user_id").(string)
 	if !exists {
 		return errors.New("invalid user_id in context")
 	}
 
 	// 查找飞行表
-	flightsheet, err := s.flightsheetDAO.GetFlightsheetByID(req.FlightsheetID)
+	flightsheet, err := s.fsRDB.GetByID(ctx, userID, req.FsID)
 	if err != nil {
 		return errors.New("flightsheet not found")
 	}
@@ -73,40 +71,44 @@ func (s *FlightsheetService) UpdateFlightsheet(ctx context.Context, req *dto.Upd
 		case "name":
 			flightsheet.Name = value.(string)
 		case "coin_type":
-			flightsheet.CoinType = value.(string)
+			flightsheet.Coin = value.(string)
 		case "wallet_id":
 			// flightsheet.
 			// 修改应用的钱包，但是如果失败需要回滚
 		case "mine_pool":
-			flightsheet.MinePool = value.(string)
+			flightsheet.Mine = value.(string)
 		case "mine_soft":
-			flightsheet.MineSoft = value.(string)
+			flightsheet.Soft = value.(string)
 		}
 	}
 
-	if err := s.flightsheetDAO.UpdateFlightsheet(flightsheet); err != nil {
-		return errors.New("delete flightsheet failed")
+	if err := s.fsRDB.Set(ctx, userID, flightsheet); err != nil {
+		return errors.New("update flightsheet failed")
 	}
 
 	return nil
 }
 
 // GetFlightsheet 获取用户的所有飞行表
-func (s *FlightsheetService) GetFlightsheet(ctx context.Context, query map[string]interface{}) (*[]model.Flightsheet, int64, error) {
-	userID, exists := ctx.Value("user_id").(int)
+func (s *FlightsheetService) GetFlightsheet(ctx context.Context, query map[string]interface{}) (*[]info.Fs, error) {
+	userID, exists := ctx.Value("user_id").(string)
 	if !exists {
-		return nil, -1, errors.New("invalid user_id in context")
+		return nil, errors.New("invalid user_id in context")
 	}
-	user, total, err := s.flightsheetDAO.GetFlightsheet(userID, query)
+	user, err := s.fsRDB.GetAll(ctx, userID)
 	if err != nil {
-		return nil, -1, errors.New("get flightsheet failed")
+		return nil, errors.New("get flightsheet failed")
 	}
-	return user, total, err
+	return user, err
 }
 
 // ApplyWallet 飞行表应用钱包
 func (s *FlightsheetService) ApplyWallet(ctx context.Context, req *dto.ApplyFlightsheetWalletReq) error {
-	if err := s.flightsheetDAO.ApplyWallet(req.FlightsheetID, req.WaleltID); err != nil {
+	userID, exists := ctx.Value("user_id").(string)
+	if !exists {
+		return errors.New("invalid user_id in context")
+	}
+	if err := s.fsRDB.ApplyWallet(ctx, userID, req.FlightsheetID, req.WaleltID); err != nil {
 		return err
 	}
 	return nil

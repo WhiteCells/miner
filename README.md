@@ -46,12 +46,13 @@ go mod tidy
 go run ./main.go
 ```
 
+`redis-cluster` 目录为 持久化的分布式 redis
+
 ### TODO
 
-- 连接 Miner
-- 单元测试，压力测试
-- 表结构需要调整
-- service 检查传入参数
-- 定时任务
+- rdb
+- 充值
 - 传输数据加密
+- 用户创建上限(内存空间)
+- 单元测试，压力测试
 - ...

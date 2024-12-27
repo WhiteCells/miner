@@ -85,13 +85,13 @@ func (c *WalletController) GetWallet(ctx *gin.Context) {
 		"page_num":  pageNum,
 		"page_size": pageSize,
 	}
-	wallets, total, err := c.walletService.GetWallet(ctx, query)
+	wallets, err := c.walletService.GetWallet(ctx, query)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
 
-	rsp.QuerySuccess(ctx, http.StatusOK, "get user all wallet success", wallets, total)
+	rsp.QuerySuccess(ctx, http.StatusOK, "get user all wallet success", wallets)
 }
 
 // GetUserWalletByID 通过钱包 ID 获取指定钱包

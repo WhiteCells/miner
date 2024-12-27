@@ -25,7 +25,7 @@ type UpdateInfoReq struct {
 }
 
 type AddPointsReq struct {
-	UserID int               `json:"user_id" binding:"required"`
+	UserID string            `json:"user_id" binding:"required"`
 	Type   points.PointsType `json:"type" binding:"required"`
 	Point  int               `json:"point" binding:"required"`
 	Time   time.Time         `json:"time" binding:"required"`
