@@ -1,0 +1,110 @@
+// POST /worker/api?id_rig=9168253&method=stats HTTP/1.1
+// Host: api.hiveos.farm
+// Content-Length: 493
+{
+    "method": "stats",
+    "params": {
+        "v": 2,
+        "rig_id": "9168253",
+        "passwd": "la0K6pTM",
+        "last_cmd_id": 874756648,
+        "meta": {
+            "fs_id": 20216083,
+            "custom": {
+                "coin": "smh"
+            }
+        },
+        "temp": [
+            0
+        ],
+        "fan": [
+            0
+        ],
+        "power": [
+            0
+        ],
+        "df": "436G",
+        "mem": [
+            15883,
+            11315
+        ],
+        "cputemp": [
+            64
+        ],
+        "cpuavg": [
+            5.07,
+            4.66,
+            4.43
+        ],
+        "miner": "custom",
+        "total_khs": 213376,
+        "miner_stats": {
+            "status": "running",
+            "khs": "213376",
+            "hs": [
+                213.38,
+                0,
+                0,
+                0
+            ],
+            "hs_units": "mhs",
+            "temp": [
+                41,
+                41,
+                42,
+                0
+            ],
+            "fan": [
+                100,
+                100,
+                100,
+                0
+            ],
+            "uptime": 740,
+            "ver": "v4.0.5",
+            "ar": [
+                0,
+                0
+            ],
+            "algo": "SMH",
+            "bus_numbers": [
+                0,
+                0,
+                0
+            ]
+        }
+    }
+}{
+    "id": null,
+    "jsonrpc": "2.0",
+    "result": {
+        "command": "exec",
+        "exec": "miner config",
+        "id": 232435612
+    }
+}
+------------
+// POST /worker/api?id_rig=9168253&method=message HTTP/1.1
+// Host: api.hiveos.farm
+// Accept: */*
+// Content-Length: 1228
+// Content-Type: application/json
+// Expect: 100-continue
+// User-Agent: curl/7.58.0-DEV
+{
+    "method": "message",
+    "jsonrpc": "2.0",
+    "id": 0,
+    "params": {
+        "rig_id": "9168253",
+        "passwd": "la0K6pTM",
+        "type": "info",
+        "data": "miner config",
+        "id": "232435612",
+        "payload": "\u001b[0;33m=== /hive/miners/custom/k3ok.com-spacemesh-s/config.yaml =================================================\u001b[0m\napiKey: smh00000-0c79-5659-7b8f-565a95961ecf\ndebug: \"\"\nextraParams:\n  deleteLoadFail: false\n  device: \"\"\n  disableInitPost: false\n  disablePlot: true\n  disablePoST: false\n  flags: fullmem\n  maxFileSize: 32\n  nonces: 128\n  numUnits: 15\n  plotInstance: 1\n  postAffinity: 0\n  postAffinityStep: 1\n  postCpuIds: \"\"\n  postInstance: 0\n  postThread: 0\n  randomxAffinity: -1\n  randomxAffinityStep: 1\n  randomxThread: 0\n  randomxUsePostThread: false\n  remoteK2Pow: true\n  removeInitFailed: false\n  reservedSize: 1\n  server: null\n  skipUninitialized: false\nhttp:\n  enable: false\n  host: \"\"\n  port: 0\nlog:\n  lv: info\n  name: miner.log\n  path: ./log/\nminerName: 15\npath:\n- /mnt/sdl2\n- /mnt/sdn2\n- /mnt/sdp2\nproxy:\n  password: \"\"\n  url: \"\"\n  username: \"\"\nscanMinute: 60\nscanPath: false\ntoken: \"\"\nurl:\n  info: \"\"\n  line: \"\"\n  proxy: http://172.16.10.77:9090\n  submit: \"\"\n  ws: \"\""
+    }
+}{
+    "jsonrpc": "2.0",
+    "id": 0,
+    "result": null
+}

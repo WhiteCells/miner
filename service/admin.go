@@ -57,8 +57,8 @@ func (s *AdminService) GetUserMiners(ctx context.Context, farmID string) (*[]inf
 }
 
 // SwitchRegister 用户注册开关
-func (s *AdminService) SwitchRegister(ctx context.Context, req *dto.AdminSwitchRegisterReq) error {
-	return s.adminRDB.SwitchRegister(ctx, req.Status)
+func (s *AdminService) SetSwitchRegister(ctx context.Context, req *dto.AdminSwitchRegisterReq) error {
+	return s.adminRDB.SetSwitchRegister(ctx, req.Status)
 }
 
 // SetGlobalFlightsheet 设置全局飞行表
@@ -73,13 +73,13 @@ func (s *AdminService) SetGlobalFs(ctx context.Context, req *dto.AdminSetGlobalF
 }
 
 // SetInviteReward 设置邀请积分奖励
-func (s *AdminService) RewardInvite(ctx context.Context, req *dto.AdminSetInviteRewardReq) error {
-	return s.adminRDB.RewardInvite(ctx, req.Reward)
+func (s *AdminService) SetRewardInvite(ctx context.Context, req *dto.AdminSetInviteRewardReq) error {
+	return s.adminRDB.SetRewardInvite(ctx, req.Reward)
 }
 
 // SetRechargeReward 设置充值积分奖励
 func (s *AdminService) RewardRecharge(ctx context.Context, req *dto.AdminSetRechargeRewardReq) error {
-	return s.adminRDB.RewardRecharge(ctx, req.Reward)
+	return s.adminRDB.SetRewardRecharge(ctx, req.Reward)
 }
 
 // SetUserStatus 设置用户状态

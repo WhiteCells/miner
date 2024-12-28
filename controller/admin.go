@@ -140,7 +140,7 @@ func (c *AdminController) SwitchRegister(ctx *gin.Context) {
 		return
 	}
 
-	if err := c.adminService.SwitchRegister(ctx, &req); err != nil {
+	if err := c.adminService.SetSwitchRegister(ctx, &req); err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, "admin switch register failed", nil)
 		return
 	}
@@ -172,7 +172,7 @@ func (c *AdminController) SetInviteReward(ctx *gin.Context) {
 		return
 	}
 
-	if err := c.adminService.RewardInvite(ctx, &req); err != nil {
+	if err := c.adminService.SetRewardInvite(ctx, &req); err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, "admin set invite reward faild", nil)
 		return
 	}

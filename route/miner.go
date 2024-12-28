@@ -21,8 +21,8 @@ func NewMinerRoute() *MinerRoute {
 func (mr *MinerRoute) InitMinerRoute(r *gin.Engine) {
 	route := r.Group("/miner")
 	route.Use(middleware.JWTAuth())
-	route.Use(middleware.IPVerify())
-	route.Use(middleware.RoleAuth(role.User))
+	route.Use(middleware.IPAuth())
+	route.Use(middleware.RoleAuth(role.User, role.Admin))
 	route.Use(middleware.StatusAuth())
 	{
 		route.POST("", mr.minerController.CreateMiner)

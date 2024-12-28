@@ -16,10 +16,8 @@ mysql:
 
 redis:
   host: localhost
-  port: 6379
-  password: "10101"
-  db: 0
-  pool_size: 100
+  port: 7000
+  password: "m3i2n1e0r"
 
 jwt:
   secret: hello#:)

@@ -1,0 +1,18 @@
+{
+    "commands": [
+        {
+            "worker_id": 10440397,
+            "commands": [
+                {
+                    "command": "config",
+                    "id": 397002086,
+                    "data": {
+                        "config": "### MINERS HIVE CONFIG ################################\n\n#URL where hive server is\nHIVE_HOST_URL=\"http://api.hiveos.farm\"\nAPI_HOST_URLs=\"http://api.hiveos.farm http://helsinki.hiveos.farm\"\n\n\n#Id of the rig, numeric value from admin panel\nRIG_ID=10440397\n\n#Rig password as in admin panel\nRIG_PASSWD=\"Tg6XEhzW\"\n\n#Rig hostname\nWORKER_NAME=\"rig0EC10A\"\n\n#Id of the farm\nFARM_ID=4396802\n\n#Selected miners\nMINER=asicminer\nMINER2=\n\n\n#Rig timezone\nTIMEZONE=\"Asia/Shanghai\"\n\n#Watchdog\nWD_ENABLED=0\n\n\n#Hive Shell server host\nHSSH_SRV=\"shell.hiveos.farm\"\n\n#Options\nSHELLINABOX_ENABLE=1\nSSH_ENABLE=1\nSSH_PASSWORD_ENABLE=1\n\n",
+                        "tweakers": "{}",
+                        "wallet": "### FLIGHT SHEET \"\" ###\n\n# Miner asicminer\nASICMINER_TEMPLATE=\"123.rig0EC10A_____4396802_10440397\"\nASICMINER_URL=\"stratum+tcp://etc.hiveon.com:8888\nstratum+tcp://etc.hiveon.com:4444\"\nASICMINER_PASS=\"\"\nASICMINER_TEMPLATE2=\"\"\nASICMINER_URL2=\"\"\nASICMINER_PASS2=\"\"\nASICMINER_TEMPLATE3=\"\"\nASICMINER_URL3=\"\"\nASICMINER_PASS3=\"\"\nASICMINER_USER_CONFIG=''\nASICMINER_VER=\"\"\nASICMINER_TLS=\"\"\n\nMETA='{\"fs_id\":21625266,\"asicminer\":{\"coin\":\"ETC\"}}'\n"
+                    }
+                }
+            ]
+        }
+    ]
+}

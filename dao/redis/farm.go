@@ -33,6 +33,7 @@ func (c *FarmRDB) Set(ctx context.Context, userID string, farm *info.Farm, perm 
 // 删除矿机
 func (c *FarmRDB) Del(ctx context.Context, userID string, farmID string) error {
 	field := MakeField(FarmField, userID)
+	// log.Fatalln(field, farmID)
 	return utils.RDB.HDel(ctx, field, farmID)
 }
 

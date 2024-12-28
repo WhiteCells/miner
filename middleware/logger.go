@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
-	"miner/common/role"
 	"miner/model"
 	"miner/utils"
 	"time"
@@ -45,26 +44,21 @@ func OperLog() gin.HandlerFunc {
 		ctx.Next()
 
 		// 业务处理完后
-		userID, exists := ctx.Get("user_id")
+		userID, exists := ctx.Value("user_id").(string)
 		if !exists {
 			// ctx.
 			return
 		}
-		userName, exists := ctx.Get("user_name")
+		userName, exists := ctx.Value("user_name").(string)
 		if !exists {
 			//
-			return
-		}
-		userRole, exists := ctx.Get("user_role")
-		if !exists {
 			return
 		}
 
 		// 创建操作日志
 		operLog := model.OperLog{
-			UserID:   userID.(int),
-			UserName: userName.(string),
-			UserRole: userRole.(role.RoleType),
+			UserID:   userID,
+			UserName: userName,
 			Time:     time.Now(),
 			Action:   ctx.Request.Method,
 			Target:   ctx.FullPath(),
@@ -97,7 +91,7 @@ func LoginLog() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		ctx.Next()
 
-		userID, exists := ctx.Value("user_id").(int)
+		userID, exists := ctx.Value("user_id").(string)
 		if !exists {
 			return
 		}

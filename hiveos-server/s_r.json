@@ -1,0 +1,106 @@
+// POST /worker/api?id_rig=9168253&method=stats HTTP/1.1
+// Host: api.hiveos.farm
+// Content-Length: 469
+{
+    "method": "stats",
+    "params": {
+        "v": 2,
+        "rig_id": "9168253",
+        "passwd": "la0K6pTM",
+        "meta": {
+            "fs_id": 20216083,
+            "custom": {
+                "coin": "smh"
+            }
+        },
+        "temp": [
+            0
+        ],
+        "fan": [
+            0
+        ],
+        "power": [
+            0
+        ],
+        "df": "436G",
+        "mem": [
+            15883,
+            11347
+        ],
+        "cputemp": [
+            63
+        ],
+        "cpuavg": [
+            4.87,
+            4.54,
+            4.38
+        ],
+        "miner": "custom",
+        "total_khs": 206464,
+        "miner_stats": {
+            "status": "running",
+            "khs": "206464",
+            "hs": [
+                206.46,
+                0,
+                0,
+                0
+            ],
+            "hs_units": "mhs",
+            "temp": [
+                41,
+                41,
+                42,
+                0
+            ],
+            "fan": [
+                100,
+                100,
+                100,
+                0
+            ],
+            "uptime": 740,
+            "ver": "v4.0.5",
+            "ar": [
+                0,
+                0
+            ],
+            "algo": "SMH",
+            "bus_numbers": [
+                0,
+                0,
+                0
+            ]
+        }
+    }
+}{
+    "id": null,
+    "jsonrpc": "2.0",
+    "result": {
+        "command": "exec",
+        "exec": "rm -rf \/hive\/miners\/custom\/downloads\/f2*",
+        "id": 453741521
+    }
+}
+// POST /worker/api?id_rig=9168253&method=message HTTP/1.1
+// Host: api.hiveos.farm
+// Accept: */*
+// Content-Length: 174
+// Content-Type: application/json
+// User-Agent: curl/7.58.0-DEV
+{
+    "method": "message",
+    "jsonrpc": "2.0",
+    "id": 0,
+    "params": {
+        "rig_id": "9168253",
+        "passwd": "la0K6pTM",
+        "type": "info",
+        "data": "rm -rf /hive/miners/custom/downloads/f2*",
+        "id": "453741521"
+    }
+}{
+    "jsonrpc": "2.0",
+    "id": 0,
+    "result": null
+}

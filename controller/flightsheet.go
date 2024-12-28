@@ -5,7 +5,6 @@ import (
 	"miner/common/rsp"
 	"miner/service"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -71,21 +70,7 @@ func (c *FlightsheetController) UpdateFlightsheet(ctx *gin.Context) {
 
 // GetFlightsheet 获取所有飞行表
 func (c *FlightsheetController) GetFs(ctx *gin.Context) {
-	pageNum, err := strconv.Atoi(ctx.Query("page_num"))
-	if err != nil || pageNum <= 0 {
-		rsp.Error(ctx, http.StatusBadRequest, "invalid page_numt", nil)
-		return
-	}
-	pageSize, err := strconv.Atoi(ctx.Query("page_size"))
-	if err != nil || pageSize <= 0 {
-		rsp.Error(ctx, http.StatusBadRequest, "invalid page_size", nil)
-		return
-	}
-	query := map[string]interface{}{
-		"page_num":  pageNum,
-		"page_size": pageSize,
-	}
-	flightsheets, err := c.flightsheetService.GetFlightsheet(ctx, query)
+	flightsheets, err := c.flightsheetService.GetFlightsheet(ctx)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInsufficientStorage, err.Error(), nil)
 		return

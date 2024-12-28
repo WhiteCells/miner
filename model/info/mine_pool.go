@@ -5,11 +5,3 @@ type MinePool struct {
 	Url    []string `json:"url"`
 	Status bool     `json:"status"`
 }
-
-/*
-	{
-		"id": 321,
-		"url": ["http://", "http://"],
-		"status": 1
-	}
-*/

@@ -21,17 +21,19 @@ var (
 
 func InitRDB() error {
 	onceRDB.Do(func() {
+		addrs := fmt.Sprintf("%s:%d", Config.Redis.Host, Config.Redis.Port)
 		client := redis.NewClusterClient(&redis.ClusterOptions{
 			// Addr:     fmt.Sprintf("%s:%d", Config.Redis.Host, Config.Redis.Port),
 			Addrs: []string{
-				"127.0.0.1:7000",
-				"127.0.0.1:7001",
-				"127.0.0.1:7002",
-				"127.0.0.1:7003",
-				"127.0.0.1:7004",
-				"127.0.0.1:7005",
+				addrs,
+				// "127.0.0.1:7000",
+				// "127.0.0.1:7001",
+				// "127.0.0.1:7002",
+				// "127.0.0.1:7003",
+				// "127.0.0.1:7004",
+				// "127.0.0.1:7005",
 			},
-			Password: "m3i2n1e0r",
+			Password: Config.Redis.Password,
 			// DB:       Config.Redis.DB,
 			// PoolSize: Config.Redis.PoolSize,
 		})

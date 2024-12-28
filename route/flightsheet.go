@@ -21,8 +21,8 @@ func NewFlightsheetRoute() *FlightsheetRoute {
 func (fr *FlightsheetRoute) InitFlightsheetRoute(r *gin.Engine) {
 	route := r.Group("/fs")
 	route.Use(middleware.JWTAuth())
-	route.Use(middleware.IPVerify())
-	route.Use(middleware.RoleAuth(role.User))
+	route.Use(middleware.IPAuth())
+	route.Use(middleware.RoleAuth(role.User, role.Admin))
 	route.Use(middleware.StatusAuth())
 	{
 		route.POST("", fr.flightsheetController.CreateFlightsheet)

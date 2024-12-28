@@ -7,6 +7,7 @@ import (
 	"miner/dao/redis"
 	"miner/model"
 	"miner/model/info"
+	"miner/utils"
 )
 
 type WalletService struct {
@@ -24,12 +25,18 @@ func (s *WalletService) CreateWallet(ctx context.Context, req *dto.CreateWalletR
 	if !exists {
 		return nil, errors.New("invalid user_id in context")
 	}
-	// id
+
+	id, err := utils.GenerateUID()
+	if err != nil {
+		return nil, errors.New("uid create failed")
+	}
 	wallet := &info.Wallet{
+		ID:   id,
 		Name: req.Name,
 		Addr: req.Addr,
 		Coin: req.Coin,
 	}
+
 	s.walletRDB.Set(ctx, userID, wallet)
 
 	return wallet, nil

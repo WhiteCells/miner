@@ -7,6 +7,7 @@ import (
 	"miner/common/perm"
 	"miner/dao/redis"
 	"miner/model/info"
+	"miner/utils"
 )
 
 type MinerService struct {
@@ -31,18 +32,33 @@ func (s *MinerService) CreateMiner(ctx context.Context, req *dto.CreateMinerReq)
 	if !s.validFarmPerm(ctx, userID, req.FarmID, []perm.FarmPerm{perm.FarmOwner, perm.FarmManager}) {
 		return nil, errors.New("permission denied")
 	}
-	// TODO id
+
+	uid, err := utils.GenerateUID()
+	if err != nil {
+		return nil, err
+	}
+
+	rigID, err := utils.GenerateRigID(8, req.FarmID, uid)
+	if err != nil {
+		return nil, err
+	}
+
+	pass, err := utils.GeneratePass(8)
+	if err != nil {
+		return nil, err
+	}
 
 	// 创建矿机
 	miner := &info.Miner{
-		Name: req.Name,
-		Perm: perm.MinerOwner,
+		ID:    uid,
+		Name:  req.Name,
+		RigID: rigID,
+		Pass:  pass,
+		Perm:  perm.MinerOwner,
 	}
 
-	// TODO 测试连接
-
 	// 创建矿机
-	err := s.minerRDB.Set(ctx, req.FarmID, miner)
+	err = s.minerRDB.Set(ctx, req.FarmID, miner)
 	return miner, err
 }
 
@@ -95,8 +111,6 @@ func (s *MinerService) UpdateMiner(ctx context.Context, req *dto.UpdateMinerReq)
 			miner.Name = value.(string)
 		}
 	}
-
-	// todo 需要测试连接
 
 	// 保存更新
 	if err := s.minerRDB.Set(ctx, req.FarmID, miner); err != nil {

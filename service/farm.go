@@ -7,6 +7,7 @@ import (
 	"miner/common/perm"
 	"miner/dao/redis"
 	"miner/model/info"
+	"miner/utils"
 )
 
 type FarmService struct {
@@ -25,13 +26,20 @@ func (s *FarmService) CreateFarm(ctx context.Context, req *dto.CreateFarmReq) (*
 	if !exists {
 		return nil, errors.New("invalid user_id in context")
 	}
+
+	id, err := utils.GenerateUID()
+	if err != nil {
+		return nil, err
+	}
 	farm := &info.Farm{
+		ID:       id,
 		Name:     req.Name,
 		TimeZone: req.TimeZone,
+		Perm:     perm.FarmOwner,
 	}
 
 	// 创建矿场
-	err := s.farmRDB.Set(ctx, userID, farm, perm.FarmOwner)
+	err = s.farmRDB.Set(ctx, userID, farm, perm.FarmOwner)
 
 	return farm, err
 }

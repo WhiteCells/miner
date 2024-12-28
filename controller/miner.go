@@ -67,8 +67,7 @@ func (c *MinerController) UpdateMiner(ctx *gin.Context) {
 
 // GetMiner 获取用户矿机
 func (c *MinerController) GetMiner(ctx *gin.Context) {
-	// farmID query
-	farmID := ""
+	farmID := ctx.Query("farm_id")
 	miners, err := c.minerService.GetMiner(ctx, farmID)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)

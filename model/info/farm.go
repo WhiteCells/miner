@@ -9,13 +9,3 @@ type Farm struct {
 	// Hash     string    `json:"hash"` // ID 可以作为唯一标识
 	Perm perm.FarmPerm `json:"perm"`
 }
-
-/*
-	{
-		"id": 101,
-		"name": "name",
-		"time_zone": "ASIA/SHANGHAI",
-		"hash": "ejf490rj32r92iej2s",
-		"miners": [1, 2]
-	}
-*/

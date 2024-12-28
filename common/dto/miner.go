@@ -3,8 +3,6 @@ package dto
 type CreateMinerReq struct {
 	FarmID string `json:"farm_id" binding:"required"`
 	Name   string `json:"name" binding:"required"`
-	Model  string `json:"model" binding:"required"`
-	IP     string `json:"ip" binding:"required,ip"`
 }
 
 type DeleteMinerReq struct {

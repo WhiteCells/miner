@@ -18,7 +18,6 @@ func main() {
 	gin.SetMode(utils.Config.Server.Mode)
 	ctx := gin.Default()
 	ctx.Use(middleware.OperLog())
-	middleware.InitSession(ctx)
 	userRoute := route.NewUserRoute()
 	userRoute.InitUserRoute(ctx)
 	farmRoute := route.NewFarmRoute()

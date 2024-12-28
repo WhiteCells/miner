@@ -17,9 +17,9 @@ const (
 )
 
 // 注册状态
-type RegisterStatus int
+type RegisterStatus string
 
 const (
-	RegisterOn  RegisterStatus = 1
-	RegisterOff RegisterStatus = 0
+	RegisterOn  RegisterStatus = "1"
+	RegisterOff RegisterStatus = "0"
 )

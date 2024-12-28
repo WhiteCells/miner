@@ -1,0 +1,13 @@
+{
+    "jsonrpc": "2.0",
+    "id": 0,
+    "result": {
+        "rig_name": "22",
+        "repository_list": "deb http:\/\/download.hiveos.farm\/repo\/binary \/\ndeb http:\/\/download2.hiveos.farm\/repo\/binary \/",
+        "config": "### MINERS HIVE CONFIG ################################\n\n#URL where hive server is\nHIVE_HOST_URL=\"http:\/\/api.hiveos.farm\"\nAPI_HOST_URLs=\"http:\/\/api.hiveos.farm http:\/\/naw.hiveos.farm\"\n\n#Id of the rig, numeric value from admin panel\nRIG_ID=8935423\n\n#Rig password as in admin panel\nRIG_PASSWD=\"h0LdxOyK\"\n\n#Rig hostname\nWORKER_NAME=\"22\"\n\n#Id of the farm\nFARM_ID=3196726\n\n#Selected miners\nMINER=custom\nMINER2=\n\n\n#Rig timezone\nTIMEZONE=\"Europe\/Kiev\"\n\n#Watchdog\nWD_ENABLED=1\nWD_MINER=3\nWD_REBOOT=5\nWD_CHECK_GPU=0\nWD_MAX_LA=100\nWD_ASR=\nWD_POWER_ENABLED=0\nWD_POWER_MIN=\nWD_POWER_MAX=\nWD_POWER_ACTION=reboot\nWD_CHECK_CONN=0\nWD_SHARE_TIME=\nWD_MINHASHES='{}'\nWD_MINHASHES_ALGO='{}'\nWD_TYPE='miner'\n\n\n#Hive Shell server host\nHSSH_SRV=\"shell.hiveos.farm\"\n\n#Options\nSHELLINABOX_ENABLE=1\nSSH_ENABLE=1\nSSH_PASSWORD_ENABLE=1\n\n",
+        "wallet": "### FLIGHT SHEET \"nooc-spacemesh\" ###\n\n# Miner custom\nCUSTOM_MINER=\"k3ok.com-spacemesh\"\nCUSTOM_INSTALL_URL=\"http:\/\/joycehonor.com\/k3ok.com-spacemesh-v3.0.3.tar.gz\"\nCUSTOM_ALGO=\"\"\nCUSTOM_TEMPLATE=\"22\"\nCUSTOM_URL=\"http:\/\/k3ok.com\/\"\nCUSTOM_PASS=\"\"\nCUSTOM_USER_CONFIG=''\nCUSTOM_TLS=\"\"\n\nMETA='{\"fs_id\":19481116,\"custom\":{\"coin\":\"smh\"}}'\n",
+        "nvidia_oc": "CLOCK=\"1400\"\nLCLOCK=\"\"\nMEM=\"\"\nLMEM=\"\"\nFAN=\"\"\nPLIMIT=\"125\"\nLOGO_BRIGHTNESS=\nOHGODAPILL_ENABLED=\nOHGODAPILL_START_TIMEOUT=\nOHGODAPILL_ARGS=\"\"\nRUNNING_DELAY=\nPOWERMIZER=\nFORCESTATE=\n",
+        "autofan": "ENABLED=\nTARGET_TEMP=\nTARGET_MEM_TEMP=\nMIN_FAN=\nMAX_FAN=\nCRITICAL_TEMP=\nCRITICAL_TEMP_ACTION=\"\"\nNO_AMD=\nREBOOT_ON_ERROR=\nSMART_MODE=\nCUSTOM_MODE=\"\"\nCUSTOM_TARGET_TEMP=\"\"\nCUSTOM_TARGET_MEM_TEMP=\"\"\nCUSTOM_MIN_FAN=\"\"\nCUSTOM_MAX_FAN=\"\"\nCUSTOM_CRITICAL_TEMP=\"\"\n",
+        "confseq": 29
+    }
+}

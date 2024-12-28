@@ -1,0 +1,148 @@
+{
+    "method": "hello",
+    "jsonrpc": "2.0",
+    "id": 0,
+    "params": {
+        "rig_id": "",
+        "passwd": "",
+        "server_url": "http://8.217.7.170",
+        "uid": "9e84fbb231f75294c30a7142eab3f795fa36f4d6",
+        "ref_id": "",
+        "boot_time": "1715692276",
+        "boot_event": "0",
+        "ip": [
+            "172.16.10.22"
+        ],
+        "net_interfaces": [
+            {
+                "iface": "eth0",
+                "mac": "00:e0:0a:b3:04:b8"
+            }
+        ],
+        "openvpn": "0",
+        "lan_config": {
+            "dhcp": 0,
+            "address": "172.16.10.22/23",
+            "gateway": "172.16.10.1",
+            "dns": "172.16.10.1"
+        },
+        "gpu": [
+            {
+                "busid": "00:02.0",
+                "name": "HD Graphics 4000",
+                "brand": "cpu",
+                "subvendor": "Intel"
+            },
+            {
+                "busid": "01:00.0",
+                "name": "GeForce RTX 2070 SUPER",
+                "brand": "nvidia",
+                "subvendor": "Colorful",
+                "mem": "8192 MB",
+                "vbios": "90.04.76.00.D6",
+                "mem_type": "Micron GDDR6",
+                "uuid": "GPU-544c8c71-9495-1ae3-00a5-bfa26aa716df",
+                "plim_min": "125 W",
+                "plim_def": "215 W",
+                "plim_max": "240 W",
+                "fan_cnt": "2"
+            },
+            {
+                "busid": "03:00.0",
+                "name": "GeForce RTX 2070 SUPER",
+                "brand": "nvidia",
+                "subvendor": "Colorful",
+                "mem": "8192 MB",
+                "vbios": "90.04.76.00.D6",
+                "mem_type": "Samsung GDDR6",
+                "uuid": "GPU-3d535347-0386-a54a-5f89-0f1b11be7956",
+                "plim_min": "125 W",
+                "plim_def": "215 W",
+                "plim_max": "240 W",
+                "fan_cnt": "2"
+            },
+            {
+                "busid": "04:00.0",
+                "name": "GeForce RTX 2070 SUPER",
+                "brand": "nvidia",
+                "subvendor": "Colorful",
+                "mem": "8192 MB",
+                "vbios": "90.04.76.80.1B",
+                "mem_type": "Samsung GDDR6",
+                "uuid": "GPU-e88b3d84-4b04-ce42-158b-d879ee501ada",
+                "plim_min": "125 W",
+                "plim_def": "215 W",
+                "plim_max": "258 W",
+                "fan_cnt": "2"
+            },
+            {
+                "busid": "05:00.0",
+                "name": "GeForce RTX 2070 SUPER",
+                "brand": "nvidia",
+                "subvendor": "Colorful",
+                "mem": "8192 MB",
+                "vbios": "90.04.76.00.D6",
+                "mem_type": "Samsung GDDR6",
+                "uuid": "GPU-d87a47dc-9118-7517-1a8d-2ac5e80342cf",
+                "plim_min": "125 W",
+                "plim_def": "215 W",
+                "plim_max": "240 W",
+                "fan_cnt": "2"
+            },
+            {
+                "busid": "06:00.0",
+                "name": "GeForce RTX 2070 SUPER",
+                "brand": "nvidia",
+                "subvendor": "Colorful",
+                "mem": "8192 MB",
+                "vbios": "90.04.76.00.D7",
+                "mem_type": "Micron GDDR6",
+                "uuid": "GPU-9bbb277a-7365-e7b9-e8c3-215d2ed73998",
+                "plim_min": "125 W",
+                "plim_def": "270 W",
+                "plim_max": "324 W",
+                "fan_cnt": "2"
+            },
+            {
+                "busid": "07:00.0",
+                "name": "GeForce RTX 2070 SUPER",
+                "brand": "nvidia",
+                "subvendor": "Colorful",
+                "mem": "8192 MB",
+                "vbios": "90.04.76.00.D7",
+                "mem_type": "Micron GDDR6",
+                "uuid": "GPU-428e26a5-a9f3-88ce-2572-0142371266c1",
+                "plim_min": "125 W",
+                "plim_def": "270 W",
+                "plim_max": "324 W",
+                "fan_cnt": "2"
+            }
+        ],
+        "gpu_count_amd": "0",
+        "gpu_count_nvidia": "6",
+        "gpu_count_intel": "0",
+        "mb": {
+            "manufacturer": "INTEL Corporation",
+            "product": "CRESCENTBAY",
+            "system_uuid": "03000200-0400-0500-0006-000700080009",
+            "bios": "5.6.5 10/18/2021"
+        },
+        "cpu": {
+            "model": "Intel(R) Celeron(R) CPU G1840 @ 2.80GHz",
+            "cores": "2",
+            "aes": "0",
+            "cpu_id": "C3060300FFFBEBBF"
+        },
+        "disk_model": "ATA FORESEE 64GB SSD 64.0GB",
+        "image_version": "20.04",
+        "kernel": "6.1.0-hiveos #65",
+        "amd_version": "5.4.6 (6.3.2401.0)",
+        "nvidia_version": "535.154.05",
+        "intel_version": "",
+        "version": "0.6-225@240130",
+        "shellinabox_enable": true,
+        "ssh_enable": true,
+        "ssh_password_enable": true,
+        "farm_hash": "d0a5d42b620e2677751e0237ffc446e72b556857"
+    }
+}

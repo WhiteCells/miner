@@ -10,8 +10,6 @@ import (
 
 type UserRDB struct{}
 
-var userField = "user"
-
 func NewUserRDB() *UserRDB {
 	return &UserRDB{}
 }
@@ -43,7 +41,7 @@ func (c *UserRDB) Set(ctx context.Context, user *info.User) error {
 
 	pipe := utils.RDB.Client.TxPipeline()
 
-	pipe.HSet(ctx, userField, user.ID, string(userJSON))
+	pipe.HSet(ctx, UserField, user.ID, string(userJSON))
 	pipe.Set(ctx, nKey, user.ID, 0)
 	pipe.Set(ctx, eKey, user.ID, 0)
 
@@ -64,7 +62,7 @@ func (c *UserRDB) Del(ctx context.Context, userID string) error {
 
 	pipe := utils.RDB.Client.TxPipeline()
 
-	pipe.HDel(ctx, userField, user.ID)
+	pipe.HDel(ctx, UserField, user.ID)
 	pipe.Del(ctx, nKey)
 	pipe.Del(ctx, eKey)
 
@@ -75,7 +73,7 @@ func (c *UserRDB) Del(ctx context.Context, userID string) error {
 
 // 获取用户信息
 func (c *UserRDB) GetByID(ctx context.Context, userID string) (*info.User, error) {
-	userJSON, err := utils.RDB.HGet(ctx, userField, userID)
+	userJSON, err := utils.RDB.HGet(ctx, UserField, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +105,7 @@ func (c *UserRDB) GetByEmail(ctx context.Context, email string) (*info.User, err
 
 // 获取所用用户信息
 func (c *UserRDB) GetAll(ctx context.Context) (*[]info.User, error) {
-	idUser, err := utils.RDB.HGetAll(ctx, userField)
+	idUser, err := utils.RDB.HGetAll(ctx, UserField)
 	if err != nil {
 		return nil, err
 	}

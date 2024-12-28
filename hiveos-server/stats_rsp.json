@@ -1,0 +1,8 @@
+{
+    "id": null,
+    "jsonrpc": "2.0",
+    "result": {
+        "command": "OK",
+        "confseq": 5
+    }
+}

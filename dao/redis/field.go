@@ -1,10 +1,17 @@
 package redis
 
+var AdminSwitchRegisterField = "switch_register"
+var AdminRewardInviteField = "reward_invite"
+var AdminRewardRechargeField = "reward_invite"
+var AdminGfsField = "gfs"
+
 var UserField = "user"
 var FarmField = "farm"
 var MinerField = "miner"
 var FsField = "fs"
 var WalletField = "wallet"
+
+var OsField = "os"
 
 var MinerFsField = "miner_fs"
 var FsWalletField = "fs_wallet"

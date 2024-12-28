@@ -7,14 +7,3 @@ type Fs struct {
 	Mine string `json:"mine"`
 	Soft string `json:"soft"`
 }
-
-/*
-	{
-		"id": 101,
-		"name": "name",
-		"coin": "ETC",
-		"mine": 321,
-		"soft": "custom",
-		"wallet": 123
-	}
-*/

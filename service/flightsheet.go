@@ -6,6 +6,7 @@ import (
 	"miner/common/dto"
 	"miner/dao/redis"
 	"miner/model/info"
+	"miner/utils"
 )
 
 type FlightsheetService struct {
@@ -25,7 +26,12 @@ func (s *FlightsheetService) CreateFlightsheet(ctx context.Context, req *dto.Cre
 		return nil, errors.New("invalid user_id in context")
 	}
 
+	id, err := utils.GenerateUID()
+	if err != nil {
+		return nil, err
+	}
 	flightsheet := &info.Fs{
+		ID:   id,
 		Name: req.Name,
 		Coin: req.CoinType,
 		Mine: req.MinePool,
@@ -90,7 +96,7 @@ func (s *FlightsheetService) UpdateFlightsheet(ctx context.Context, req *dto.Upd
 }
 
 // GetFlightsheet 获取用户的所有飞行表
-func (s *FlightsheetService) GetFlightsheet(ctx context.Context, query map[string]interface{}) (*[]info.Fs, error) {
+func (s *FlightsheetService) GetFlightsheet(ctx context.Context) (*[]info.Fs, error) {
 	userID, exists := ctx.Value("user_id").(string)
 	if !exists {
 		return nil, errors.New("invalid user_id in context")

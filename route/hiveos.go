@@ -2,27 +2,29 @@ package route
 
 import (
 	"miner/common/role"
+	"miner/controller"
 	"miner/middleware"
 
 	"github.com/gin-gonic/gin"
 )
 
-type HiveosRoute struct {
+type HiveOsRoute struct {
+	hiveOsController *controller.HiveOsController
 }
 
-func NewHiveosRoute() *HiveosRoute {
-	return &HiveosRoute{}
+func NewHiveosRoute() *HiveOsRoute {
+	return &HiveOsRoute{
+		hiveOsController: controller.NewHiveOsController(),
+	}
 }
 
-func (hr *HiveosRoute) InitHiveosRoute(r *gin.Engine) {
+func (hr *HiveOsRoute) InitHiveosRoute(r *gin.Engine) {
 	route := r.Group("/hiveos")
 	route.Use(middleware.JWTAuth())
-	route.Use(middleware.IPVerify())
-	route.Use(middleware.RoleAuth(role.User))
+	route.Use(middleware.IPAuth())
+	route.Use(middleware.RoleAuth(role.User, role.Admin))
 	route.Use(middleware.StatusAuth())
 	{
-		route.POST("/worker/api", func(ctx *gin.Context) {
-
-		})
+		route.POST("/worker/api", hr.hiveOsController.Interact)
 	}
 }

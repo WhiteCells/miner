@@ -2,6 +2,7 @@ package redis
 
 import (
 	"context"
+	"encoding/json"
 	"miner/common/status"
 	"miner/model/info"
 	"miner/utils"
@@ -25,7 +26,7 @@ func NewAdminRDB() *AdminRDB {
 
 // 获取所有用户信息
 func (c *AdminRDB) GetAllUsers(ctx context.Context) (*[]info.User, error) {
-	idInfo, err := utils.RDB.HGetAll(ctx, userField)
+	idInfo, err := utils.RDB.HGetAll(ctx, UserField)
 	if err != nil {
 		return nil, err
 	}
@@ -59,30 +60,47 @@ func (c *AdminRDB) GetUserMiners(ctx context.Context, farmID string) (*[]info.Mi
 	return c.minerRDB.GetAll(ctx, farmID)
 }
 
-// +--------+-----------------+------+
-// + field  | key             | val  |
-// +--------+-----------------+------+
-// + admin  | reward_invite   | 111  |
-// + admin  | reward_recharge | 111  |
-// + admin  | switch_register | 1    |
-// +--------+-----------------+------+
+// +-----------------------+------+
+// + key                   | val  |
+// +-----------------------+------+
+// + admin_reward_invite   | 111  |
+// +-----------------------+------+
+// + admin_reward_recharge | 111  |
+// +-----------------------+------+
+// + admin_switch_register | 1    |
+// +-----------------------+------+
 
 // 修改注册开关
-func (c *AdminRDB) SwitchRegister(ctx context.Context, status status.RegisterStatus) error {
-	return nil
+func (c *AdminRDB) SetSwitchRegister(ctx context.Context, status status.RegisterStatus) error {
+	return utils.RDB.Set(ctx, AdminSwitchRegisterField, status)
+}
+
+// 获取注册开关
+func (c *AdminRDB) GetSwitchRegister(ctx context.Context) (string, error) {
+	return utils.RDB.Get(ctx, AdminSwitchRegisterField)
 }
 
 // 修改邀请积分奖励
-func (c *AdminRDB) RewardInvite(ctx context.Context, reward int) error {
-	return nil
+func (c *AdminRDB) SetRewardInvite(ctx context.Context, reward int) error {
+	return utils.RDB.Set(ctx, AdminRewardInviteField, reward)
 }
 
 // 修改充值积分奖励
-func (c *AdminRDB) RewardRecharge(ctx context.Context, reward int) error {
-	return nil
+func (c *AdminRDB) SetRewardRecharge(ctx context.Context, reward int) error {
+	return utils.RDB.Set(ctx, AdminRewardRechargeField, reward)
 }
+
+// +-----------+---------+------+
+// + field     | key     | val  |
+// +-----------+---------+------+
+// + admin_gfs | <fs_id> | info |
+// +-----------+---------+------+
 
 // 设置全局飞行表
 func (c *AdminRDB) SetGlobalFs(ctx context.Context, fs *info.Fs) error {
-	return nil
+	fsJSON, err := json.Marshal(fs)
+	if err != nil {
+		return err
+	}
+	return utils.RDB.HSet(ctx, AdminGfsField, fs.ID, string(fsJSON))
 }

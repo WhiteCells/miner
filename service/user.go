@@ -52,7 +52,7 @@ func (s *UserService) Register(ctx *gin.Context, req *dto.RegisterReq) error {
 		return errors.New("failed to create secret")
 	}
 
-	uid, err := utils.GenUID()
+	uid, err := utils.GenerateUID()
 	if err != nil {
 		return errors.New("uid create failed")
 	}
@@ -128,7 +128,7 @@ func (s *UserService) Login(ctx *gin.Context, req *dto.LoginReq) (string, *info.
 	}
 
 	// 生成 JWT token
-	token, err := utils.GenerateToken(user.ID, user.Name, user.Role, 24)
+	token, err := utils.GenerateToken(user.ID, user.Name, 24)
 	if err != nil {
 		return "", nil, err
 	}

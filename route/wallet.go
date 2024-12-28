@@ -21,8 +21,8 @@ func NewWalletRoute() *WalletRoute {
 func (wr *WalletRoute) InitWalletRoute(r *gin.Engine) {
 	route := r.Group("/wallet")
 	route.Use(middleware.JWTAuth())
-	route.Use(middleware.IPVerify())
-	route.Use(middleware.RoleAuth(role.User))
+	route.Use(middleware.IPAuth())
+	route.Use(middleware.RoleAuth(role.User, role.Admin))
 	route.Use(middleware.StatusAuth())
 	{
 		route.POST("", wr.walletController.CreateWallet)
