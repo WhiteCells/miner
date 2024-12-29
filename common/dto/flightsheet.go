@@ -1,23 +1,23 @@
 package dto
 
-type CreateFlightsheetReq struct {
+type CreateFsReq struct {
 	Name     string `json:"name" binding:"required"`
-	CoinType string `json:"coin_type" binding:"required"`
+	CoinID   string `json:"coin" binding:"required"`
 	WalletID string `json:"wallet_id" binding:"required"`
-	MinePool string `json:"mine_pool" binding:"required"`
-	MineSoft string `json:"mine_soft" binding:"required"`
+	MineID   string `json:"mine_id" binding:"required"`
+	SoftID   string `json:"soft_id" binding:"required"`
 }
 
-type DeleteFlightsheetReq struct {
+type DeleteFsReq struct {
 	FsID string `json:"fs_id" binding:"required"`
 }
 
-type UpdateFlightsheetReq struct {
+type UpdateFsReq struct {
 	FsID       string                 `json:"fs_id" binding:"required"`
 	UpdateInfo map[string]interface{} `json:"update_info" binding:"required"`
 }
 
-type ApplyFlightsheetWalletReq struct {
-	FlightsheetID string `json:"fs_id" binding:"required"`
-	WaleltID      string `json:"walelt_id" binding:"required"`
+type ApplyWalletReq struct {
+	FsID     string `json:"fs_id" binding:"required"`
+	WaleltID string `json:"walelt_id" binding:"required"`
 }

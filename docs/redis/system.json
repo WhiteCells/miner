@@ -1,9 +1,0 @@
-{
-    "points_reward": 1,
-    "invite_reward": 1,
-    "register_switch": 1,
-    "global_mine_pool": [
-        ["http://", "http://"], 
-        ["http://", "http://"]
-    ]
-}

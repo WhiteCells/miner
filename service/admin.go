@@ -64,10 +64,10 @@ func (s *AdminService) SetSwitchRegister(ctx context.Context, req *dto.AdminSwit
 // SetGlobalFlightsheet 设置全局飞行表
 func (s *AdminService) SetGlobalFs(ctx context.Context, req *dto.AdminSetGlobalFsReq) error {
 	fs := &info.Fs{
-		Name: req.Name,
-		Coin: req.Coin,
-		Mine: req.Mine,
-		Soft: req.Soft,
+		Name:   req.Name,
+		CoinID: req.Coin,
+		MineID: req.Mine,
+		SoftID: req.Soft,
 	}
 	return s.adminRDB.SetGlobalFs(ctx, fs)
 }
@@ -84,12 +84,10 @@ func (s *AdminService) RewardRecharge(ctx context.Context, req *dto.AdminSetRech
 
 // SetUserStatus 设置用户状态
 func (s *AdminService) SetUserStatus(ctx context.Context, req *dto.AdminSetUserStatusReq) error {
-	// return s.adminDAO.SetUserStatus(req.UserID, req.Status)
-	return nil
+	return s.adminRDB.SetUserStatus(ctx, req.UserID, req.Status)
 }
 
 // SetMinerPoolCost 设置矿池消耗
-func (s *AdminService) SetMinePoolCost(ctx context.Context, req *dto.AdminSetMinerPoolCostReq) error {
-	// return s.adminDAO.SetMinePoolCost(req.MinePoolID, req.Cost)
-	return nil
+func (s *AdminService) SetMinepoolCost(ctx context.Context, req *dto.AdminSetMinePoolCostReq) error {
+	return s.adminRDB.SetMinepoolCost(ctx, req.MinepoolID, req.Cost)
 }

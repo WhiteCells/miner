@@ -11,6 +11,8 @@ var MinerField = "miner"
 var FsField = "fs"
 var WalletField = "wallet"
 
+var MpField = "mp"
+
 var OsField = "os"
 
 var MinerFsField = "miner_fs"

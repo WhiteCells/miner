@@ -67,7 +67,7 @@ func (r *RedisClient) HGetAll(ctx context.Context, field string) (map[string]str
 }
 
 func (r *RedisClient) HDel(ctx context.Context, field string, key string) error {
-	return r.Client.HDel(ctx, key, field).Err()
+	return r.Client.HDel(ctx, field, key).Err()
 }
 
 func (r *RedisClient) Set(ctx context.Context, key string, value interface{}) error {

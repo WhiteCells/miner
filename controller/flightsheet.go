@@ -21,7 +21,7 @@ func NewFlightsheetController() *FlightsheetController {
 
 // CreateFlightsheet 创建飞行表
 func (c *FlightsheetController) CreateFlightsheet(ctx *gin.Context) {
-	var req dto.CreateFlightsheetReq
+	var req dto.CreateFsReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
@@ -38,7 +38,7 @@ func (c *FlightsheetController) CreateFlightsheet(ctx *gin.Context) {
 
 // DeleteFlightsheet 删除飞行表
 func (c *FlightsheetController) DeleteFlightsheet(ctx *gin.Context) {
-	var req dto.DeleteFlightsheetReq
+	var req dto.DeleteFsReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
@@ -54,7 +54,7 @@ func (c *FlightsheetController) DeleteFlightsheet(ctx *gin.Context) {
 
 // UpdateFlightsheet 更新飞行表
 func (c *FlightsheetController) UpdateFlightsheet(ctx *gin.Context) {
-	var req dto.UpdateFlightsheetReq
+	var req dto.UpdateFsReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
@@ -81,7 +81,7 @@ func (c *FlightsheetController) GetFs(ctx *gin.Context) {
 
 // ApplyWallet 飞行表应用钱包
 func (c *FlightsheetController) ApplyWallet(ctx *gin.Context) {
-	var req dto.ApplyFlightsheetWalletReq
+	var req dto.ApplyWalletReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return

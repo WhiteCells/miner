@@ -19,3 +19,8 @@ func (s *HiveOsService) Interact(ctx context.Context) error {
 
 	return nil
 }
+
+func (s *HiveOsService) SendCmd(ctx context.Context) error {
+
+	return nil
+}

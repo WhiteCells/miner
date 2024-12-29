@@ -64,12 +64,8 @@ func (s *MinerService) CreateMiner(ctx context.Context, req *dto.CreateMinerReq)
 
 // DeleteMiner 删除矿机
 func (s *MinerService) DeleteMiner(ctx context.Context, req *dto.DeleteMinerReq) error {
-	userID, exists := ctx.Value("user_id").(string)
-	if !exists {
-		return errors.New("invalid user_id in context")
-	}
 	// 检查用户对 Miner 的权限
-	if !s.validPerm(ctx, userID, req.MinerID, []perm.MinerPerm{perm.MinerOwner}) {
+	if !s.validPerm(ctx, req.FarmID, req.MinerID, []perm.MinerPerm{perm.MinerOwner}) {
 		return errors.New("permission denied")
 	}
 	// 删除矿机

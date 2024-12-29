@@ -213,14 +213,14 @@ func (c *AdminController) SetUserStatus(ctx *gin.Context) {
 }
 
 // SetMinerPoolCost 设置矿池费用
-func (c *AdminController) SetMinerPoolCost(ctx *gin.Context) {
-	var req dto.AdminSetMinerPoolCostReq
+func (c *AdminController) SetMinePoolCost(ctx *gin.Context) {
+	var req dto.AdminSetMinePoolCostReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		rsp.Error(ctx, http.StatusBadRequest, "invalid request", nil)
 		return
 	}
 
-	if err := c.adminService.SetMinePoolCost(ctx, &req); err != nil {
+	if err := c.adminService.SetMinepoolCost(ctx, &req); err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, "admin set miner poolCost faild", nil)
 		return
 	}

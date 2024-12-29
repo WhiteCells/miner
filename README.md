@@ -56,3 +56,12 @@ go run ./main.go
 - 用户创建上限(内存空间)
 - 单元测试，压力测试
 - ...
+
+
+### 交互
+
+![](./assets/interact.png)
+
+### 充值
+
+![](./assets/recharge.png)

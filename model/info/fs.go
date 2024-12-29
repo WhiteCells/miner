@@ -1,9 +1,9 @@
 package info
 
 type Fs struct {
-	ID   string `json:"id"`
-	Name string `json:"name"`
-	Coin string `json:"coin"`
-	Mine string `json:"mine"`
-	Soft string `json:"soft"`
+	ID     string `json:"id"`
+	Name   string `json:"name"`
+	CoinID string `json:"coin"`
+	MineID string `json:"mine"`
+	SoftID string `json:"soft"`
 }

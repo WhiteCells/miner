@@ -9,18 +9,20 @@ import (
 )
 
 type AdminRDB struct {
-	userRDB   *UserRDB
-	farmRDB   *FarmRDB
-	minerRDB  *MinerRDB
-	SystemRDB *SystemRDB
+	userRDB     *UserRDB
+	farmRDB     *FarmRDB
+	minerRDB    *MinerRDB
+	SystemRDB   *SystemRDB
+	minepoolRDB *MinepoolRDB
 }
 
 func NewAdminRDB() *AdminRDB {
 	return &AdminRDB{
-		userRDB:   NewUserRDB(),
-		farmRDB:   NewFarmRDB(),
-		minerRDB:  NewMinerRDB(),
-		SystemRDB: NewSystemRDB(),
+		userRDB:     NewUserRDB(),
+		farmRDB:     NewFarmRDB(),
+		minerRDB:    NewMinerRDB(),
+		SystemRDB:   NewSystemRDB(),
+		minepoolRDB: NewMinpoolRDB(),
 	}
 }
 
@@ -103,4 +105,24 @@ func (c *AdminRDB) SetGlobalFs(ctx context.Context, fs *info.Fs) error {
 		return err
 	}
 	return utils.RDB.HSet(ctx, AdminGfsField, fs.ID, string(fsJSON))
+}
+
+// 设置用户状态
+func (c *AdminRDB) SetUserStatus(ctx context.Context, userID string, s status.UserStatus) error {
+	user, err := c.userRDB.GetByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+	user.Status = s
+	return c.userRDB.Set(ctx, user)
+}
+
+// 设置矿池的消耗
+func (c *AdminRDB) SetMinepoolCost(ctx context.Context, mpID string, cost float64) error {
+	mp, err := c.minepoolRDB.GetByID(ctx, mpID)
+	if err != nil {
+		return err
+	}
+	mp.Cost = cost
+	return c.minepoolRDB.Set(ctx, mp)
 }
