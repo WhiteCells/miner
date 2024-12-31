@@ -2,7 +2,9 @@ package service
 
 import (
 	"context"
+	"crypto/rand"
 	"errors"
+	"math/big"
 	"miner/common/dto"
 	"miner/common/perm"
 	"miner/dao/redis"
@@ -11,14 +13,16 @@ import (
 )
 
 type MinerService struct {
-	minerRDB *redis.MinerRDB
-	farmRDB  *redis.FarmRDB
+	minerRDB  *redis.MinerRDB
+	farmRDB   *redis.FarmRDB
+	hiveosRDB *redis.HiveOsRDB
 }
 
 func NewMinerService() *MinerService {
 	return &MinerService{
-		minerRDB: redis.NewMinerRDB(),
-		farmRDB:  redis.NewFarmRDB(),
+		minerRDB:  redis.NewMinerRDB(),
+		farmRDB:   redis.NewFarmRDB(),
+		hiveosRDB: redis.NewHiveOsRDB(),
 	}
 }
 
@@ -38,7 +42,7 @@ func (s *MinerService) CreateMiner(ctx context.Context, req *dto.CreateMinerReq)
 		return nil, err
 	}
 
-	rigID, err := utils.GenerateRigID(8, req.FarmID, uid)
+	rigID, err := s.generateRigID(ctx, 8)
 	if err != nil {
 		return nil, err
 	}
@@ -198,4 +202,27 @@ func (s *MinerService) validFarmPerm(ctx context.Context, userID string, farmID 
 	}
 
 	return false
+}
+
+func (s *MinerService) generateRigID(ctx context.Context, length int) (string, error) {
+	if length < 8 {
+		return "", errors.New("invalid argument")
+	}
+	const charset = "0123456789"
+	id := make([]byte, length)
+	for {
+		for i := range id {
+			num, err := rand.Int(rand.Reader, big.NewInt(int64(len(charset))))
+			if err != nil {
+				return "", err
+			}
+			id[i] = charset[num.Int64()]
+		}
+		uid := string(id)
+		// rigIDMutex.Lock()
+		if !s.hiveosRDB.ExistsRigID(ctx, uid) {
+			return uid, nil
+		}
+		// rigIDMutex.Unlock()
+	}
 }

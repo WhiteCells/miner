@@ -111,6 +111,12 @@ func (c *MinerRDB) ApplyFs(ctx context.Context, minerID string, fsID string) err
 	return utils.RDB.Set(ctx, key, fsID)
 }
 
+// 获取应用的飞行表
+func (c *MinerRDB) GetApplyFs(ctx context.Context, minerID string) (string, error) {
+	key := MakeKey(MinerFsField, minerID)
+	return utils.RDB.Get(ctx, key)
+}
+
 // 添加管理员
 // fromUserID 操作的用户 ID
 // fromFarmID 操作的用户矿场 ID

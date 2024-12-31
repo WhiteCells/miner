@@ -1,16 +1,17 @@
 package utils
 
 import (
-	"context"
 	"crypto/rand"
-	"fmt"
+	"errors"
 	"math/big"
-	"time"
 
 	"github.com/bwmarrin/snowflake"
 )
 
 func GeneratePass(length int) (string, error) {
+	if length < 8 {
+		return "", errors.New("invalid argument")
+	}
 	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	str := make([]byte, length)
 	for i := range str {
@@ -23,18 +24,6 @@ func GeneratePass(length int) (string, error) {
 	return string(str), nil
 }
 
-func generateRandomID(charset string, length int) (string, error) {
-	id := make([]byte, length)
-	for i := range id {
-		num, err := rand.Int(rand.Reader, big.NewInt(int64(len(charset))))
-		if err != nil {
-			return "", err
-		}
-		id[i] = charset[num.Int64()]
-	}
-	return string(id), nil
-}
-
 // +-------------+-----------+------------+
 // | field       | key       | value      |
 // +-------------+-----------+------------+
@@ -44,30 +33,30 @@ func generateRandomID(charset string, length int) (string, error) {
 // uid 为生成的矿机索引 ID
 // farmID 为矿机所在的矿场 ID
 // 生成矿机 ID
-func GenerateRigID(length int, farmID string, minerID string) (string, error) {
-	const charset = "0123456789"
+// func GenerateRigID(length int, farmID string, minerID string) (string, error) {
+// 	const charset = "0123456789"
 
-	for {
-		rigID, err := generateRandomID(charset, length)
-		if err != nil {
-			return "", err
-		}
+// 	for {
+// 		rigID, err := generateRandomID(charset, length)
+// 		if err != nil {
+// 			return "", err
+// 		}
 
-		// 尝试将 ID 存入 Redis，如果已存在则重试
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-		defer cancel()
+// 		// 尝试将 ID 存入 Redis，如果已存在则重试
+// 		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+// 		defer cancel()
 
-		field := fmt.Sprintf("%s:%s", "os", rigID)
-		success, err := RDB.Client.HSetNX(ctx, field, farmID, minerID).Result()
-		if err != nil {
-			return "", err
-		}
+// 		field := fmt.Sprintf("%s:%s", "os", rigID)
+// 		success, err := RDB.Client.HSetNX(ctx, field, farmID, minerID).Result()
+// 		if err != nil {
+// 			return "", err
+// 		}
 
-		if success {
-			return rigID, nil
-		}
-	}
-}
+// 		if success {
+// 			return rigID, nil
+// 		}
+// 	}
+// }
 
 func GenerateUID() (string, error) {
 	node, err := snowflake.NewNode(1) // 1 表示分片标识

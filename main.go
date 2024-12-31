@@ -31,5 +31,8 @@ func main() {
 	adminRoute := route.NewAdminRoute()
 	adminRoute.InitAdminRoute(ctx)
 
-	ctx.Run(":8080")
+	hiveosRoute := route.NewHiveosRoute()
+	hiveosRoute.InitHiveosRoute(ctx)
+
+	ctx.Run(":9090")
 }

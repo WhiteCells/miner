@@ -23,7 +23,11 @@ func NewMinpoolRDB() *MinepoolRDB {
 // +-------+----------+-------+
 func (r *MinepoolRDB) Set(ctx context.Context, mp *info.Minepool) error {
 	field := MakeField(MpField)
-	return utils.RDB.HSet(ctx, field, mp.ID, mp)
+	mpJSON, err := json.Marshal(mp)
+	if err != nil {
+		return err
+	}
+	return utils.RDB.HSet(ctx, field, mp.ID, string(mpJSON))
 }
 
 func (r *MinepoolRDB) SetCost(ctx context.Context, mpID string, cost float64) error {

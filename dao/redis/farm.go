@@ -97,7 +97,7 @@ func (c *FarmRDB) Transfer(ctx context.Context, fromID string, toID string, farm
 // 添加成员
 func (c *FarmRDB) AddMember(ctx context.Context, userID string, farmID string, memID string) error {
 	field := MakeField(FarmField, memID)
-	return utils.RDB.HSet(ctx, field, farmID, perm.FarmManager)
+	return utils.RDB.HSet(ctx, field, farmID, string(perm.FarmManager))
 }
 
 // 删除成员

@@ -63,13 +63,13 @@ func (c *AdminRDB) GetUserMiners(ctx context.Context, farmID string) (*[]info.Mi
 }
 
 // +-----------------------+------+
-// + key                   | val  |
+// | key                   | val  |
 // +-----------------------+------+
-// + admin_reward_invite   | 111  |
+// | admin_reward_invite   | 111  |
 // +-----------------------+------+
-// + admin_reward_recharge | 111  |
+// | admin_reward_recharge | 111  |
 // +-----------------------+------+
-// + admin_switch_register | 1    |
+// | admin_switch_register | 1    |
 // +-----------------------+------+
 
 // 修改注册开关

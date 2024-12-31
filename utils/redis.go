@@ -54,7 +54,19 @@ func InitRDB() error {
 	return initRDBError
 }
 
-func (r *RedisClient) HSet(ctx context.Context, field string, key string, value interface{}) error {
+func (r *RedisClient) RPush(ctx context.Context, key string, value string) error {
+	return r.Client.RPush(ctx, key, value).Err()
+}
+
+func (r *RedisClient) LPop(ctx context.Context, key string) (string, error) {
+	return r.Client.LPop(ctx, key).Result()
+}
+
+func (r *RedisClient) LLen(ctx context.Context, key string) (int64, error) {
+	return r.Client.LLen(ctx, key).Result()
+}
+
+func (r *RedisClient) HSet(ctx context.Context, field string, key string, value string) error {
 	return r.Client.HSet(ctx, field, key, value).Err()
 }
 
