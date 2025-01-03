@@ -62,7 +62,14 @@ func (s *MinerService) CreateMiner(ctx context.Context, req *dto.CreateMinerReq)
 	}
 
 	// 创建矿机
-	err = s.minerRDB.Set(ctx, req.FarmID, miner)
+	if err = s.minerRDB.Set(ctx, req.FarmID, miner); err != nil {
+		return nil, err
+	}
+
+	if err = s.hiveosRDB.SetRig(ctx, rigID, req.FarmID, miner.ID); err != nil {
+		return nil, err
+	}
+
 	return miner, err
 }
 

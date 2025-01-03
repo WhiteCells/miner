@@ -2,6 +2,8 @@ package redis
 
 import (
 	"context"
+	"encoding/json"
+	"miner/model/info"
 	"miner/utils"
 )
 
@@ -35,4 +37,24 @@ func (c *HiveOsRDB) GetRigMinerID(ctx context.Context, rigID string) (string, er
 func (c *HiveOsRDB) ExistsRigID(ctx context.Context, rigID string) bool {
 	field := MakeField(OsField, rigID)
 	return utils.RDB.Exists(ctx, field)
+}
+
+// 矿机状态
+// +---------------------+-----------+
+// | key                 | val       |
+// +---------------------+-----------+
+// | os_miner:<rig_id>   | <info>    |
+// +---------------------+-----------+
+func (c *HiveOsRDB) SetMinerStatus(ctx context.Context, rigID string, status *info.MinerStatus) error {
+	key := MakeKey(OsMinerField, rigID)
+	minerStatusJSON, err := json.Marshal(status)
+	if err != nil {
+		return err
+	}
+	return utils.RDB.Set(ctx, key, string(minerStatusJSON))
+}
+
+func (c *HiveOsRDB) GetMinerStatus(ctx context.Context, rigID string) error {
+
+	return nil
 }

@@ -1,7 +1,10 @@
 package controller
 
 import (
+	"miner/common/dto"
+	"miner/common/rsp"
 	"miner/service"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -158,14 +161,30 @@ func (c *HiveOsController) Poll(ctx *gin.Context) {
 }
 
 // 发送命令
+// reponse taskID
 func (c *HiveOsController) SendCmd(ctx *gin.Context) {
-	// 构建
-	// 构建 Task
+	var req dto.SendCmdReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		rsp.Error(ctx, http.StatusBadRequest, "", "")
+		return
+	}
+	taskID, err := c.hiveOsService.SendCmd(ctx, &req)
+	if err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, "", "")
+		return
+	}
+	rsp.Success(ctx, http.StatusOK, "send success", taskID)
 }
 
 // 获取命令结果
 func (c *HiveOsController) GetCmdRes(ctx *gin.Context) {
-
+	taskID := ctx.Query("task_id")
+	res, err := c.hiveOsService.GetCmdRes(ctx, taskID)
+	if err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, "", "")
+		return
+	}
+	rsp.Success(ctx, http.StatusOK, "send success", res)
 }
 
 // 设置配置

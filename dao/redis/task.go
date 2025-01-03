@@ -21,12 +21,33 @@ func NewTaskRDB() *TaskRDB {
 // +-------+-------------+
 // | task  | <task_info> |
 // +-------+-------------+
-//
+// +-------+-------------+
+// | key   | val         |
+// +-------+-------------+
+// | task  | <rig_id>:<task_id> |
+// +-------+-------------+
 // +----------------+------------+
 // | key            | val        |
 // +----------------+------------+
-// | task:<task_id> | <task_res> |
+// | task:<rig_id><task_id> | <task_res> |
 // +----------------+------------+
+//
+// +----------------+------------+---------------+
+// | field          | key        | val           |
+// +----------------+------------+---------------+
+// | task:<rig_id>  | <task_id>  | <task_info>   |
+// +----------------+------------+---------------+
+func (c *TaskRDB) Set(ctx context.Context, rigID string, taskID string, taskRes string) error {
+	// field := MakeField(TaskField, rigID)
+	// return utils.RDB.HSet(ctx, field, taskID)
+	return nil
+}
+
+func (c *TaskRDB) Get(ctx context.Context, taskID string) (string, error) {
+	key := MakeKey(TaskField, taskID)
+	return utils.RDB.Get(ctx, key)
+}
+
 func (c *TaskRDB) RPush(ctx context.Context, task *info.Task) error {
 	key := MakeKey(TaskField)
 	taskJSON, err := json.Marshal(task)
