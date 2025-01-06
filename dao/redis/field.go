@@ -20,8 +20,9 @@ var FsMinepoolField = "fs_minepool"
 
 // Hiveos
 var OsField = "os"
-var TaskField = "task"
 var OsMinerField = "os_miner"
+var TaskIDField = "task_id"
+var TaskInfoField = "task_info"
 
 func MakeKey(str ...string) string {
 	b := false

@@ -44,7 +44,7 @@ func (s *UserService) Register(ctx *gin.Context, req *dto.RegisterReq) error {
 	}
 
 	// 生成邀请码
-	// inviteCode := utils.GenerateInviteCode() // 使用 ID 作为邀请码，方便查找用户
+	// 使用 ID 作为邀请码，方便查找用户
 
 	// 生成身份验证密钥
 	secret, err := utils.CreateSecret()
@@ -143,14 +143,6 @@ func (s *UserService) Login(ctx *gin.Context, req *dto.LoginReq) (string, *info.
 		return "", nil, errors.New("RDB failed")
 	}
 
-	// // 缓存 info token
-	// if err := s.userCache.SetUser(ctx, user); err != nil {
-	// 	return "", nil, err
-	// }
-	// if err := s.userCache.SetUserTokenByID(ctx, user.ID, token); err != nil {
-	// 	return "", nil, err
-	// }
-
 	return token, user, nil
 }
 
@@ -172,27 +164,6 @@ func (s *UserService) UpdateUserInfo(ctx *gin.Context, req *dto.UpdateInfoReq) e
 
 	return s.userRDB.Set(ctx, user)
 }
-
-// 更新密码
-// func (s *UserService) UpdatePassword(ctx *gin.Context, userID int, oldPassword, newPassword string) error {
-// 	user, err := s.userDAO.GetUserByID(userID)
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	// 验证旧密码
-// 	if !s.validatePassword(user, oldPassword) {
-// 		return errors.New("invalid old password")
-// 	}
-
-// 	// 更新密码
-// 	if err := s.userDAO.UpdatePassword(userID, newPassword); err != nil {
-// 		return err
-// 	}
-
-// 	// 清除缓存
-// 	return s.userCache.DeleteUserCache(ctx)
-// }
 
 // GetPointsBalance 获取用户积分余额
 func (s *UserService) GetPointsBalance(ctx *gin.Context) (int, error) {

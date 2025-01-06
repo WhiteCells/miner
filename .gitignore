@@ -1,3 +1,6 @@
 go.sum
 *.log
 .idea/
+redis-cluster/*/log.txt
+redis-cluster/*/store/*
+!redis-cluster/*/store/.gitkeep

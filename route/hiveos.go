@@ -26,10 +26,8 @@ func (hr *HiveOsRoute) InitHiveosRoute(r *gin.Engine) {
 		route.Use(middleware.IPAuth())
 		route.Use(middleware.RoleAuth(role.User, role.Admin))
 		route.Use(middleware.StatusAuth())
-		route.POST("/cmd", hr.hiveOsController.SendCmd)
-		route.GET("/cmd", hr.hiveOsController.GetCmdRes)
-		route.POST("/config", hr.hiveOsController.SetConfig)
-		route.GET("/config", hr.hiveOsController.GetConfigRes)
+		route.POST("/task", hr.hiveOsController.PostTask)
+		route.GET("/task", hr.hiveOsController.GetTaskRes)
 		route.GET("/stats", hr.hiveOsController.GetStats)
 	}
 }

@@ -4,6 +4,7 @@ import (
 	"miner/middleware"
 	"miner/route"
 	"miner/utils"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,23 +17,18 @@ func main() {
 	utils.InitDB()
 
 	gin.SetMode(utils.Config.Server.Mode)
+
 	ctx := gin.Default()
 	ctx.Use(middleware.OperLog())
-	userRoute := route.NewUserRoute()
-	userRoute.InitUserRoute(ctx)
-	farmRoute := route.NewFarmRoute()
-	farmRoute.InitFarmRoute(ctx)
-	minerRoute := route.NewMinerRoute()
-	minerRoute.InitMinerRoute(ctx)
-	flightsheetRoute := route.NewFlightsheetRoute()
-	flightsheetRoute.InitFlightsheetRoute(ctx)
-	walletRoute := route.NewWalletRoute()
-	walletRoute.InitWalletRoute(ctx)
-	adminRoute := route.NewAdminRoute()
-	adminRoute.InitAdminRoute(ctx)
 
-	hiveosRoute := route.NewHiveosRoute()
-	hiveosRoute.InitHiveosRoute(ctx)
+	route.NewUserRoute().InitUserRoute(ctx)
+	route.NewFarmRoute().InitFarmRoute(ctx)
+	route.NewMinerRoute().InitMinerRoute(ctx)
+	route.NewFlightsheetRoute().InitFlightsheetRoute(ctx)
+	route.NewWalletRoute().InitWalletRoute(ctx)
+	route.NewAdminRoute().InitAdminRoute(ctx)
+	route.NewHiveosRoute().InitHiveosRoute(ctx)
 
-	ctx.Run(":9090")
+	port := strconv.Itoa(utils.Config.Server.Port)
+	ctx.Run(":" + port)
 }

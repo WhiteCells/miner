@@ -1,5 +1,7 @@
 package dto
 
+import "miner/model/info"
+
 /*
 // detail
 task:<task_id>/detail
@@ -19,10 +21,12 @@ type Task struct {
 	Stats   string `json:"stats"`
 }
 
-type SendCmdReq struct {
-	FarmID  string `json:"farm_id"`
-	MinerID string `json:"miner_id"`
-	Cmd     string `json:"cmd"`
+type PostTaskReq struct {
+	FarmID  string        `json:"farm_id"`
+	MinerID string        `json:"miner_id"`
+	RigID   string        `json:"rig_id"`
+	Type    info.TaskType `json:"type"`
+	Content string        `json:"content"`
 }
 
 type SetConfigReq struct {

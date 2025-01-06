@@ -8,6 +8,7 @@ import (
 
 type ServerConfig struct {
 	Server struct {
+		Host string `mapstructure:"host"`
 		Port int    `mapstructure:"port"`
 		Mode string `mapstructure:"mode"`
 	} `mapstructure:"server"`
@@ -40,12 +41,6 @@ type ServerConfig struct {
 		MaxAge     int    `mapstructure:"max_age"`
 		MaxBackups int    `mapstructure:"max_backups"`
 	} `mapstructure:"log"`
-
-	Session struct {
-		Secret string `mapstructure:"secret"`
-		Name   string `mapstructure:"name"`
-		MaxAge int    `mapstructure:"max_age"`
-	} `mapstructure:"session"`
 }
 
 var Config ServerConfig

@@ -215,7 +215,7 @@ func (s *MinerService) generateRigID(ctx context.Context, length int) (string, e
 	if length < 8 {
 		return "", errors.New("invalid argument")
 	}
-	const charset = "0123456789"
+	const charset = "123456789" // 以 0 开头时会导致转为字符串与实际 ID 不符合
 	id := make([]byte, length)
 	for {
 		for i := range id {
