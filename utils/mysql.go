@@ -80,5 +80,6 @@ func autoMigrate() error {
 		&model.FarmFlightsheet{},
 		&model.MinePool{},
 		&model.System{},
+		&model.Task{},
 	)
 }

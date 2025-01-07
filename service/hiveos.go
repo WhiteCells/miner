@@ -7,7 +7,9 @@ import (
 	"log"
 	"miner/common/dto"
 	"miner/common/rsp"
+	"miner/dao/mysql"
 	"miner/dao/redis"
+	"miner/model"
 	"miner/model/info"
 	"miner/utils"
 	"net/http"
@@ -23,6 +25,7 @@ type HiveOsService struct {
 	minerRDB  *redis.MinerRDB
 	taskRDB   *redis.TaskRDB
 	fsRDB     *redis.FsRDB
+	taskDAO   *mysql.TaskDAO
 }
 
 func NewHiveOsService() *HiveOsService {
@@ -32,6 +35,7 @@ func NewHiveOsService() *HiveOsService {
 		minerRDB:  redis.NewMinerRDB(),
 		taskRDB:   redis.NewTaskRDB(),
 		fsRDB:     redis.NewFsRDB(),
+		taskDAO:   mysql.NewTaskDAO(),
 	}
 }
 
@@ -232,6 +236,9 @@ func (s *HiveOsService) statsCase(ctx *gin.Context, rigID string) {
 	task, err := s.taskRDB.GetTask(ctx, rigID)
 	if err != nil {
 		// 没有任务则结束
+		log.Println("=============================================")
+		log.Println(err.Error())
+		log.Println("=============================================")
 		return
 	}
 
@@ -239,6 +246,8 @@ func (s *HiveOsService) statsCase(ctx *gin.Context, rigID string) {
 	if err != nil {
 		return
 	}
+
+	log.Println("===> stats  taskID", taskIDInt)
 
 	// 对任务分类讨论
 	switch task.Type {
@@ -312,7 +321,7 @@ func (s *HiveOsService) messageCase(ctx *gin.Context, rigID string) {
 	// 查找命令
 	// 根绝请求生成新的任务，更新任务中的 result
 	taskID := req.Params.ID
-	task, err := s.taskRDB.Get(ctx, taskID)
+	task, err := s.taskDAO.GetTask(taskID)
 	if err != nil {
 		log.Println(taskID)
 		log.Println("taskRDB.Get")
@@ -323,9 +332,12 @@ func (s *HiveOsService) messageCase(ctx *gin.Context, rigID string) {
 	task.Result = req.Params.Payload
 	task.Status = info.Done
 
-	log.Fatalln(task.Content)
+	if err := s.taskDAO.UpdateTask(task); err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), "update result failed")
+		return
+	}
 
-	s.taskRDB.Set(ctx, taskID, task)
+	log.Println("=======================", task)
 
 	// 从 req 中获取 rigID，根据 rigID 查询 hiveOsRDB farmID:minerID
 	// rigID := req.Params.RigID
@@ -435,25 +447,22 @@ func (s *HiveOsService) setMinerStatus(ctx context.Context, rigID string, req *d
 }
 
 func (s *HiveOsService) PostTask(ctx context.Context, req *dto.PostTaskReq) (string, error) {
-	// 生成任务 ID
-	taskID, err := utils.GenerateUID()
-	if err != nil {
-		return "", err
-	}
-	task := &info.Task{
-		ID:      taskID,
+	// TODO 限制命令长度
+	// TODO 限制 QPS
+	task := &model.Task{
 		Type:    req.Type,
 		Status:  info.Pending,
 		Content: req.Content,
 	}
-	if err := s.taskRDB.AddTask(ctx, req.RigID, taskID, task); err != nil {
+	if err := s.taskDAO.AddTask(ctx, req.RigID, task); err != nil {
 		return "", err
 	}
-	return taskID, nil
+
+	return task.ID, nil
 }
 
-func (s *HiveOsService) GetTaskRes(ctx context.Context, taskID string) (*info.Task, error) {
-	return s.taskRDB.Get(ctx, taskID)
+func (s *HiveOsService) GetTaskRes(ctx context.Context, taskID string) (*model.Task, error) {
+	return s.taskDAO.GetTask(taskID)
 }
 
 func (s *HiveOsService) GetStats(ctx context.Context) error {

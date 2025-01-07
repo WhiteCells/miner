@@ -3,7 +3,10 @@ package utils
 import (
 	"crypto/rand"
 	"errors"
+	"fmt"
 	"math/big"
+	mr "math/rand"
+	"time"
 
 	"github.com/bwmarrin/snowflake"
 )
@@ -31,4 +34,16 @@ func GenerateUID() (string, error) {
 	}
 	id := node.Generate() // 不会以 0 开头
 	return id.String(), nil
+}
+
+func GenerateTaskID() string {
+	// 获取当前时间戳后8位
+	timestamp := time.Now().UnixNano() / 1e6 % 100000000
+
+	// 生成4位随机数
+	mr.Seed(time.Now().UnixNano())
+	randomNum := mr.Intn(9000) + 1000 // 生成1000-9999之间的随机数
+
+	// 组合成12位数的ID
+	return fmt.Sprintf("%d%d", timestamp, randomNum)
 }

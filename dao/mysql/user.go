@@ -2,7 +2,6 @@ package mysql
 
 import (
 	"miner/model"
-	"miner/model/info"
 	"miner/utils"
 
 	"golang.org/x/crypto/bcrypt"
@@ -36,8 +35,8 @@ func (dao *UserDAO) GetUserByName(name string) (*model.User, error) {
 	return &user, err
 }
 
-func (dao *UserDAO) GetUserByInviteCode(inviteCode string) (*info.User, error) {
-	var user info.User
+func (dao *UserDAO) GetUserByInviteCode(inviteCode string) (*model.User, error) {
+	var user model.User
 	err := utils.DB.Where("invite_code = ?", inviteCode).First(&user).Error
 	return &user, err
 }
