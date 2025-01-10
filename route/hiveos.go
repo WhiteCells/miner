@@ -28,6 +28,7 @@ func (hr *HiveOsRoute) InitHiveosRoute(r *gin.Engine) {
 		route.Use(middleware.StatusAuth())
 		route.POST("/task", hr.hiveOsController.PostTask)
 		route.GET("/task", hr.hiveOsController.GetTaskRes)
-		route.GET("/stats", hr.hiveOsController.GetTaskStats)
+		route.GET("/stats", hr.hiveOsController.GetMinerStats)
+		route.GET("/info", hr.hiveOsController.GetMinerInfo)
 	}
 }

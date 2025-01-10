@@ -55,12 +55,6 @@ func (c *FarmRDB) GetAll(ctx context.Context, userID string) (*[]info.Farm, erro
 	return &farms, nil
 }
 
-// filter
-// 查询指定权限
-// func (c *FarmRDB) GetFliter(ctx context.Context, userID string, perm perm.Perm) (*[]info.Farm, error) {
-
-// }
-
 // 通过 ID 查询
 func (c *FarmRDB) GetByID(ctx context.Context, userID string, farmID string) (*info.Farm, error) {
 	field := MakeField(FarmField, userID)

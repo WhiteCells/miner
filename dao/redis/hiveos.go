@@ -39,22 +39,58 @@ func (c *HiveOsRDB) ExistsRigID(ctx context.Context, rigID string) bool {
 	return utils.RDB.Exists(ctx, field)
 }
 
-// 矿机状态
-// +---------------------+-----------+
-// | key                 | val       |
-// +---------------------+-----------+
-// | os_miner:<rig_id>   | <info>    |
-// +---------------------+-----------+
-func (c *HiveOsRDB) SetMinerStatus(ctx context.Context, rigID string, status *info.MinerStatus) error {
-	key := MakeKey(OsMinerField, rigID)
-	minerStatusJSON, err := json.Marshal(status)
+// 矿机统计信息
+// +--------------------+----------+
+// | key                | val      |
+// +--------------------+----------+
+// | os_stats:<rig_id>  | <stats>  |
+// +--------------------+----------+
+func (c *HiveOsRDB) SetMinerStats(ctx context.Context, rigID string, stats *info.MinerStats) error {
+	key := MakeKey(OsStatsField, rigID)
+	minerStatsByte, err := json.Marshal(stats)
 	if err != nil {
 		return err
 	}
-	return utils.RDB.Set(ctx, key, string(minerStatusJSON))
+	return utils.RDB.Set(ctx, key, string(minerStatsByte))
 }
 
-func (c *HiveOsRDB) GetMinerStatus(ctx context.Context, rigID string) error {
+func (c *HiveOsRDB) GetMinerStatus(ctx context.Context, rigID string) (*info.MinerStats, error) {
+	key := MakeKey(OsStatsField, rigID)
+	minerStatsByte, err := utils.RDB.Get(ctx, key)
+	if err != nil {
+		return nil, err
+	}
+	var minerStats info.MinerStats
+	if err := json.Unmarshal([]byte(minerStatsByte), &minerStats); err != nil {
+		return nil, err
+	}
+	return &minerStats, nil
+}
 
-	return nil
+// 矿机信息
+// +-------------------+-----------+
+// | key               | val       |
+// +-------------------+-----------+
+// | os_info:<rig_id>  | <info>    |
+// +-------------------+-----------+
+func (c *HiveOsRDB) SetMinerInfo(ctx context.Context, rigID string, info *info.MinerInfo) error {
+	key := MakeKey(OsInfoField, rigID)
+	minerInfoByte, err := json.Marshal(info)
+	if err != nil {
+		return err
+	}
+	return utils.RDB.Set(ctx, key, string(minerInfoByte))
+}
+
+func (c *HiveOsRDB) GetMinerInfo(ctx context.Context, rigID string) (*info.MinerInfo, error) {
+	key := MakeKey(OsInfoField, rigID)
+	minerInfoByte, err := utils.RDB.Get(ctx, key)
+	if err != nil {
+		return nil, err
+	}
+	var minerInfo info.MinerInfo
+	if err := json.Unmarshal([]byte(minerInfoByte), &minerInfo); err != nil {
+		return nil, err
+	}
+	return &minerInfo, nil
 }

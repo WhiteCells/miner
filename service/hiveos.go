@@ -55,7 +55,7 @@ func (s *HiveOsService) Poll(ctx *gin.Context) {
 
 // Poll hello case
 func (s *HiveOsService) helloCase(ctx *gin.Context, rigID string) {
-	var req dto.HiveosReq
+	var req dto.HelloReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), "")
 		return
@@ -68,7 +68,8 @@ func (s *HiveOsService) helloCase(ctx *gin.Context, rigID string) {
 	fmt.Printf("%s\n", jsonInd)
 	////////////////////////////////////////////////
 	// 对 req 的数据进行存储
-	s.setMinerStatus(ctx, rigID, &req)
+	// s.setMinerStatus(ctx, rigID, &req)
+	s.setMinerInfo(ctx, rigID, &req)
 	// 从 req 中获取 rigID，根据 rigID 查询 hiveOsRDB farmID:minerID
 	// rigID := req.Params.RigID
 	farmMiner, err := s.hiveOsRDB.GetRigMinerID(ctx, rigID)
@@ -424,26 +425,58 @@ func (s *HiveOsService) messageCase(ctx *gin.Context, rigID string) {
 	})
 }
 
+func (s *HiveOsService) setMinerInfo(ctx context.Context, rigID string, req *dto.HelloReq) error {
+	var info info.MinerInfo
+	info.RigID = req.Params.RigID
+	info.Passwd = req.Params.Passwd
+	info.ServerUrl = req.Params.ServerUrl
+	info.UID = req.Params.UID
+	info.RefId = req.Params.RigID
+	info.BootTime = req.Params.BootTime
+	info.BootEvent = req.Params.BootEvent
+	info.Ip = req.Params.Ip
+	info.NetInterfaces = req.Params.NetInterfaces
+	info.Openvpn = req.Params.Openvpn
+	info.LanConfig = req.Params.LanConfig
+	info.Gpu = req.Params.Gpu
+	info.GpuCountAmd = req.Params.GpuCountAmd
+	info.GpuCountNvidia = req.Params.GpuCountNvidia
+	info.GpuCountIntel = req.Params.GpuCountIntel
+	info.Mb = req.Params.Mb
+	info.Cpu = req.Params.Cpu
+	info.DiskModel = req.Params.DiskModel
+	info.ImageVersion = req.Params.ImageVersion
+	info.Kernel = req.Params.Kernel
+	info.AmdVersion = req.Params.AmdVersion
+	info.NvidiaVersion = req.Params.NvidiaVersion
+	info.IntelVersion = req.Params.IntelVersion
+	info.Version = req.Params.Version
+	info.ShellinaboxEnable = req.Params.ShellinaboxEnable
+	info.SshEnable = req.Params.SshEnable
+	info.SshPasswordEnable = req.Params.SshPasswordEnable
+	return s.hiveOsRDB.SetMinerInfo(ctx, rigID, &info)
+}
+
 func (s *HiveOsService) setMinerStatus(ctx context.Context, rigID string, req *dto.HiveosReq) error {
-	var status info.MinerStatus
-	status.Algo = req.Params.MinerStats.Algo
-	status.BusNumbers = req.Params.MinerStats.BusNumbers
-	status.Coin = req.Params.Meta.Custom.Coin
-	status.Cpuavg = req.Params.Cpuavg
-	status.Cputemp = req.Params.Cputemp
-	status.Df = req.Params.Df
-	status.Fan = req.Params.Fan
-	status.FsID = req.Params.Meta.FsID
-	status.Hs = req.Params.MinerStats.Hs
-	status.HsUnits = req.Params.MinerStats.HsUnits
-	status.Khs = req.Params.MinerStats.Khs
-	status.Mem = req.Params.Mem
-	status.Miner = req.Params.Miner
-	status.Power = req.Params.Power
-	status.Status = req.Params.MinerStats.Status
-	status.Temp = req.Params.Temp
-	status.TotalKhs = req.Params.TotalKhs
-	return s.hiveOsRDB.SetMinerStatus(ctx, rigID, &status)
+	var stats info.MinerStats
+	stats.Algo = req.Params.MinerStats.Algo
+	stats.BusNumbers = req.Params.MinerStats.BusNumbers
+	stats.Coin = req.Params.Meta.Custom.Coin
+	stats.Cpuavg = req.Params.Cpuavg
+	stats.Cputemp = req.Params.Cputemp
+	stats.Df = req.Params.Df
+	stats.Fan = req.Params.Fan
+	stats.FsID = req.Params.Meta.FsID
+	stats.Hs = req.Params.MinerStats.Hs
+	stats.HsUnits = req.Params.MinerStats.HsUnits
+	stats.Khs = req.Params.MinerStats.Khs
+	stats.Mem = req.Params.Mem
+	stats.Miner = req.Params.Miner
+	stats.Power = req.Params.Power
+	stats.Status = req.Params.MinerStats.Status
+	stats.Temp = req.Params.Temp
+	stats.TotalKhs = req.Params.TotalKhs
+	return s.hiveOsRDB.SetMinerStats(ctx, rigID, &stats)
 }
 
 func (s *HiveOsService) PostTask(ctx context.Context, req *dto.PostTaskReq) (string, error) {
@@ -470,9 +503,18 @@ func (s *HiveOsService) GetTaskStats(ctx context.Context, taskID string) (info.T
 	return task.Status, err
 }
 
+func (s *HiveOsService) GetMinerStats(ctx context.Context, rigID string) (*info.MinerStats, error) {
+	return s.hiveOsRDB.GetMinerStatus(ctx, rigID)
+}
+
+func (s *HiveOsService) GetMinerInfo(ctx context.Context, rigID string) (*info.MinerInfo, error) {
+	return s.hiveOsRDB.GetMinerInfo(ctx, rigID)
+}
+
 // 生成Config字符串
 func (s *HiveOsService) generateConfig(rigID int, passwrod string, farmID int, workerName, hiveHostURL, apiHostURL, sshServer string) string {
-	return fmt.Sprintf(`HIVE_HOST_URL="%s"
+	return fmt.Sprintf(`\
+HIVE_HOST_URL="%s"
 API_HOST_URLs="%s"
 RIG_ID=%d
 RIG_PASSWD="%s"
@@ -508,7 +550,7 @@ SSH_PASSWORD_ENABLE=1
 
 // 生成Wallet字符串
 func (s *HiveOsService) generateWallet(customMiner, installURL, template, customProxy string) string {
-	return fmt.Sprintf(`# Miner custom
+	return fmt.Sprintf(`
 CUSTOM_MINER="%s"
 CUSTOM_INSTALL_URL="%s"
 CUSTOM_ALGO=""

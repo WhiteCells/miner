@@ -60,3 +60,25 @@ func (c *HiveOsController) GetTaskStats(ctx *gin.Context) {
 	}
 	rsp.Success(ctx, http.StatusOK, "get task status success", taskStatus)
 }
+
+// 获取矿机统计信息
+func (c *HiveOsController) GetMinerStats(ctx *gin.Context) {
+	rigID := ctx.Query("rig_id")
+	stats, err := c.hiveOsService.GetMinerStats(ctx, rigID)
+	if err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, "get miner stats failed", err.Error())
+		return
+	}
+	rsp.Success(ctx, http.StatusOK, "get miner stats success", stats)
+}
+
+// 获取矿机信息
+func (c *HiveOsController) GetMinerInfo(ctx *gin.Context) {
+	rigID := ctx.Query("rig_id")
+	info, err := c.hiveOsService.GetMinerInfo(ctx, rigID)
+	if err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, "get miner stats failed", err.Error())
+		return
+	}
+	rsp.Success(ctx, http.StatusOK, "get miner stats success", info)
+}

@@ -22,6 +22,8 @@ var BanToken = "ban_token"
 
 // Hiveos
 var OsField = "os"
+var OsInfoField = "os_info"
+var OsStatsField = "os_stats"
 var OsMinerField = "os_miner"
 var TaskIDField = "task_id"
 var TaskInfoField = "task_info"
