@@ -2,8 +2,8 @@ package redis
 
 // Admin
 var AdminSwitchRegisterField = "switch_register"
-var AdminRewardInviteField = "reward_invite"
-var AdminRewardRechargeField = "reward_invite"
+var AdminInviteRewardField = "invite_reward"
+var AdminRechargeRatioField = "recharge_ratio"
 var AdminGfsField = "gfs"
 
 // User

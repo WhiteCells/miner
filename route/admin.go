@@ -33,7 +33,7 @@ func (ar *AdminRoute) InitAdminRoute(r *gin.Engine) {
 		route.POST("/switch_register", ar.adminController.SwitchRegister)
 		route.POST("/set_global_fs", ar.adminController.SetGlobalFs)
 		route.POST("/set_invite_reward", ar.adminController.SetInviteReward)
-		route.POST("/set_recharge_reward", ar.adminController.SetRechargeReward)
+		route.POST("/set_recharge_reward", ar.adminController.SetRechargeRatio)
 		route.POST("/set_user_status", ar.adminController.SetUserStatus)
 		route.POST("/set_miner_pool_cost", ar.adminController.SetMinePoolCost)
 	}

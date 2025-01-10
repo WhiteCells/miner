@@ -172,7 +172,7 @@ func (c *AdminController) SetInviteReward(ctx *gin.Context) {
 		return
 	}
 
-	if err := c.adminService.SetRewardInvite(ctx, &req); err != nil {
+	if err := c.adminService.SetInviteReward(ctx, &req); err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, "admin set invite reward faild", nil)
 		return
 	}
@@ -180,15 +180,15 @@ func (c *AdminController) SetInviteReward(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "admin set invite reward success", nil)
 }
 
-// SetRechargeReward 设置充值积分奖励
-func (c *AdminController) SetRechargeReward(ctx *gin.Context) {
+// SetRechargeReward 设置充值兑换积分比率
+func (c *AdminController) SetRechargeRatio(ctx *gin.Context) {
 	var req dto.AdminSetRechargeRewardReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		rsp.Error(ctx, http.StatusBadRequest, "invalid request", nil)
 		return
 	}
 
-	if err := c.adminService.RewardRecharge(ctx, &req); err != nil {
+	if err := c.adminService.SetRechargeRatio(ctx, &req); err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, "admin set recharge reward faild", nil)
 		return
 	}

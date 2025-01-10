@@ -60,7 +60,7 @@ type MinerInfo struct {
 		Cores string `json:"cores"`
 		Aes   string `json:"aes"`
 		CpuID string `json:"cpu_id"`
-	}
+	} `json:"cpu"`
 	DiskModel         string `json:"disk_model"`
 	ImageVersion      string `json:"image_version"`
 	Kernel            string `json:"kernel"`

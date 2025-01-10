@@ -4,10 +4,12 @@ import (
 	"errors"
 	"fmt"
 	"miner/common/dto"
+	"miner/common/points"
 	"miner/common/role"
 	"miner/common/status"
 	"miner/dao/mysql"
 	"miner/dao/redis"
+	"miner/model"
 	"miner/model/info"
 	"miner/utils"
 	"strings"
@@ -20,6 +22,7 @@ import (
 type UserService struct {
 	userDAO         *mysql.UserDAO
 	userRDB         *redis.UserRDB
+	adminRDB        *redis.AdminRDB
 	operLog         *mysql.OperLogDAO
 	pointsRecordDAO *mysql.PointsRecordDAO
 }
@@ -28,6 +31,7 @@ func NewUserSerivce() *UserService {
 	return &UserService{
 		userDAO:         mysql.NewUserDAO(),
 		userRDB:         redis.NewUserRDB(),
+		adminRDB:        redis.NewAdminRDB(),
 		operLog:         mysql.NewOperLogDAO(),
 		pointsRecordDAO: mysql.NewPointRecordDAO(),
 	}
@@ -80,12 +84,10 @@ func (s *UserService) Register(ctx *gin.Context, req *dto.RegisterReq) error {
 	// 如果有邀请码，处理邀请关系
 	if req.InviteCode != "" {
 		user.InviteBy = uid
-
 		// 给邀请人增加积分
-		// TODO 记录日志
-		// err = s.addInvitePoints(ctx, inviter.ID)
+		s.addInvitePoints(ctx, uid, req.InviteCode)
 		// if err != nil {
-		// 	return errors.New("add invite points failed")
+		// 	return err
 		// }
 	}
 
@@ -187,61 +189,57 @@ func (s *UserService) UpdateUserInfo(ctx *gin.Context, req *dto.UpdateInfoReq) e
 
 // GetPointsBalance 获取用户积分余额
 func (s *UserService) GetPointsBalance(ctx *gin.Context) (int, error) {
-	userID, exists := ctx.Value("user_id").(int)
+	userID, exists := ctx.Value("user_id").(string)
 	if !exists {
 		return -1, errors.New("invalid user_id in context")
 	}
-	user, err := s.userDAO.GetUserByID(userID)
+	// 查找用户
+	user, err := s.userRDB.GetByID(ctx, userID)
 	if err != nil {
 		return -1, errors.New("user not found")
 	}
-	return user.Points, err
+	// 邀请所获得的积分 + 充值所获的积分
+	points := user.InvitePoints + user.RechargePoints
+	return points, nil
 }
 
-// 添加积分
-// func (s *UserService) UpdatePoints(ctx *gin.Context, req *dto.AddPointsReq) error {
-// 	user, err := s.userRDB.GetByID(ctx, req.UserID)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	if err := s.userRDB.UpdatePoints(ctx, req.UserID, req.Point); err != nil {
-// 		return err
-// 	}
-
-// 	pointsRecord := &model.PointsRecord{
-// 		UserID:  req.UserID,
-// 		Type:    req.Type,
-// 		Amount:  req.Point,
-// 		Balance: newPoint,
-// 		Time:    req.Time,
-// 	}
-// 	return s.pointsRecordDAO.CreatePointsRecord(pointsRecord)
-// }
-
-// 添加邀请积分
-// func (s *UserService) addInvitePoints(ctx *gin.Context, inviterID string) error {
-// 	// 邀请奖励积分
-// 	// to
-// 	const invitePoints int = 100
-// 	req := &dto.AddPointsReq{
-// 		UserID: inviterID,
-// 		Type:   "invite",
-// 		Point:  invitePoints,
-// 		Time:   time.Now(),
-// 	}
-// 	return s.UpdatePoints(ctx, req)
-// }
-
 // 获取用户信息
-// func (s *UserService) GetUserInfo(ctx *gin.Context) (*model.User, error) {
-// 	if user, err := s.userCache.GetUserInfoByID(ctx, req.UserID); err == nil {
-// 		return user, nil
-// 	}
-// 	return s.userDAO.GetUserByID(req.UserID)
-// }
+func (s *UserService) GetUserInfo(ctx *gin.Context, userID string) (*info.User, error) {
+	return s.userRDB.GetByID(ctx, userID)
+}
 
 // 验证密码
 func (s *UserService) validPassword(user *info.User, password string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
 	return err == nil
+}
+
+// 给邀请者增加积分
+func (s *UserService) addInvitePoints(ctx *gin.Context, uid string, inviterID string) error {
+	// 获取邀请积分
+	invitePoints, err := s.adminRDB.GetInviteReward(ctx)
+	if err != nil {
+		return errors.New("invite rewards are not set")
+	}
+	// 查找邀请人
+	user, err := s.userRDB.GetByID(ctx, inviterID)
+	if err != nil {
+		return errors.New("inviter not long exists")
+	}
+	// 增加邀请积分
+	user.InvitePoints += invitePoints
+	// 积分记录
+	detail := fmt.Sprintf("%s invite %s", inviterID, uid)
+	go func() {
+		record := &model.PointsRecord{
+			UserID:  inviterID,
+			Type:    points.PointInvite,
+			Amount:  invitePoints,
+			Balance: user.InvitePoints,
+			Time:    time.Now(),
+			Detail:  detail,
+		}
+		s.pointsRecordDAO.CreatePointsRecord(record)
+	}()
+	return s.userRDB.Set(ctx, user)
 }

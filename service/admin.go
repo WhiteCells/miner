@@ -73,13 +73,13 @@ func (s *AdminService) SetGlobalFs(ctx context.Context, req *dto.AdminSetGlobalF
 }
 
 // SetInviteReward 设置邀请积分奖励
-func (s *AdminService) SetRewardInvite(ctx context.Context, req *dto.AdminSetInviteRewardReq) error {
-	return s.adminRDB.SetRewardInvite(ctx, req.Reward)
+func (s *AdminService) SetInviteReward(ctx context.Context, req *dto.AdminSetInviteRewardReq) error {
+	return s.adminRDB.SetInviteReward(ctx, req.Reward)
 }
 
-// SetRechargeReward 设置充值积分奖励
-func (s *AdminService) RewardRecharge(ctx context.Context, req *dto.AdminSetRechargeRewardReq) error {
-	return s.adminRDB.SetRewardRecharge(ctx, req.Reward)
+// SetRechargeReward 设置充值获取积分比率
+func (s *AdminService) SetRechargeRatio(ctx context.Context, req *dto.AdminSetRechargeRewardReq) error {
+	return s.adminRDB.SetRechargeRatio(ctx, req.Ratio)
 }
 
 // SetUserStatus 设置用户状态

@@ -14,6 +14,7 @@ func main() {
 	utils.InitJWT()
 	utils.InitLogger()
 	utils.InitRDB()
+	utils.InitRDBContent()
 	utils.InitDB()
 
 	gin.SetMode(utils.Config.Server.Mode)

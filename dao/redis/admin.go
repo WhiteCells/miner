@@ -6,6 +6,7 @@ import (
 	"miner/common/status"
 	"miner/model/info"
 	"miner/utils"
+	"strconv"
 )
 
 type AdminRDB struct {
@@ -82,14 +83,40 @@ func (c *AdminRDB) GetSwitchRegister(ctx context.Context) (string, error) {
 	return utils.RDB.Get(ctx, AdminSwitchRegisterField)
 }
 
-// 修改邀请积分奖励
-func (c *AdminRDB) SetRewardInvite(ctx context.Context, reward int) error {
-	return utils.RDB.Set(ctx, AdminRewardInviteField, reward)
+// 修改邀请积分奖励数量
+func (c *AdminRDB) SetInviteReward(ctx context.Context, reward int) error {
+	return utils.RDB.Set(ctx, AdminInviteRewardField, reward)
 }
 
-// 修改充值积分奖励
-func (c *AdminRDB) SetRewardRecharge(ctx context.Context, reward int) error {
-	return utils.RDB.Set(ctx, AdminRewardRechargeField, reward)
+// 获取邀请积分奖励数量
+func (c *AdminRDB) GetInviteReward(ctx context.Context) (int, error) {
+	rewardStr, err := utils.RDB.Get(ctx, AdminInviteRewardField)
+	if err != nil {
+		return 0, err
+	}
+	reward, err := strconv.Atoi(rewardStr)
+	if err != nil {
+		return 0, err
+	}
+	return reward, nil
+}
+
+// 修改充值积分奖励比例
+func (c *AdminRDB) SetRechargeRatio(ctx context.Context, ratio float64) error {
+	return utils.RDB.Set(ctx, AdminRechargeRatioField, ratio)
+}
+
+// 获取充值积分奖励比例
+func (c *AdminRDB) GetRechargeRatio(ctx context.Context) (float64, error) {
+	ratioStr, err := utils.RDB.Get(ctx, AdminRechargeRatioField)
+	if err != nil {
+		return 0, err
+	}
+	ratio, err := strconv.ParseFloat(ratioStr, 64)
+	if err != nil {
+		return 0, err
+	}
+	return ratio, nil
 }
 
 // +-----------+---------+------+

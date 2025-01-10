@@ -7,7 +7,7 @@ import (
 
 type PointsRecord struct {
 	ID      string            `json:"id" gorm:"column:id;type:int;primaryKey;autoIncrement"`
-	UserID  string            `json:"user_id" gorm:"index;column:user_id;type:int;comment:用户ID"`
+	UserID  string            `json:"user_id" gorm:"index;column:user_id;type:varchar(255);comment:用户ID"`
 	Type    points.PointsType `json:"type" gorm:"column:type;type:varchar(255);comment:积分类型"`
 	Amount  int               `json:"amount" gorm:"column:amount;type:int;comment:数量"`
 	Balance int               `json:"balance" gorm:"column:balance;type:int;comment:余额"`

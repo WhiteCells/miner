@@ -19,7 +19,7 @@ type AdminSetInviteRewardReq struct {
 }
 
 type AdminSetRechargeRewardReq struct {
-	Reward int `json:"reward" binding:"required"`
+	Ratio float64 `json:"ratio" binding:"required"`
 }
 
 type AdminSetUserStatusReq struct {
