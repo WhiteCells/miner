@@ -6,6 +6,7 @@ import (
 	"miner/common/points"
 	"miner/model/info"
 	"miner/utils"
+	"time"
 )
 
 type UserRDB struct{}
@@ -17,9 +18,9 @@ func NewUserRDB() *UserRDB {
 // 添加用户
 // 更新用户
 // +-------+-----------+--------+
-// + field | key       | val    |
+// | field | key       | val    |
 // +-------+-----------+--------+
-// + user  | <user_id> | info   |
+// | user  | <user_id> | info   |
 // +-------+-----------+--------+
 //
 // +------------------+------------+
@@ -149,4 +150,39 @@ func (c *UserRDB) UpdatePoints(ctx context.Context, userID string, num int, poin
 	}
 
 	return c.Set(ctx, user)
+}
+
+// token 黑名单，TTL 为 JWT TTL 剩余时间
+// +-------------------+-----------+
+// | key               | val       |
+// +-------------------+-----------+
+// | <token>:ban_token | ""        |
+// +-------------------+-----------+
+func (c *UserRDB) AddBanToken(ctx context.Context, token string) error {
+	key := MakeKey(BanToken, token)
+	// 解析 token
+	claims, err := utils.ParseToken(token)
+	if err != nil {
+		return err
+	}
+	// 登出时间
+	now := time.Now()
+	// token 过期时间
+	expTime := claims.ExpiresAt.Time
+	if expTime.Before(now) {
+		return err
+	}
+	// 计算 TTL
+	ttl := time.Until(expTime)
+	// 添加到 ban token
+	return utils.RDB.Set(ctx, key, "", ttl)
+}
+
+// 判断 token 是否存在 ban token
+func (c *UserRDB) ExistsBanToken(ctx context.Context, token string) bool {
+	key := MakeKey(BanToken, token)
+	if _, err := utils.RDB.Get(ctx, key); err != nil {
+		return false
+	}
+	return true
 }

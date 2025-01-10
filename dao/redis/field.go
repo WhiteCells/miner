@@ -18,6 +18,8 @@ var MinerFsField = "miner_fs"
 var FsWalletField = "fs_wallet"
 var FsMinepoolField = "fs_minepool"
 
+var BanToken = "ban_token"
+
 // Hiveos
 var OsField = "os"
 var OsMinerField = "os_miner"

@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"miner/common/dto"
 	"miner/common/role"
 	"miner/common/status"
@@ -9,6 +10,7 @@ import (
 	"miner/dao/redis"
 	"miner/model/info"
 	"miner/utils"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -148,6 +150,24 @@ func (s *UserService) Login(ctx *gin.Context, req *dto.LoginReq) (string, *info.
 
 // Logout 用户注销
 func (s *UserService) Logout(ctx *gin.Context) error {
+	// 从请求头中获取 authorization 信息
+	authHeader := ctx.GetHeader("Authorization")
+	if authHeader == "" {
+		return errors.New("authorization header is missing")
+	}
+
+	// 验证 token 格式是否正确
+	parts := strings.Split(authHeader, " ")
+	if len(parts) != 2 || parts[0] != "Bearer" {
+		return errors.New("invalid authorization format")
+	}
+	token := parts[1]
+
+	// 添加 token 到 ban token
+	if err := s.userRDB.AddBanToken(ctx, token); err != nil {
+		return fmt.Errorf("failed to logout: %w", err)
+	}
+
 	return nil
 }
 

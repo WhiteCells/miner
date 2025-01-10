@@ -465,9 +465,9 @@ func (s *HiveOsService) GetTaskRes(ctx context.Context, taskID string) (*model.T
 	return s.taskDAO.GetTask(taskID)
 }
 
-func (s *HiveOsService) GetStats(ctx context.Context) error {
-
-	return nil
+func (s *HiveOsService) GetTaskStats(ctx context.Context, taskID string) (info.TaskStatus, error) {
+	task, err := s.GetTaskRes(ctx, taskID)
+	return task.Status, err
 }
 
 // 生成Config字符串

@@ -85,23 +85,23 @@ func (c *TaskRDB) LLen(ctx context.Context, rigID string) (int64, error) {
 // +---------------------+--------------+
 // | task_info:<task_id> | <task_info>  |
 // +---------------------+--------------+
-func (c *TaskRDB) AddTask(ctx context.Context, rigID string, taskID string, task *info.Task) error {
-	list_key := MakeKey(TaskIDField, rigID)
-	hash_key := MakeKey(TaskInfoField, taskID)
+// func (c *TaskRDB) AddTask(ctx context.Context, rigID string, taskID string, task *info.Task) error {
+// 	list_key := MakeKey(TaskIDField, rigID)
+// 	hash_key := MakeKey(TaskInfoField, taskID)
 
-	pipe := utils.RDB.Client.Pipeline()
-	// list
-	pipe.RPush(ctx, list_key, taskID)
-	taskJSON, err := json.Marshal(task)
-	if err != nil {
-		return err
-	}
-	// hash
-	pipe.Set(ctx, hash_key, string(taskJSON), 0)
-	_, err = pipe.Exec(ctx)
+// 	pipe := utils.RDB.Client.Pipeline()
+// 	// list
+// 	pipe.RPush(ctx, list_key, taskID)
+// 	taskJSON, err := json.Marshal(task)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	// hash
+// 	pipe.Set(ctx, hash_key, string(taskJSON), 0)
+// 	_, err = pipe.Exec(ctx)
 
-	return err
-}
+// 	return err
+// }
 
 // 获取矿机的队头任务
 func (c *TaskRDB) GetTask(ctx context.Context, rigID string) (*model.Task, error) {

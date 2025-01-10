@@ -14,6 +14,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+var UserRDB = redis.NewUserRDB()
+
 // JWT 验证
 func JWTAuth() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -27,6 +29,13 @@ func JWTAuth() gin.HandlerFunc {
 		parts := strings.SplitN(authHeader, " ", 2)
 		if !(len(parts) == 2 && parts[0] == "Bearer") {
 			rsp.Error(ctx, http.StatusUnauthorized, "authorization header format error", nil)
+			ctx.Abort()
+			return
+		}
+
+		// token 是否存在 ban tokne 中
+		if UserRDB.ExistsBanToken(ctx, parts[1]) {
+			rsp.Error(ctx, http.StatusUnauthorized, "token expired", nil)
 			ctx.Abort()
 			return
 		}
@@ -45,8 +54,6 @@ func JWTAuth() gin.HandlerFunc {
 		ctx.Next()
 	}
 }
-
-var UserRDB = redis.NewUserRDB()
 
 // 角色验证
 func RoleAuth(roles ...role.RoleType) gin.HandlerFunc {
@@ -150,15 +157,5 @@ func IPAuth() gin.HandlerFunc {
 		}
 
 		ctx.Next()
-	}
-}
-
-// 矿机验证
-func MinerAuth() gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		// 从请求参数中获取信息
-		// 矿机 ID
-		// 矿机密码
-		// 矿机信息
 	}
 }
