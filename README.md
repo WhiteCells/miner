@@ -50,12 +50,13 @@ go run ./main.go
 
 ### TODO
 
+- 计费系统
+    ![](./assets/p1.png)
 - rdb
 - 充值
 - 传输数据加密
 - 用户创建上限(内存空间)
 - 单元测试，压力测试
-- 短时间内对客户端的请求进行丢弃，加长客户端请求间隔，减轻服务端压力
 - ...
 
 
@@ -64,5 +65,9 @@ go run ./main.go
 ![](./assets/interact.png)
 
 ### 充值
+
+```sh
+https://api.bscscan.com/api?module=account&action=tokenbalance&contractaddress=0x55d398326f99059fF775485246999027B3197955&address=0x87E05a80e58E8661079c85aaF18b1d74f6E43259&tag=latest&apikey=VZGUVSK854CUN7X1W157UT4EFN5SE4HIXS
+```
 
 ![](./assets/recharge.png)

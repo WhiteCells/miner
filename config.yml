@@ -1,5 +1,5 @@
 server:
-  host: 172.16.0.176
+  host: 192.168.35.51
   port: 9090
   mode: debug # debug/release
 

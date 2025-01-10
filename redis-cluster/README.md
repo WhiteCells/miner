@@ -10,6 +10,6 @@ redis-cli --cluster create \
 127.0.0.1:7003 \
 127.0.0.1:7004 \
 127.0.0.1:7005 \
---cluster-replicas 1
+--cluster-replicas 1 \
 -a m3i2n1e0r # 密码
 ```
