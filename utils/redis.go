@@ -54,29 +54,6 @@ func InitRDB() error {
 	return initRDBError
 }
 
-func InitRDBContent() error {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	keys := map[string]interface{}{
-		"invite_reward":   10,
-		"recharge_ratio":  1,
-		"switch_register": 1,
-	}
-
-	for key, value := range keys {
-		set, err := RDB.Client.SetNX(ctx, key, value, 0).Result()
-		if err != nil {
-			return err
-		}
-		if !set {
-			fmt.Printf("Key %s already exists, skipping.\n", key)
-		}
-	}
-
-	return nil
-}
-
 func (r *RedisClient) RPush(ctx context.Context, key string, value string) error {
 	return r.Client.RPush(ctx, key, value).Err()
 }

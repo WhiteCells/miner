@@ -8,11 +8,13 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"miner/common/status"
 	"miner/model/info"
 	"miner/utils"
 	"strconv"
+	"time"
 )
 
 type AdminRDB struct {
@@ -31,6 +33,28 @@ func NewAdminRDB() *AdminRDB {
 		SystemRDB:   NewSystemRDB(),
 		minepoolRDB: NewMinpoolRDB(),
 	}
+}
+
+func InitAdminRDB() error {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	keys := map[string]interface{}{}
+	keys[MakeKey(AdminField, AdminInviteRewardField)] = 10
+	keys[MakeKey(AdminField, AdminRechargeRatioField)] = 1
+	keys[MakeKey(AdminField, AdminSwitchRegisterField)] = 1
+
+	for key, value := range keys {
+		set, err := utils.RDB.Client.SetNX(ctx, key, value, 0).Result()
+		if err != nil {
+			return err
+		}
+		if !set {
+			fmt.Printf("Key %s already exists, skipping.\n", key)
+		}
+	}
+
+	return nil
 }
 
 // 获取所有用户信息
@@ -72,31 +96,35 @@ func (c *AdminRDB) GetUserMiners(ctx context.Context, farmID string) (*[]info.Mi
 // +-----------------------+------+
 // | key                   | val  |
 // +-----------------------+------+
-// | admin_reward_invite   | 111  |
+// | admin:invite_reward   | 111  |
 // +-----------------------+------+
-// | admin_reward_recharge | 111  |
+// | admin:recharge_ratio  | 111  |
 // +-----------------------+------+
-// | admin_switch_register | 1    |
+// | admin:switch_register | 1    |
 // +-----------------------+------+
 
 // 修改注册开关
 func (c *AdminRDB) SetSwitchRegister(ctx context.Context, status status.RegisterStatus) error {
-	return utils.RDB.Set(ctx, AdminSwitchRegisterField, status)
+	key := MakeKey(AdminField, AdminSwitchRegisterField)
+	return utils.RDB.Set(ctx, key, status)
 }
 
 // 获取注册开关
 func (c *AdminRDB) GetSwitchRegister(ctx context.Context) (string, error) {
-	return utils.RDB.Get(ctx, AdminSwitchRegisterField)
+	key := MakeKey(AdminField, AdminSwitchRegisterField)
+	return utils.RDB.Get(ctx, key)
 }
 
 // 修改邀请积分奖励数量
 func (c *AdminRDB) SetInviteReward(ctx context.Context, reward int) error {
-	return utils.RDB.Set(ctx, AdminInviteRewardField, reward)
+	key := MakeKey(AdminField, AdminInviteRewardField)
+	return utils.RDB.Set(ctx, key, reward)
 }
 
 // 获取邀请积分奖励数量
 func (c *AdminRDB) GetInviteReward(ctx context.Context) (int, error) {
-	rewardStr, err := utils.RDB.Get(ctx, AdminInviteRewardField)
+	key := MakeKey(AdminField, AdminInviteRewardField)
+	rewardStr, err := utils.RDB.Get(ctx, key)
 	if err != nil {
 		return 0, err
 	}
@@ -109,12 +137,14 @@ func (c *AdminRDB) GetInviteReward(ctx context.Context) (int, error) {
 
 // 修改充值积分奖励比例
 func (c *AdminRDB) SetRechargeRatio(ctx context.Context, ratio float64) error {
-	return utils.RDB.Set(ctx, AdminRechargeRatioField, ratio)
+	key := MakeKey(AdminField, AdminRechargeRatioField)
+	return utils.RDB.Set(ctx, key, ratio)
 }
 
 // 获取充值积分奖励比例
 func (c *AdminRDB) GetRechargeRatio(ctx context.Context) (float64, error) {
-	ratioStr, err := utils.RDB.Get(ctx, AdminRechargeRatioField)
+	key := MakeKey(AdminField, AdminRechargeRatioField)
+	ratioStr, err := utils.RDB.Get(ctx, key)
 	if err != nil {
 		return 0, err
 	}
@@ -129,16 +159,17 @@ func (c *AdminRDB) GetRechargeRatio(ctx context.Context) (float64, error) {
 // +-----------+---------+------+
 // | field     | key     | val  |
 // +-----------+---------+------+
-// | admin_gfs | <fs_id> | info |
+// | admin:gfs | <fs_id> | info |
 // +-----------+---------+------+
 
 // 设置全局飞行表
 func (c *AdminRDB) SetGlobalFs(ctx context.Context, fs *info.Fs) error {
+	key := MakeKey(AdminField, AdminGfsField)
 	fsJSON, err := json.Marshal(fs)
 	if err != nil {
 		return err
 	}
-	return utils.RDB.HSet(ctx, AdminGfsField, fs.ID, string(fsJSON))
+	return utils.RDB.HSet(ctx, key, fs.ID, string(fsJSON))
 }
 
 // 设置用户状态

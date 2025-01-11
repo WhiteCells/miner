@@ -1,6 +1,7 @@
 package main
 
 import (
+	"miner/dao/redis"
 	"miner/middleware"
 	"miner/route"
 	"miner/utils"
@@ -14,7 +15,7 @@ func main() {
 	utils.InitJWT()
 	utils.InitLogger()
 	utils.InitRDB()
-	utils.InitRDBContent()
+	redis.InitAdminRDB()
 	utils.InitDB()
 
 	gin.SetMode(utils.Config.Server.Mode)

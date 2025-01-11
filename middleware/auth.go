@@ -107,22 +107,22 @@ func StatusAuth() gin.HandlerFunc {
 	}
 }
 
-var SystemRDB = redis.NewAdminRDB()
+var AdminRDB = redis.NewAdminRDB()
 
 // 注册开关验证
 func RegisterAuth() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		// b, err := SystemRDB.GetSwitchRegister(ctx)
-		// if err != nil {
-		// 	rsp.Error(ctx, http.StatusForbidden, "system rdb not found", nil)
-		// 	ctx.Abort()
-		// 	return
-		// }
-		// if b != string(status.RegisterOn) {
-		// 	rsp.Error(ctx, http.StatusBadRequest, "register closed", nil)
-		// 	ctx.Abort()
-		// 	return
-		// }
+		b, err := AdminRDB.GetSwitchRegister(ctx)
+		if err != nil {
+			rsp.Error(ctx, http.StatusForbidden, "admin rdb not found", nil)
+			ctx.Abort()
+			return
+		}
+		if b != string(status.RegisterOn) {
+			rsp.Error(ctx, http.StatusBadRequest, "register closed", nil)
+			ctx.Abort()
+			return
+		}
 		ctx.Next()
 	}
 }
@@ -141,10 +141,7 @@ func IPAuth() gin.HandlerFunc {
 		c := context.Background()
 		user, err := UserRDB.GetByID(c, userID)
 		if err != nil {
-			ctx.JSON(http.StatusUnauthorized, gin.H{
-				"code": 401,
-				"msg":  "User info not found",
-			})
+			rsp.Error(ctx, http.StatusUnauthorized, "User info not found", nil)
 			ctx.Abort()
 			return
 		}
