@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"fmt"
+	"math/rand"
 	"miner/common/dto"
 	"miner/common/points"
 	"miner/common/role"
@@ -12,6 +13,7 @@ import (
 	"miner/model"
 	"miner/model/info"
 	"miner/utils"
+	"strconv"
 	"strings"
 	"time"
 
@@ -23,7 +25,7 @@ type UserService struct {
 	userDAO         *mysql.UserDAO
 	userRDB         *redis.UserRDB
 	adminRDB        *redis.AdminRDB
-	operLog         *mysql.OperLogDAO
+	operLogDAO      *mysql.OperLogDAO
 	pointsRecordDAO *mysql.PointsRecordDAO
 }
 
@@ -32,7 +34,7 @@ func NewUserSerivce() *UserService {
 		userDAO:         mysql.NewUserDAO(),
 		userRDB:         redis.NewUserRDB(),
 		adminRDB:        redis.NewAdminRDB(),
-		operLog:         mysql.NewOperLogDAO(),
+		operLogDAO:      mysql.NewOperLogDAO(),
 		pointsRecordDAO: mysql.NewPointRecordDAO(),
 	}
 }
@@ -49,8 +51,14 @@ func (s *UserService) Register(ctx *gin.Context, req *dto.RegisterReq) error {
 		return errors.New("user Email " + req.Email + " exists")
 	}
 
-	// 生成邀请码
-	// 使用 ID 作为邀请码，方便查找用户
+	// 用户 ID
+	uid := s.generateUserID(ctx)
+
+	// 用户 password
+	password, err := s.encryptPassword(req.Password)
+	if err != nil {
+		return err
+	}
 
 	// 生成身份验证密钥
 	secret, err := utils.CreateSecret()
@@ -58,45 +66,37 @@ func (s *UserService) Register(ctx *gin.Context, req *dto.RegisterReq) error {
 		return errors.New("failed to create secret")
 	}
 
-	uid, err := utils.GenerateUID()
+	// 交易地址
+	address, err := s.GenerateAddress(ctx, uid)
 	if err != nil {
-		return errors.New("uid create failed")
+		return err
 	}
-
-	// password
-	hashPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
-	if err != nil {
-		return errors.New("uid create failed")
-	}
-	password := string(hashPassword)
 
 	user := &info.User{
 		ID:         uid,
 		Name:       req.Username,
 		Password:   password,
+		Secret:     secret,
+		Address:    address,
 		Email:      req.Email,
 		Role:       role.User,
 		Status:     status.UserOn,
 		InviteCode: uid,
-		Secret:     secret,
 	}
 
 	// 如果有邀请码，处理邀请关系
 	if req.InviteCode != "" {
 		user.InviteBy = uid
 		// 给邀请人增加积分
-		s.addInvitePoints(ctx, uid, req.InviteCode)
-		// if err != nil {
-		// 	return err
-		// }
+		err = s.addInvitePoints(ctx, uid, req.InviteCode)
 	}
 
-	// 缓存
+	// 存储用户
 	if err = s.userRDB.Set(ctx, user); err != nil {
 		return errors.New("user cached failed")
 	}
 
-	return nil
+	return err
 }
 
 // Login 用户登录
@@ -208,6 +208,20 @@ func (s *UserService) GetUserInfo(ctx *gin.Context, userID string) (*info.User, 
 	return s.userRDB.GetByID(ctx, userID)
 }
 
+// 获取用户充值地址
+// func (s *UserService) GetUserAddress(ctx *gin.Context, userID string) (string, error) {
+// 	return s.userRDB.
+// }
+
+// 加密用户密码
+func (c *UserService) encryptPassword(password string) (string, error) {
+	hashPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return "", errors.New("failed to encrypt password")
+	}
+	return string(hashPassword), nil
+}
+
 // 验证密码
 func (s *UserService) validPassword(user *info.User, password string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password))
@@ -242,4 +256,52 @@ func (s *UserService) addInvitePoints(ctx *gin.Context, uid string, inviterID st
 		s.pointsRecordDAO.CreatePointsRecord(record)
 	}()
 	return s.userRDB.Set(ctx, user)
+}
+
+// 生成用户 ID
+// 原先用户 ID 无法用于生成钱包的账户
+// [0, 4294967295]
+func (s *UserService) generateUserID(ctx *gin.Context) string {
+	for {
+		source := rand.NewSource(time.Now().UnixNano())
+		r := rand.New(source)
+
+		// 生成 [0, 4294967295] 范围内的随机数
+		userIDInt := r.Uint32()
+		userID := strconv.FormatUint(uint64(userIDInt), 10)
+
+		if s.userRDB.ExistsSameID(ctx, userID) {
+			continue
+		}
+
+		return userID
+	}
+}
+
+// 通过助记词为每个用户生成地址
+/*
+m：主路径，表示从助记词派生出根密钥。
+44'：BIP-44 标准，允许使用多种加密货币。
+60'：指定以太坊（Ethereum）作为目标货币。
+0'：账户索引，指定第一个账户。
+0：变化类型，指定生成外部地址。
+%d：用户索引，用于区分不同用户生成不同的地址
+*/
+func (s *UserService) GenerateAddress(ctx *gin.Context, userID string) (string, error) {
+	if utils.TxWallet == nil {
+		mnemonoic, err := s.adminRDB.GetMnemonic(ctx)
+		if err != nil {
+			return "", fmt.Errorf("mnemonoic not set")
+		}
+		if err = utils.UpdateTxWallet(mnemonoic); err != nil {
+			fmt.Println(mnemonoic)
+			return "", fmt.Errorf("failed to update TxWallet")
+		}
+	}
+	account, err := utils.TxWallet.Derive(utils.DerivationPath(userID), false)
+	if err != nil {
+		return "", err
+	}
+	// TODO 是否需要存储私钥
+	return account.Address.Hex(), nil
 }

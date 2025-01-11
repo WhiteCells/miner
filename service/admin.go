@@ -91,3 +91,18 @@ func (s *AdminService) SetUserStatus(ctx context.Context, req *dto.AdminSetUserS
 func (s *AdminService) SetMinepoolCost(ctx context.Context, req *dto.AdminSetMinePoolCostReq) error {
 	return s.adminRDB.SetMinepoolCost(ctx, req.MinepoolID, req.Cost)
 }
+
+// SetMnemonic 设置助记词
+func (s *AdminService) SetMnemonic(ctx context.Context, req *dto.AdminSetMnemonicReq) error {
+	return s.adminRDB.SetMnemonic(ctx, req.Mnemonic)
+}
+
+// GetMnemonic 获取活跃助记词
+func (s *AdminService) GetMnemonic(ctx context.Context) (string, error) {
+	return s.adminRDB.GetMnemonic(ctx)
+}
+
+// GetAllMnemonic 获取所有助记词
+func (s *AdminService) GetAllMnemonic(ctx context.Context) (*[]string, error) {
+	return s.adminRDB.GetAllMnemonic(ctx)
+}

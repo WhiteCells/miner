@@ -89,6 +89,10 @@ func (r *RedisClient) LLen(ctx context.Context, key string) (int64, error) {
 	return r.Client.LLen(ctx, key).Result()
 }
 
+func (r *RedisClient) LRange(ctx context.Context, key string) ([]string, error) {
+	return r.Client.LRange(ctx, key, 0, -1).Result()
+}
+
 func (r *RedisClient) HSet(ctx context.Context, field string, key string, value string) error {
 	return r.Client.HSet(ctx, field, key, value).Err()
 }

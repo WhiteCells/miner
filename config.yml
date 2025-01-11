@@ -30,3 +30,8 @@ log:
   max_size: 100 # MB
   max_age: 30 # days
   max_backups: 10
+
+mnemonic:
+  key: "&123*567)_dm,lo;" # 助记词加密（16 位）
+  path: "m/44'/60'/0'/0" # 派生路径，还需要加上用户索引
+  

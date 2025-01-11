@@ -36,5 +36,8 @@ func (ar *AdminRoute) InitAdminRoute(r *gin.Engine) {
 		route.POST("/set_recharge_reward", ar.adminController.SetRechargeRatio)
 		route.POST("/set_user_status", ar.adminController.SetUserStatus)
 		route.POST("/set_miner_pool_cost", ar.adminController.SetMinePoolCost)
+		route.POST("/set_mnemonic", ar.adminController.SetMnemonic)
+		route.POST("/get_mnemonic", ar.adminController.GetMnemonic)
+		route.POST("/get_all_mnemonic", ar.adminController.GetAllMnemonic)
 	}
 }

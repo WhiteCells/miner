@@ -12,6 +12,7 @@ type User struct {
 	Email          string            `json:"email"`
 	Password       string            `json:"password"`
 	Secret         string            `json:"secret"`
+	Address        string            `json:"address"`
 	Role           role.RoleType     `json:"role"`
 	InvitePoints   int               `json:"invite_points"`
 	RechargePoints int               `json:"recharge_points"`

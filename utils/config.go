@@ -41,6 +41,11 @@ type ServerConfig struct {
 		MaxAge     int    `mapstructure:"max_age"`
 		MaxBackups int    `mapstructure:"max_backups"`
 	} `mapstructure:"log"`
+
+	Mnemonic struct {
+		Key  string `mapstructure:"key"`
+		Path string `mapstructure:"path"`
+	}
 }
 
 var Config ServerConfig

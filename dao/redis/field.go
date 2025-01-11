@@ -28,6 +28,11 @@ var OsMinerField = "os_miner"
 var TaskIDField = "task_id"
 var TaskInfoField = "task_info"
 
+// Mnemonic
+var Mnemonic = "mnemonic"
+var Active = "active"
+var Non = "non"
+
 func MakeKey(str ...string) string {
 	b := false
 	res := ""

@@ -227,3 +227,37 @@ func (c *AdminController) SetMinePoolCost(ctx *gin.Context) {
 
 	rsp.Success(ctx, http.StatusOK, "admin set miner poolCost success", nil)
 }
+
+// SetMnemonic 设置助记词
+func (c *AdminController) SetMnemonic(ctx *gin.Context) {
+	var req dto.AdminSetMnemonicReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		rsp.Error(ctx, http.StatusBadRequest, "invalid request", err.Error())
+		return
+	}
+	if err := c.adminService.SetMnemonic(ctx, &req); err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, "set mnemonic", err.Error())
+		return
+	}
+	rsp.Success(ctx, http.StatusOK, "set mnemonict success", nil)
+}
+
+// GetMnemonic 获取活跃助记词
+func (c *AdminController) GetMnemonic(ctx *gin.Context) {
+	mnemonic, err := c.adminService.GetMnemonic(ctx)
+	if err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, "no active mnemonic", err.Error())
+		return
+	}
+	rsp.Success(ctx, http.StatusOK, "get mnemonict success", mnemonic)
+}
+
+// GetAllMnemonic 获取所有助记词
+func (c *AdminController) GetAllMnemonic(ctx *gin.Context) {
+	mnemonics, err := c.adminService.GetAllMnemonic(ctx)
+	if err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, "no mnemonic", err.Error())
+		return
+	}
+	rsp.Success(ctx, http.StatusOK, "get mnemonict success", mnemonics)
+}

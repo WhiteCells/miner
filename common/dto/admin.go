@@ -31,3 +31,7 @@ type AdminSetMinePoolCostReq struct {
 	MinepoolID string  `json:"minerpool_id" binding:"required"`
 	Cost       float64 `json:"cost" binding:"required"`
 }
+
+type AdminSetMnemonicReq struct {
+	Mnemonic string `json:"mnemonic"`
+}

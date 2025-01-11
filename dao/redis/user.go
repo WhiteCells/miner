@@ -31,8 +31,7 @@ func NewUserRDB() *UserRDB {
 // | email_id:<email> | <<user_id> |
 // +------------------+------------+
 func (c *UserRDB) Set(ctx context.Context, user *info.User) error {
-	// 转为 json
-	userJSON, err := json.Marshal(user)
+	userByte, err := json.Marshal(user)
 	if err != nil {
 		return err
 	}
@@ -42,7 +41,7 @@ func (c *UserRDB) Set(ctx context.Context, user *info.User) error {
 
 	pipe := utils.RDB.Client.TxPipeline()
 
-	pipe.HSet(ctx, UserField, user.ID, string(userJSON))
+	pipe.HSet(ctx, UserField, user.ID, string(userByte))
 	pipe.Set(ctx, nKey, user.ID, 0)
 	pipe.Set(ctx, eKey, user.ID, 0)
 
@@ -123,15 +122,19 @@ func (c *UserRDB) GetAll(ctx context.Context) (*[]info.User, error) {
 
 // 是否存在用户名
 func (c *UserRDB) ExistsName(ctx context.Context, name string) bool {
-	eKey := MakeKey("name_id", name)
-	_, err := utils.RDB.Get(ctx, eKey)
+	_, err := c.GetByName(ctx, name)
 	return err == nil
 }
 
 // 是否存在邮箱
 func (c *UserRDB) ExistsEmail(ctx context.Context, email string) bool {
-	eKey := MakeKey("email_id", email)
-	_, err := utils.RDB.Get(ctx, eKey)
+	_, err := c.GetByEmail(ctx, email)
+	return err == nil
+}
+
+// 是否存在相同 ID
+func (c *UserRDB) ExistsSameID(ctx context.Context, userID string) bool {
+	_, err := c.GetByID(ctx, userID)
 	return err == nil
 }
 

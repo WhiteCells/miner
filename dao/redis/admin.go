@@ -2,7 +2,13 @@ package redis
 
 import (
 	"context"
+	"crypto/aes"
+	"crypto/cipher"
+	"crypto/rand"
+	"encoding/base64"
 	"encoding/json"
+	"errors"
+	"io"
 	"miner/common/status"
 	"miner/model/info"
 	"miner/utils"
@@ -119,10 +125,11 @@ func (c *AdminRDB) GetRechargeRatio(ctx context.Context) (float64, error) {
 	return ratio, nil
 }
 
+// 全局飞行表
 // +-----------+---------+------+
-// + field     | key     | val  |
+// | field     | key     | val  |
 // +-----------+---------+------+
-// + admin_gfs | <fs_id> | info |
+// | admin_gfs | <fs_id> | info |
 // +-----------+---------+------+
 
 // 设置全局飞行表
@@ -152,4 +159,145 @@ func (c *AdminRDB) SetMinepoolCost(ctx context.Context, mpID string, cost float6
 	}
 	mp.Cost = cost
 	return c.minepoolRDB.Set(ctx, mp)
+}
+
+// 助记词
+// string
+// +-------------------+----------------+
+// | key               | val            |
+// +-------------------+----------------+
+// | mnemonic:active   | <mnemonic_str> |
+// +-------------------+----------------+
+// list
+// +----------------+------------------+
+// | key            | val              |
+// +----------------+------------------+
+// | mnemonic:non   | <mnemonic_str>   |
+// +----------------+------------------+
+
+// 设置助记词
+// 如果一存在活跃助记词
+// 则将该活跃的助记词加入不活跃列表
+// 将设置的助记词设置为活跃
+func (c *AdminRDB) SetMnemonic(ctx context.Context, mnemonic string) error {
+	// 检查助记词
+	if !utils.ValidMnemonic(mnemonic) {
+		return errors.New("invalid mnemonic")
+	}
+
+	activeKey := MakeKey(Mnemonic, Active)
+	nonKey := MakeKey(Mnemonic, Non)
+
+	// 助记词加密
+	encryptMnemonic, err := c.encryptMnemonic(mnemonic, utils.Config.Mnemonic.Key)
+	if err != nil {
+		return err
+	}
+
+	// 判断是否存在已活跃助记词
+	prevMnemonic, err := c.getEncryptMnemonic(ctx)
+
+	// 不存在活跃的助记词
+	if err != nil {
+		return utils.RDB.Set(ctx, activeKey, encryptMnemonic)
+	}
+
+	// 存在活跃的助记词
+	pipe := utils.RDB.Client.TxPipeline()
+
+	pipe.RPush(ctx, nonKey, prevMnemonic)
+	pipe.Set(ctx, activeKey, encryptMnemonic, 0)
+
+	_, err = pipe.Exec(ctx)
+
+	// 更新
+	if err == nil {
+		err = utils.UpdateTxWallet(mnemonic)
+	}
+
+	return err
+}
+
+// 获取加密助记词
+func (c *AdminRDB) getEncryptMnemonic(ctx context.Context) (string, error) {
+	key := MakeField(Mnemonic, Active)
+	return utils.RDB.Get(ctx, key)
+}
+
+// 获取活跃助记词
+func (c *AdminRDB) GetMnemonic(ctx context.Context) (string, error) {
+	key := MakeKey(Mnemonic, Active)
+	mnemonic, err := utils.RDB.Get(ctx, key)
+	if err != nil {
+		return "", err
+	}
+	// 解密
+	mnemonic, err = c.decryptMnemonic(mnemonic, utils.Config.Mnemonic.Key)
+	if err != nil {
+		return "", err
+	}
+	return mnemonic, nil
+}
+
+// 获取所有助记词
+func (c *AdminRDB) GetAllMnemonic(ctx context.Context) (*[]string, error) {
+	var mnemonics []string
+
+	// active
+	activeKey := MakeKey(Mnemonic, Active)
+	activeMnemonic, err := utils.RDB.Get(ctx, activeKey)
+	if err != nil {
+		return nil, err
+	}
+	mnemonics = append(mnemonics, activeMnemonic)
+
+	// non
+	nonKey := MakeKey(Mnemonic, Non)
+	nonMnemonics, err := utils.RDB.LRange(ctx, nonKey)
+	if err != nil {
+		return nil, err
+	}
+	mnemonics = append(mnemonics, nonMnemonics...)
+
+	for i := range mnemonics {
+		mnemonics[i], err = c.decryptMnemonic(mnemonics[i], utils.Config.Mnemonic.Key)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return &mnemonics, nil
+}
+
+// 加密助记词
+func (c *AdminRDB) encryptMnemonic(plaintext, key string) (string, error) {
+	block, err := aes.NewCipher([]byte(key))
+	if err != nil {
+		return "", err
+	}
+	ciphertext := make([]byte, aes.BlockSize+len(plaintext))
+	iv := ciphertext[:aes.BlockSize]
+	if _, err := io.ReadFull(rand.Reader, iv); err != nil {
+		return "", err
+	}
+	stream := cipher.NewCFBEncrypter(block, iv)
+	stream.XORKeyStream(ciphertext[aes.BlockSize:], []byte(plaintext))
+	return base64.StdEncoding.EncodeToString(ciphertext), nil
+}
+
+// 解密助记词
+func (c *AdminRDB) decryptMnemonic(ciphertext, key string) (string, error) {
+	block, err := aes.NewCipher([]byte(key))
+	if err != nil {
+		return "", err
+	}
+	decoded, err := base64.StdEncoding.DecodeString(ciphertext)
+	if err != nil {
+		return "", err
+	}
+	iv := decoded[:aes.BlockSize]
+	decoded = decoded[aes.BlockSize:]
+	stream := cipher.NewCFBDecrypter(block, iv)
+	stream.XORKeyStream(decoded, decoded)
+	return string(decoded), nil
 }
