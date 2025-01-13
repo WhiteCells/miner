@@ -67,7 +67,7 @@ func (s *UserService) Register(ctx *gin.Context, req *dto.RegisterReq) error {
 	}
 
 	// 交易地址
-	address, err := s.GenerateAddress(ctx, uid)
+	address, key, err := s.GenerateAddress(ctx, uid)
 
 	user := &info.User{
 		ID:         uid,
@@ -79,6 +79,7 @@ func (s *UserService) Register(ctx *gin.Context, req *dto.RegisterReq) error {
 		Role:       role.User,
 		Status:     status.UserOn,
 		InviteCode: uid,
+		Key:        key,
 	}
 
 	// 如果有邀请码，处理邀请关系
@@ -286,21 +287,26 @@ m：主路径，表示从助记词派生出根密钥。
 0：变化类型，指定生成外部地址。
 %d：用户索引，用于区分不同用户生成不同的地址
 */
-func (s *UserService) GenerateAddress(ctx *gin.Context, userID string) (string, error) {
+func (s *UserService) GenerateAddress(ctx *gin.Context, userID string) (string, string, error) {
 	if utils.TxWallet == nil {
 		mnemonoic, err := s.adminRDB.GetMnemonic(ctx)
 		if err != nil {
-			return "", fmt.Errorf("mnemonoic not set")
+			return "", "", fmt.Errorf("mnemonoic not set")
 		}
 		if err = utils.UpdateTxWallet(mnemonoic); err != nil {
 			fmt.Println(mnemonoic)
-			return "", fmt.Errorf("failed to update TxWallet")
+			return "", "", fmt.Errorf("failed to update TxWallet")
 		}
 	}
 	account, err := utils.TxWallet.Derive(utils.DerivationPath(userID), false)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 	// TODO 是否需要存储私钥
-	return account.Address.Hex(), nil
+	// 测试传出私钥
+	privateKey, err := utils.TxWallet.PrivateKeyHex(account)
+	if err != nil {
+		return "", "", err
+	}
+	return account.Address.Hex(), privateKey, nil
 }
