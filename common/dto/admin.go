@@ -35,3 +35,17 @@ type AdminSetMinePoolCostReq struct {
 type AdminSetMnemonicReq struct {
 	Mnemonic string `json:"mnemonic"`
 }
+
+type AdminAddBscApiKeyReq struct {
+	Apikey string `json:"apikey"`
+}
+
+type AdminDelBscApiKeyReq struct {
+	Apikey string `json:"apikey"`
+}
+
+// test
+type AdminIncrBscApiKeyReq struct {
+	Apikey string  `json:"apikey"`
+	Score  float64 `json:"score"`
+}

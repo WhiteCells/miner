@@ -11,14 +11,16 @@ import (
 )
 
 type AdminService struct {
-	adminDAO *mysql.AdminDAO
-	adminRDB *redis.AdminRDB
+	adminDAO     *mysql.AdminDAO
+	adminRDB     *redis.AdminRDB
+	bscApiKeyRDB *redis.BscApiKeyRDB
 }
 
 func NewAdminService() *AdminService {
 	return &AdminService{
-		adminDAO: mysql.NewAdminDAO(),
-		adminRDB: redis.NewAdminRDB(),
+		adminDAO:     mysql.NewAdminDAO(),
+		adminRDB:     redis.NewAdminRDB(),
+		bscApiKeyRDB: redis.NewBscApiKeyRDB(),
 	}
 }
 
@@ -105,4 +107,25 @@ func (s *AdminService) GetMnemonic(ctx context.Context) (string, error) {
 // GetAllMnemonic 获取所有助记词
 func (s *AdminService) GetAllMnemonic(ctx context.Context) (*[]string, error) {
 	return s.adminRDB.GetAllMnemonic(ctx)
+}
+
+// AddApiKey 添加 apikey
+func (s *AdminService) AddBscApiKey(ctx context.Context, apikey string) error {
+	return s.bscApiKeyRDB.ZAdd(ctx, apikey)
+}
+
+// test
+// 增加 apikey 调用次数
+func (s *AdminService) IncrBscApiKeyScore(ctx context.Context, apikey string, score float64) error {
+	return s.bscApiKeyRDB.ZIncrBy(ctx, apikey, score)
+}
+
+// GetApiKey 获取 apikey（最少使用）
+func (s *AdminService) GetBscApiKey(ctx context.Context) (string, error) {
+	return s.bscApiKeyRDB.ZRangeWithScore(ctx)
+}
+
+// DelApiKey 删除 apikey
+func (s *AdminService) DelBscApiKey(ctx context.Context, apikey string) error {
+	return s.bscApiKeyRDB.ZRem(ctx, apikey)
 }

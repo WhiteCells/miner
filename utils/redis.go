@@ -54,6 +54,40 @@ func InitRDB() error {
 	return initRDBError
 }
 
+func (r *RedisClient) ZAdd(ctx context.Context, field string, key string) error {
+	_, err := r.Client.ZAdd(ctx, field, redis.Z{
+		Score:  0,
+		Member: key,
+	}).Result()
+	return err
+}
+
+func (r *RedisClient) ZIncrBy(ctx context.Context, field string, key string, increment float64) error {
+	_, err := r.Client.ZIncrBy(ctx, field, increment, key).Result()
+	return err
+}
+
+func (r *RedisClient) ZRem(ctx context.Context, field string, key string) error {
+	_, err := r.Client.ZRem(ctx, field, key).Result()
+	return err
+}
+
+func (r *RedisClient) ZRangeWithScore(ctx context.Context, field string) (string, error) {
+	res, err := r.Client.ZRangeWithScores(ctx, field, 0, 0).Result()
+	if err != nil {
+		return "", err
+	}
+	if len(res) == 0 {
+		return "", err
+	}
+	return res[0].Member.(string), nil
+}
+
+// 主要用于判断 field key 是否已经村存在
+func (r *RedisClient) ZScore(ctx context.Context, field string, key string) (float64, error) {
+	return r.Client.ZScore(ctx, field, key).Result()
+}
+
 func (r *RedisClient) RPush(ctx context.Context, key string, value string) error {
 	return r.Client.RPush(ctx, key, value).Err()
 }

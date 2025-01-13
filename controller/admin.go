@@ -261,3 +261,55 @@ func (c *AdminController) GetAllMnemonic(ctx *gin.Context) {
 	}
 	rsp.Success(ctx, http.StatusOK, "get mnemonict success", mnemonics)
 }
+
+// AddBscApiKey 添加 apikey
+func (c *AdminController) AddBscApiKey(ctx *gin.Context) {
+	var req dto.AdminAddBscApiKeyReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		rsp.Error(ctx, http.StatusBadRequest, "invalid request", err.Error())
+		return
+	}
+	if err := c.adminService.AddBscApiKey(ctx, req.Apikey); err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, "failed to add bsc apikey", err.Error())
+		return
+	}
+	rsp.Success(ctx, http.StatusOK, "add bsc apikey success", "")
+}
+
+// 获取 apikey（获取使用最少的）
+func (c *AdminController) GetBscApiKey(ctx *gin.Context) {
+	apikey, err := c.adminService.GetBscApiKey(ctx)
+	if err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, "failed to get bsc apikey", err.Error())
+		return
+	}
+	rsp.Success(ctx, http.StatusOK, "get bsc apikey success", apikey)
+}
+
+// DelBscApiKey 删除 apikey
+func (c *AdminController) DelBscApiKey(ctx *gin.Context) {
+	var req dto.AdminDelBscApiKeyReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		rsp.Error(ctx, http.StatusBadRequest, "invalid request", err.Error())
+		return
+	}
+	if err := c.adminService.DelBscApiKey(ctx, req.Apikey); err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, "failed to del bsc apikey", err.Error())
+		return
+	}
+	rsp.Success(ctx, http.StatusOK, "del bsc apikey success", "")
+}
+
+// test
+func (c *AdminController) IncrBscApiKeyScore(ctx *gin.Context) {
+	var req dto.AdminIncrBscApiKeyReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		rsp.Error(ctx, http.StatusBadRequest, "invalid request", err.Error())
+		return
+	}
+	if err := c.adminService.IncrBscApiKeyScore(ctx, req.Apikey, req.Score); err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, "failed to increment bsc apikey", err.Error())
+		return
+	}
+	rsp.Success(ctx, http.StatusOK, "increment bsc apikey success", "")
+}

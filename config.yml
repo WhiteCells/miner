@@ -34,4 +34,12 @@ log:
 mnemonic:
   key: "&123*567)_dm,lo;" # 助记词加密（16 位）
   path: "m/44'/60'/0'/0" # 派生路径，还需要加上用户索引
-  
+
+bsc:
+  api: "https://api.bscscan.com/api\
+        ?module=account\
+        &action=tokenbalance\
+        &contractaddress=0x55d398326f99059fF775485246999027B3197955\
+        &address=%s\
+        &tag=latest\
+        &apikey=%s"

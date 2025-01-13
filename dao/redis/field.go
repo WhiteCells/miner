@@ -34,6 +34,9 @@ var Mnemonic = "mnemonic"
 var Active = "active"
 var Non = "non"
 
+// api
+var ApiKeyBscField = "apikey:bsc"
+
 func MakeKey(str ...string) string {
 	b := false
 	res := ""

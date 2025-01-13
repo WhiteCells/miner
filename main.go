@@ -30,6 +30,7 @@ func main() {
 	route.NewWalletRoute().InitWalletRoute(ctx)
 	route.NewAdminRoute().InitAdminRoute(ctx)
 	route.NewHiveosRoute().InitHiveosRoute(ctx)
+	route.NewBscApiKeyRoute().InitBscApiKeyRoute(ctx)
 
 	port := strconv.Itoa(utils.Config.Server.Port)
 	ctx.Run(":" + port)

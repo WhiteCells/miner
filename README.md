@@ -67,7 +67,20 @@ go run ./main.go
 ### 充值
 
 ```sh
-https://api.bscscan.com/api?module=account&action=tokenbalance&contractaddress=0x55d398326f99059fF775485246999027B3197955&address=0x87E05a80e58E8661079c85aaF18b1d74f6E43259&tag=latest&apikey=VZGUVSK854CUN7X1W157UT4EFN5SE4HIXS
+https://api.bscscan.com/api
+?module=account
+&action=tokenbalance
+&contractaddress=0x55d398326f99059fF775485246999027B3197955
+&address=0x87E05a80e58E8661079c85aaF18b1d74f6E43259
+&tag=latest
+&apikey=VZGUVSK854CUN7X1W157UT4EFN5SE4HIXS
 ```
 
 ![](./assets/recharge.png)
+
+
+### 计划
+
+1.13 完成支付检查模块
+
+1.14 完成客户端配置文件模块

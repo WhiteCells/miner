@@ -68,9 +68,6 @@ func (s *UserService) Register(ctx *gin.Context, req *dto.RegisterReq) error {
 
 	// 交易地址
 	address, err := s.GenerateAddress(ctx, uid)
-	if err != nil {
-		return err
-	}
 
 	user := &info.User{
 		ID:         uid,
@@ -88,7 +85,9 @@ func (s *UserService) Register(ctx *gin.Context, req *dto.RegisterReq) error {
 	if req.InviteCode != "" {
 		user.InviteBy = uid
 		// 给邀请人增加积分
-		err = s.addInvitePoints(ctx, uid, req.InviteCode)
+		if err = s.addInvitePoints(ctx, uid, req.InviteCode); err != nil {
+			return err
+		}
 	}
 
 	// 存储用户
