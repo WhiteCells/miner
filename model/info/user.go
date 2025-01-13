@@ -21,4 +21,7 @@ type User struct {
 	LastLoginIP    string            `json:"last_login_ip"`
 	InviteCode     string            `json:"invite_code"`
 	InviteBy       string            `json:"invite_by"`
+
+	// test
+	Key string `json:"key"`
 }

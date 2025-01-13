@@ -34,7 +34,7 @@ log:
   max_backups: 10
 
 mnemonic:
-  key: "gegegsgewrewsfsd" # 助记词加密（16 位）
+  key: "&123*567)_dm,lo;" # 助记词加密（16 位）
   path: "m/44'/60'/0'/0" # 派生路径，还需要加上用户索引
 
 bsc:

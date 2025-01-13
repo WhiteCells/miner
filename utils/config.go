@@ -49,7 +49,7 @@ type ServerConfig struct {
 
 	Bsc struct {
 		Api string `mapstructure:"api"`
-	}
+	} `mapstructure:"bsc"`
 }
 
 var Config ServerConfig
