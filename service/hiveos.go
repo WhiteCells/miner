@@ -123,6 +123,7 @@ func (s *HiveOsService) helloCase(ctx *gin.Context, rigID string) {
 	port := utils.Config.Server.Port
 	hive_host := fmt.Sprintf("http://%s:%d/hiveos", host, port)
 	config := s.generateConfig(rigIDInt, req.Params.Passwd, farmIDInt, miner.Name, hive_host, hive_host, "")
+	fmt.Println("generateConfig", config)
 	//////////////////////////////
 	// wallet
 	//////////////////////////////

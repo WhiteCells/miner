@@ -26,13 +26,13 @@ func (c *UserController) Register(ctx *gin.Context) {
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
-
-	if err := c.userService.Register(ctx, &req); err != nil {
+	secret, err := c.userService.Register(ctx, &req)
+	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
 
-	rsp.Success(ctx, http.StatusOK, "register success", nil)
+	rsp.Success(ctx, http.StatusOK, "register success", secret)
 }
 
 // Login 用户登陆

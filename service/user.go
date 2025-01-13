@@ -40,15 +40,15 @@ func NewUserSerivce() *UserService {
 }
 
 // Register 用户注册
-func (s *UserService) Register(ctx *gin.Context, req *dto.RegisterReq) error {
+func (s *UserService) Register(ctx *gin.Context, req *dto.RegisterReq) (string, error) {
 	// 用户名
 	if s.userRDB.ExistsName(ctx, req.Username) {
-		return errors.New("user Name " + req.Username + " exists")
+		return "", errors.New("user Name " + req.Username + " exists")
 	}
 
 	// 邮箱
 	if s.userRDB.ExistsEmail(ctx, req.Email) {
-		return errors.New("user Email " + req.Email + " exists")
+		return "", errors.New("user Email " + req.Email + " exists")
 	}
 
 	// 用户 ID
@@ -57,18 +57,18 @@ func (s *UserService) Register(ctx *gin.Context, req *dto.RegisterReq) error {
 	// 用户 password
 	password, err := s.encryptPassword(req.Password)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	// 生成身份验证密钥
 	secret, err := utils.CreateSecret()
 	if err != nil {
-		return errors.New("failed to create secret")
+		return "", errors.New("failed to create secret")
 	}
 
 	// 交易地址
 	address, err := s.GenerateAddress(ctx, uid)
-
+	//var address = "0xd45F6B5B4c0b4F79B5b7d6a6B79d5cC1fba11215"
 	user := &info.User{
 		ID:         uid,
 		Name:       req.Username,
@@ -86,16 +86,16 @@ func (s *UserService) Register(ctx *gin.Context, req *dto.RegisterReq) error {
 		user.InviteBy = uid
 		// 给邀请人增加积分
 		if err = s.addInvitePoints(ctx, uid, req.InviteCode); err != nil {
-			return err
+			return "", err
 		}
 	}
 
 	// 存储用户
 	if err = s.userRDB.Set(ctx, user); err != nil {
-		return errors.New("user cached failed")
+		return "", errors.New("user cached failed")
 	}
 
-	return err
+	return secret, nil
 }
 
 // Login 用户登录

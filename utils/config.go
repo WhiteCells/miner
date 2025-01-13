@@ -45,7 +45,7 @@ type ServerConfig struct {
 	Mnemonic struct {
 		Key  string `mapstructure:"key"`
 		Path string `mapstructure:"path"`
-	} `mapstructure:"log"`
+	} `mapstructure:"mnemonic"`
 
 	Bsc struct {
 		Api string `mapstructure:"api"`

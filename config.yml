@@ -1,16 +1,18 @@
 server:
   host: 192.168.35.51
+#  host: 172.16.20.240
   port: 9090
   mode: debug # debug/release
 
 mysql:
-  # host: 45.119.55.22
+#  host: 45.119.55.22
   host: localhost
   port: 3306
-  # user: miner
+# user: miner
   user: root
-  # password: "iRhPyszHSPC5LCXK"
-  password: "3215"
+#  password: "iRhPyszHSPC5LCXK"
+#  password: "3215"
+  password: "123456"
   dbname: miner
   max_idle_conns: 10
   max_open_conns: 100
@@ -32,7 +34,7 @@ log:
   max_backups: 10
 
 mnemonic:
-  key: "&123*567)_dm,lo;" # 助记词加密（16 位）
+  key: "gegegsgewrewsfsd" # 助记词加密（16 位）
   path: "m/44'/60'/0'/0" # 派生路径，还需要加上用户索引
 
 bsc:

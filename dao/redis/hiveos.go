@@ -30,6 +30,7 @@ func (c *HiveOsRDB) SetRig(ctx context.Context, rigID string, farmID string, min
 // 获取 OS 矿机
 func (c *HiveOsRDB) GetRigMinerID(ctx context.Context, rigID string) (string, error) {
 	key := MakeField(OsField, rigID)
+	//log.Fatalln(key)
 	return utils.RDB.Get(ctx, key)
 }
 
