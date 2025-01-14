@@ -111,27 +111,29 @@ func (s *HiveOsService) helloCase(ctx *gin.Context, rigID string) {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), "")
 		return
 	}
-	farmIDInt, err := strconv.Atoi(farmID)
-	if err != nil {
-		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), "")
-		return
-	}
+
 	//////////////////////////////
 	// config
 	//////////////////////////////
 	host := utils.Config.Server.Host
 	port := utils.Config.Server.Port
 	hive_host := fmt.Sprintf("http://%s:%d/hiveos", host, port)
-	config := s.generateConfig(rigIDInt, req.Params.Passwd, farmIDInt, miner.Name, hive_host, hive_host, "")
-	fmt.Println("generateConfig", config)
+	var hiveOsConfig utils.HiveOsConfig
+	hiveOsConfig.HiveOsUrl = hive_host
+	hiveOsConfig.ApiHiveOsUrls = hive_host
+	hiveOsConfig.FarmID = farmID
+	hiveOsConfig.RigID = rigID
+	config := utils.GenerateHiveOsConfig(&hiveOsConfig)
 	//////////////////////////////
 	// wallet
 	//////////////////////////////
-	wallet := s.generateWallet("custom", "", "template", "custom")
+	var hiveOsWallet utils.HiveOsWallet
+	wallet := utils.GenerateHiveOsWallet(&hiveOsWallet)
 	//////////////////////////////
 	// autofan
 	//////////////////////////////
-	autofan := s.generateAutofan("", "", "")
+	var hiveOsAutoFan utils.HiveOsAutoFan
+	autofan := utils.GenerateHiveOsAutofan(&hiveOsAutoFan)
 
 	ctx.JSON(http.StatusOK, &dto.ServerRsp{
 		ID:      rigIDInt,
@@ -171,7 +173,7 @@ func (s *HiveOsService) statsCase(ctx *gin.Context, rigID string) {
 	fmt.Printf("%s\n", jsonInd)
 	////////////////////////////////////////////////
 	// 对 req 的数据进行存储
-	s.setMinerStatus(ctx, rigID, &req)
+	s.setMinerStats(ctx, rigID, &req)
 	// 从 req 中获取 rigID，根据 rigID 查询 hiveOsRDB farmID:minerID
 	// rigID := req.Params.RigID
 	farmMiner, err := s.hiveOsRDB.GetRigMinerID(ctx, rigID)
@@ -213,26 +215,29 @@ func (s *HiveOsService) statsCase(ctx *gin.Context, rigID string) {
 		rsp.Error(ctx, http.StatusInternalServerError, "convertion failed", err.Error())
 		return
 	}
-	farmIDInt, err := strconv.Atoi(farmID)
-	if err != nil {
-		rsp.Error(ctx, http.StatusInternalServerError, "convertion failed", err.Error())
-		return
-	}
+
 	//////////////////////////////
 	// config
 	//////////////////////////////
 	host := utils.Config.Server.Host
 	port := utils.Config.Server.Port
 	hive_host := fmt.Sprintf("http://%s:%d/hiveos", host, port)
-	config := s.generateConfig(rigIDInt, req.Params.Passwd, farmIDInt, miner.Name, hive_host, hive_host, "")
+	var hiveOsConfig utils.HiveOsConfig
+	hiveOsConfig.HiveOsUrl = hive_host
+	hiveOsConfig.ApiHiveOsUrls = hive_host
+	hiveOsConfig.FarmID = farmID
+	hiveOsConfig.RigID = rigID
+	config := utils.GenerateHiveOsConfig(&hiveOsConfig)
 	//////////////////////////////
 	// wallet
 	//////////////////////////////
-	wallet := s.generateWallet("custom", "", "template", "custom")
+	var hiveOsWallet utils.HiveOsWallet
+	wallet := utils.GenerateHiveOsWallet(&hiveOsWallet)
 	//////////////////////////////
 	// autofan
 	//////////////////////////////
-	autofan := s.generateAutofan("", "", "")
+	var hiveOsAutoFan utils.HiveOsAutoFan
+	autofan := utils.GenerateHiveOsAutofan(&hiveOsAutoFan)
 
 	// 从 taskRDB 中拿出对应的 task
 	task, err := s.taskRDB.GetTask(ctx, rigID)
@@ -377,31 +382,35 @@ func (s *HiveOsService) messageCase(ctx *gin.Context, rigID string) {
 	//  没找到不退出
 	// 	return
 	// }
-	rigIDInt, err := strconv.Atoi(rigID)
-	if err != nil {
-		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), "")
-		return
-	}
-	farmIDInt, err := strconv.Atoi(farmID)
-	if err != nil {
-		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), "")
-		return
-	}
+
 	//////////////////////////////
 	// config
 	//////////////////////////////
 	host := utils.Config.Server.Host
 	port := utils.Config.Server.Port
 	hive_host := fmt.Sprintf("http://%s:%d/hiveos", host, port)
-	config := s.generateConfig(rigIDInt, req.Params.Passwd, farmIDInt, miner.Name, hive_host, hive_host, "")
+	var hiveOsConfig utils.HiveOsConfig
+	hiveOsConfig.HiveOsUrl = hive_host
+	hiveOsConfig.ApiHiveOsUrls = hive_host
+	hiveOsConfig.FarmID = farmID
+	hiveOsConfig.RigID = rigID
+	config := utils.GenerateHiveOsConfig(&hiveOsConfig)
 	//////////////////////////////
 	// wallet
 	//////////////////////////////
-	wallet := s.generateWallet("custom", "", "template", "custom")
+	var hiveOsWallet utils.HiveOsWallet
+	wallet := utils.GenerateHiveOsWallet(&hiveOsWallet)
 	//////////////////////////////
 	// autofan
 	//////////////////////////////
-	autofan := s.generateAutofan("", "", "")
+	var hiveOsAutoFan utils.HiveOsAutoFan
+	autofan := utils.GenerateHiveOsAutofan(&hiveOsAutoFan)
+
+	rigIDInt, err := strconv.Atoi(rigID)
+	if err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, "string conversion", err.Error())
+		return
+	}
 
 	ctx.JSON(http.StatusOK, &dto.ServerRsp{
 		ID:      rigIDInt,
@@ -458,7 +467,7 @@ func (s *HiveOsService) setMinerInfo(ctx context.Context, rigID string, req *dto
 	return s.hiveOsRDB.SetMinerInfo(ctx, rigID, &info)
 }
 
-func (s *HiveOsService) setMinerStatus(ctx context.Context, rigID string, req *dto.HiveosReq) error {
+func (s *HiveOsService) setMinerStats(ctx context.Context, rigID string, req *dto.HiveosReq) error {
 	var stats info.MinerStats
 	stats.Algo = req.Params.MinerStats.Algo
 	stats.BusNumbers = req.Params.MinerStats.BusNumbers
@@ -512,122 +521,192 @@ func (s *HiveOsService) GetMinerInfo(ctx context.Context, rigID string) (*info.M
 	return s.hiveOsRDB.GetMinerInfo(ctx, rigID)
 }
 
-// 生成Config字符串
-func (s *HiveOsService) generateConfig(rigID int, passwrod string, farmID int, workerName, hiveHostURL, apiHostURL, sshServer string) string {
-	return fmt.Sprintf(`\
-HIVE_HOST_URL="%s"
-API_HOST_URLs="%s"
-RIG_ID=%d
-RIG_PASSWD="%s"
-WORKER_NAME="%s"
-FARM_ID=%d
-MINER=custom
-MINER2=
-TIMEZONE="Europe/Kiev"
-WD_ENABLED=1
-WD_MINER=3
-WD_REBOOT=5
-WD_CHECK_GPU=0
-WD_MAX_LA=900
-WD_ASR=
-WD_POWER_ENABLED=0
-WD_POWER_MIN=
-WD_POWER_MAX=
-WD_POWER_ACTION=
-WD_CHECK_CONN=0
-WD_SHARE_TIME=
-WD_MINHASHES='{}'
-WD_MINHASHES_ALGO='{}'
-WD_TYPE='miner'
-HSSH_SRV="%s"
-X_DISABLED=1
-MINER_DELAY=1
-DOH_ENABLED=0
-SHELLINABOX_ENABLE=1
-SSH_ENABLE=1
-SSH_PASSWORD_ENABLE=1
-`, hiveHostURL, apiHostURL, rigID, passwrod, workerName, farmID, sshServer)
-}
+// // 生成Config字符串
+// // 主要是飞行表
+// // 暂时去掉可选
+// // DOH_ENABLED
+// // SHELLINABOX_ENABLE
+// // SSH_ENABLE
+// // SSH_PASSWORD_ENABLE
+// func (s *HiveOsService) generateConfig(
+// 	hiveOsUrl string,
+// 	apiHiveOsUrls string,
+// 	rigID string,
+// 	rigPasswd string,
+// 	workerName string,
+// 	farmID string,
+// 	miner string,
+// 	miner2 string,
+// 	timeZone string,
+// 	wdEnable string,
+// 	wdMiner string,
+// 	wdReboot string,
+// 	wdMaxLA string,
+// 	wdASR string,
+// 	wdShareTime string,
+// 	wdPowerEnabled string,
+// 	wdPowerMin string,
+// 	wdPowerMax string,
+// 	wdPowerAction string,
+// 	wdType string,
+// ) string {
+// 	return fmt.Sprintf(`\
+// HIVE_HOST_URL="%s"
+// API_HOST_URLs="%s"
+// RIG_ID=%s
+// RIG_PASSWD="%s"
+// WORKER_NAME="%s"
+// FARM_ID=%s
+// MINER=%s
+// MINER2=%s
+// TIMEZONE="%s"
+// # 算力监视器开关(开关)
+// WD_ENABLED=%s
+// # 软件重启于(分钟)
+// WD_MINER=%s
+// # 重启于(分钟)
+// WD_REBOOT=%s
+// # 重启当 LA >=
+// WD_MAX_LA=%s
+// # Min ASR
+// WD_ASR=%s
+// # WD Share Time(分钟)
+// WD_SHARE_TIME=%s
+// # WD Power
+// WD_POWER_ENABLED=%s
+// # WD Min Power
+// WD_POWER_MIN=%s
+// # WD Max Power
+// WD_POWER_MAX=%s
+// # Power Action (Reboot)
+// WD_POWER_ACTION=%s
+// # wd mode
+// WD_TYPE='%s'
+// # 未知参数
+// WD_CHECK_GPU=%s
+// WD_CHECK_CONN=%s
+// WD_MINHASHES='%s'
+// WD_MINHASHES_ALGO='%s'
+// `,
+// 		hiveOsUrl,
+// 		apiHiveOsUrls,
+// 		rigID,
+// 		rigPasswd,
+// 		workerName,
+// 		farmID,
+// 		miner,
+// 		miner2,
+// 		timeZone,
+// 		wdEnable,
+// 		wdMiner,
+// 		wdReboot,
+// 		wdMaxLA,
+// 		wdASR,
+// 		wdShareTime,
+// 		wdPowerEnabled,
+// 		wdPowerMin,
+// 		wdPowerMax,
+// 		wdPowerAction,
+// 		wdType,
+// 	)
+// }
 
-// 生成Wallet字符串
-func (s *HiveOsService) generateWallet(customMiner, installURL, template, customProxy string) string {
-	return fmt.Sprintf(`
-CUSTOM_MINER="%s"
-CUSTOM_INSTALL_URL="%s"
-CUSTOM_ALGO=""
-CUSTOM_TEMPLATE="%s"
-CUSTOM_URL="http://hiveos.vip/"
-CUSTOM_PASS=""
-CUSTOM_USER_CONFIG='path:
-- /mnt/
-minerName: %s
-apiKey: smh00000-0c79-5659-7b8f-565a95961ecf
-extraParams:
-  deleteLoadFail: false
-  device: ""
-  disableInitPost: false
-  disablePlot: true
-  disablePoST: false
-  flags: fullmem
-  maxFileSize: 32
-  nonces: 128
-  numUnits: %s
-  plotInstance: 1
-  postAffinity: 0
-  postAffinityStep: 1
-  postCpuIds: ""
-  postInstance: 0
-  postThread: 0
-  randomxAffinity: -1
-  randomxAffinityStep: 1
-  randomxThread: 0
-  removeInitFailed: false
-  reservedSize: 1
-  skipUninitialized: false
-  remoteK2Pow: true
-log:
-  lv: info
-  path: ./log/
-  name: miner.log
-url:
-  info: ""
-  submit: ""
-  line: ""
-  ws: ""
-  proxy: "%s"
-proxy:
-  url: ""
-  username: ""
-  password: ""
-http:
-  enable: false
-  host: ""
-  port: 0
-scanPath: false
-scanMinute: 60
-debug: ""'
-CUSTOM_TLS=""
-META='{"fs_id":20216083,"custom":{"coin":"smh"}}'
-`, customMiner, installURL, template, template, template, customProxy)
-}
+// // 生成Wallet字符串
+// func (s *HiveOsService) generateWallet(
+// 	customMiner string,
+// 	customInstallURL string,
+// 	customAlgo string,
+// 	customTemplate string,
+// 	customUrl string,
+// 	customPass string,
+// 	customUserConfig string,
+// 	customTLS string,
+// 	fsID string,
+// 	coin string,
+// ) string {
+// 	return fmt.Sprintf(`
+// # 软件名称
+// CUSTOM_MINER="%s"
+// # 下载地址
+// CUSTOM_INSTALL_URL="%s"
+// # 软件算法
+// CUSTOM_ALGO="%s"
+// # 模板
+// CUSTOM_TEMPLATE="%s"
+// # 池地址
+// CUSTOM_URL="%s"
+// # 密码
+// CUSTOM_PASS="%s"
+// # 其他模板参数
+// CUSTOM_USER_CONFIG='%s'
+// CUSTOM_TLS=""
+// META='{
+// 	"fs_id":%s,
+// 	"custom": {
+// 		"coin":"%s"
+// 	}
+// }'
+// `,
+// 		customMiner,
+// 		customInstallURL,
+// 		customAlgo,
+// 		customTemplate,
+// 		customUrl,
+// 		customPass,
+// 		customUserConfig,
+// 	)
+// }
 
-// 生成Autofan字符串
-func (s *HiveOsService) generateAutofan(enabled, targetTemp, criticalTemp string) string {
-	return fmt.Sprintf(`ENABLED=%s
-TARGET_TEMP=%s
-TARGET_MEM_TEMP=
-MIN_FAN=
-MAX_FAN=
-CRITICAL_TEMP=%s
-CRITICAL_TEMP_ACTION=""
-NO_AMD=
-REBOOT_ON_ERROR=
-SMART_MODE=
-CUSTOM_MODE=""
-CUSTOM_TARGET_TEMP=""
-CUSTOM_TARGET_MEM_TEMP=""
-CUSTOM_MIN_FAN=""
-CUSTOM_MAX_FAN=""
-CUSTOM_CRITICAL_TEMP=""
-`, enabled, targetTemp, criticalTemp)
-}
+// // 生成Autofan字符串
+// // false 选项时，默认不填写
+// // 使用默认参数时，不填写
+// // 静态参数找不到
+// func (s *HiveOsService) generateAutofan(
+// 	criticalTemp string,
+// 	criticalTempAction string,
+// 	enable string,
+// 	targetTemp string,
+// 	minFan string,
+// 	maxFan string,
+// 	noAMD string,
+// 	targetMemTemp string,
+// 	rebootOnError string,
+// 	smartMode string,
+// ) string {
+// 	return fmt.Sprintf(`
+// # Critical temp
+// CRITICAL_TEMP=%s
+// # Critical action
+// # 默认停止 重启 reboot 关闭 shutdown
+// CRITICAL_TEMP_ACTION="%s"
+// # 自动风扇
+// ENABLED=%s
+// # 缺少 Fan mode
+// # 缺少 Static speed
+// TARGET_TEMP=%s
+// # Min fan speed
+// MIN_FAN=%s
+// # Max fan speed
+// MAX_FAN=%s
+// # 未知参数
+// NO_AMD=%s
+// # 缺少 Target core temp
+// # Target memory temp
+// TARGET_MEM_TEMP=%s
+// # Reboot on errors 1 或 0
+// REBOOT_ON_ERROR=%s
+// # Smart mode 1 或 0
+// SMART_MODE=%s
+// `,
+// 		criticalTemp,
+// 		criticalTempAction,
+// 		enable,
+// 		targetTemp,
+// 		minFan,
+// 		maxFan,
+// 		noAMD,
+// 		targetMemTemp,
+// 		rebootOnError,
+// 		smartMode,
+// 	)
+// }

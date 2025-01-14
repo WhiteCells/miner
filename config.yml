@@ -11,8 +11,8 @@ mysql:
 # user: miner
   user: root
 #  password: "iRhPyszHSPC5LCXK"
-#  password: "3215"
-  password: "123456"
+  password: "3215"
+  # password: "123456"
   dbname: miner
   max_idle_conns: 10
   max_open_conns: 100
