@@ -112,26 +112,9 @@ func (s *HiveOsService) helloCase(ctx *gin.Context, rigID string) {
 		return
 	}
 
-	//////////////////////////////
-	// config
-	//////////////////////////////
-	var hiveOsConfig utils.HiveOsConfig
-	hive_host := utils.GenerateHiveOsUrl()
-	hiveOsConfig.HiveOsUrl = hive_host
-	hiveOsConfig.ApiHiveOsUrls = hive_host
-	hiveOsConfig.FarmID = farmID
-	hiveOsConfig.RigID = rigID
-	config := utils.GenerateHiveOsConfig(&hiveOsConfig)
-	//////////////////////////////
-	// wallet
-	//////////////////////////////
-	var hiveOsWallet utils.HiveOsWallet
-	wallet := utils.GenerateHiveOsWallet(&hiveOsWallet)
-	//////////////////////////////
-	// autofan
-	//////////////////////////////
-	var hiveOsAutoFan utils.HiveOsAutoFan
-	autofan := utils.GenerateHiveOsAutofan(&hiveOsAutoFan)
+	config := utils.GenerateHiveOsConfig(&miner.HiveOsConfig)
+	wallet := utils.GenerateHiveOsWallet(&miner.HiveOsWallet)
+	autofan := utils.GenerateHiveOsAutofan(&miner.HiveOsAutoFan)
 
 	ctx.JSON(http.StatusOK, &dto.ServerRsp{
 		ID:      rigIDInt,
@@ -214,26 +197,9 @@ func (s *HiveOsService) statsCase(ctx *gin.Context, rigID string) {
 		return
 	}
 
-	//////////////////////////////
-	// config
-	//////////////////////////////
-	var hiveOsConfig utils.HiveOsConfig
-	hive_host := utils.GenerateHiveOsUrl()
-	hiveOsConfig.HiveOsUrl = hive_host
-	hiveOsConfig.ApiHiveOsUrls = hive_host
-	hiveOsConfig.FarmID = farmID
-	hiveOsConfig.RigID = rigID
-	config := utils.GenerateHiveOsConfig(&hiveOsConfig)
-	//////////////////////////////
-	// wallet
-	//////////////////////////////
-	var hiveOsWallet utils.HiveOsWallet
-	wallet := utils.GenerateHiveOsWallet(&hiveOsWallet)
-	//////////////////////////////
-	// autofan
-	//////////////////////////////
-	var hiveOsAutoFan utils.HiveOsAutoFan
-	autofan := utils.GenerateHiveOsAutofan(&hiveOsAutoFan)
+	config := utils.GenerateHiveOsConfig(&miner.HiveOsConfig)
+	wallet := utils.GenerateHiveOsWallet(&miner.HiveOsWallet)
+	autofan := utils.GenerateHiveOsAutofan(&miner.HiveOsAutoFan)
 
 	// 从 taskRDB 中拿出对应的 task
 	task, err := s.taskRDB.GetTask(ctx, rigID)
@@ -379,26 +345,9 @@ func (s *HiveOsService) messageCase(ctx *gin.Context, rigID string) {
 	// 	return
 	// }
 
-	//////////////////////////////
-	// config
-	//////////////////////////////
-	var hiveOsConfig utils.HiveOsConfig
-	hive_host := utils.GenerateHiveOsUrl()
-	hiveOsConfig.HiveOsUrl = hive_host
-	hiveOsConfig.ApiHiveOsUrls = hive_host
-	hiveOsConfig.FarmID = farmID
-	hiveOsConfig.RigID = rigID
-	config := utils.GenerateHiveOsConfig(&hiveOsConfig)
-	//////////////////////////////
-	// wallet
-	//////////////////////////////
-	var hiveOsWallet utils.HiveOsWallet
-	wallet := utils.GenerateHiveOsWallet(&hiveOsWallet)
-	//////////////////////////////
-	// autofan
-	//////////////////////////////
-	var hiveOsAutoFan utils.HiveOsAutoFan
-	autofan := utils.GenerateHiveOsAutofan(&hiveOsAutoFan)
+	config := utils.GenerateHiveOsConfig(&miner.HiveOsConfig)
+	wallet := utils.GenerateHiveOsWallet(&miner.HiveOsWallet)
+	autofan := utils.GenerateHiveOsAutofan(&miner.HiveOsAutoFan)
 
 	rigIDInt, err := strconv.Atoi(rigID)
 	if err != nil {
@@ -514,6 +463,58 @@ func (s *HiveOsService) GetMinerStats(ctx context.Context, rigID string) (*info.
 func (s *HiveOsService) GetMinerInfo(ctx context.Context, rigID string) (*info.MinerInfo, error) {
 	return s.hiveOsRDB.GetMinerInfo(ctx, rigID)
 }
+
+// // 设置 SetHiveOsConfig
+// func (s *HiveOsService) SetHiveOsConfig(conf *utils.HiveOsConfig, from *utils.HiveOsConfig) {
+// 	conf.HiveOsUrl = from.HiveOsUrl
+// 	conf.ApiHiveOsUrls = from.ApiHiveOsUrls
+// 	conf.RigID = from.RigID
+// 	conf.RigPasswd = from.RigPasswd
+// 	conf.WorkerName = from.WorkerName
+// 	conf.FarmID = from.FarmID
+// 	conf.Miner = from.Miner
+// 	conf.Miner2 = from.Miner2
+// 	conf.TimeZone = from.TimeZone
+// 	conf.WdEnable = from.WdEnable
+// 	conf.WdMiner = from.WdMiner
+// 	conf.WdReboot = from.WdReboot
+// 	conf.WdMaxLA = from.WdMaxLA
+// 	conf.WdASR = from.WdASR
+// 	conf.WdShareTime = from.WdShareTime
+// 	conf.WdPowerEnabled = from.WdPowerEnabled
+// 	conf.WdPowerMin = from.WdPowerMin
+// 	conf.WdPowerMax = from.WdPowerMax
+// 	conf.WdPowerAction = from.WdPowerAction
+// 	conf.WdType = from.WdType
+// }
+
+// // 设置 SetHiveOsWallet
+// func (s *HiveOsService) SetHiveOsWallet(wallet *utils.HiveOsWallet, from *utils.HiveOsWallet) {
+// 	wallet.CustomMiner = from.CustomMiner
+// 	wallet.CustomInstallURL = from.CustomInstallURL
+// 	wallet.CustomAlgo = from.CustomAlgo
+// 	wallet.CustomTemplate = from.CustomTemplate
+// 	wallet.CustomUrl = from.CustomUrl
+// 	wallet.CustomPass = from.CustomPass
+// 	wallet.CustomUserConfig = from.CustomUserConfig
+// 	wallet.CustomTLS = from.CustomTLS
+// 	wallet.FsID = from.FsID
+// 	wallet.Coin = from.Coin
+// }
+
+// // 设置 SetHiveOsAutoFan
+// func (s *HiveOsService) SetHiveOsAutoFan(autofan *utils.HiveOsAutoFan, from *utils.HiveOsAutoFan) {
+// 	autofan.CriticalTemp = from.CriticalTemp
+// 	autofan.CriticalTempAction = from.CriticalTempAction
+// 	autofan.Enable = from.Enable
+// 	autofan.TargetTemp = from.TargetTemp
+// 	autofan.MinFan = from.MinFan
+// 	autofan.MaxFan = from.MaxFan
+// 	autofan.NoAMD = from.NoAMD
+// 	autofan.TargetMemTemp = from.TargetMemTemp
+// 	autofan.RebootOnError = from.RebootOnError
+// 	autofan.SmartMode = from.SmartMode
+// }
 
 // // 生成Config字符串
 // // 主要是飞行表

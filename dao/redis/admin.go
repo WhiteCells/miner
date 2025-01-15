@@ -122,17 +122,17 @@ func (c *AdminRDB) SetInviteReward(ctx context.Context, reward int) error {
 }
 
 // 获取邀请积分奖励数量
-func (c *AdminRDB) GetInviteReward(ctx context.Context) (int, error) {
+func (c *AdminRDB) GetInviteReward(ctx context.Context) (float32, error) {
 	key := MakeKey(AdminField, AdminInviteRewardField)
 	rewardStr, err := utils.RDB.Get(ctx, key)
 	if err != nil {
 		return 0, err
 	}
-	reward, err := strconv.Atoi(rewardStr)
+	reward, err := strconv.ParseFloat(rewardStr, 32)
 	if err != nil {
 		return 0, err
 	}
-	return reward, nil
+	return float32(reward), nil
 }
 
 // 修改充值积分奖励比例

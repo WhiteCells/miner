@@ -139,7 +139,7 @@ func (c *UserRDB) ExistsSameID(ctx context.Context, userID string) bool {
 }
 
 // 更新积分
-func (c *UserRDB) UpdatePoints(ctx context.Context, userID string, num int, points_type points.PointsType) error {
+func (c *UserRDB) UpdatePoints(ctx context.Context, userID string, num float32, points_type points.PointsType) error {
 	user, err := c.GetByID(ctx, userID)
 	if err != nil {
 		return err

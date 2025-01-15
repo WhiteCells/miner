@@ -2,7 +2,7 @@ package utils
 
 import (
 	"fmt"
-	"miner/model"
+	// "miner/model"
 	"sync"
 
 	"gorm.io/driver/mysql"
@@ -47,39 +47,8 @@ func InitDB() error {
 		sqlDB.SetMaxIdleConns(Config.MySQL.MaxIdleConns)
 		sqlDB.SetMaxOpenConns(Config.MySQL.MaxOpenConns)
 
-		err = autoMigrate()
-		if err != nil {
-			fmt.Println("failed to auto migrate")
-			initDBError = err
-			return
-		}
-
 		Logger.Info("init database successfully")
 	})
 
 	return initDBError
-}
-
-func autoMigrate() error {
-	return DB.AutoMigrate(
-		&model.User{},
-		&model.Farm{},
-		&model.Miner{},
-		&model.Flightsheet{},
-		&model.Wallet{},
-		&model.UserFarm{},
-		&model.UserWallet{},
-		&model.FarmMiner{},
-		&model.UserMiner{},
-		&model.MinerFlightsheet{},
-		&model.FlightsheetWallet{},
-		&model.OperLog{},
-		&model.LoginLog{},
-		&model.PointsRecord{},
-		&model.UserFlightsheet{},
-		&model.FarmFlightsheet{},
-		&model.MinePool{},
-		&model.System{},
-		&model.Task{},
-	)
 }

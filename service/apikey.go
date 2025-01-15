@@ -49,7 +49,7 @@ func (s *BscApiKeyService) requestBscApi(ctx *gin.Context, address string, apike
 
 	rsp, err := http.Get(url)
 
-	time.Sleep(3)
+	time.Sleep(300000000)
 
 	// 减少 apikey 的使用次数
 	s.bscApiKeyRDB.ZIncrBy(ctx, apikey, -1)

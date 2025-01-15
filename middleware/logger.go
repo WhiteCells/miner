@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"io"
+	"time"
+
 	"miner/model"
 	"miner/utils"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )

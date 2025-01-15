@@ -1,37 +1,44 @@
 package main
 
 import (
+	"miner/dao/mysql"
 	"miner/dao/redis"
-	"miner/middleware"
 	"miner/route"
 	"miner/utils"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
-func main() {
-	utils.InitConfig("./config.yml", "yml")
+func initialize() error {
+	if err := utils.InitConfig("./config.yml", "yml"); err != nil {
+		return err
+	}
 	utils.InitJWT()
-	utils.InitLogger()
-	utils.InitRDB()
-	redis.InitAdminRDB()
-	utils.InitDB()
+	if err := utils.InitLogger(); err != nil {
+		utils.Logger.Error("" + err.Error())
+		return err
+	}
+	if err := utils.InitRDB(); err != nil {
+		utils.Logger.Error("" + err.Error())
+		return err
+	}
+	redis.Init()
+	if err := utils.InitDB(); err != nil {
+		utils.Logger.Error("" + err.Error())
+		return err
+	}
+	mysql.Init()
+	return nil
+}
 
+func main() {
+	if err := initialize(); err != nil {
+		utils.Logger.Error(err.Error())
+	}
 	gin.SetMode(utils.Config.Server.Mode)
-
 	ctx := gin.Default()
-	ctx.Use(middleware.OperLog())
-
-	route.NewUserRoute().InitUserRoute(ctx)
-	route.NewFarmRoute().InitFarmRoute(ctx)
-	route.NewMinerRoute().InitMinerRoute(ctx)
-	route.NewFlightsheetRoute().InitFlightsheetRoute(ctx)
-	route.NewWalletRoute().InitWalletRoute(ctx)
-	route.NewAdminRoute().InitAdminRoute(ctx)
-	route.NewHiveosRoute().InitHiveosRoute(ctx)
-	route.NewBscApiKeyRoute().InitBscApiKeyRoute(ctx)
-
-	port := strconv.Itoa(utils.Config.Server.Port)
-	ctx.Run(":" + port)
+	route.Init(ctx)
+	if err := ctx.Run(utils.GeneratePort()); err != nil {
+		utils.Logger.Error("" + err.Error())
+	}
 }

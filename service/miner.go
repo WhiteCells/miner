@@ -54,6 +54,8 @@ func (s *MinerService) CreateMiner(ctx context.Context, req *dto.CreateMinerReq)
 		return nil, err
 	}
 
+	hiveOsUrl := utils.GenerateHiveOsUrl()
+
 	// 创建矿机
 	miner := &info.Miner{
 		ID:    uid,
@@ -61,6 +63,12 @@ func (s *MinerService) CreateMiner(ctx context.Context, req *dto.CreateMinerReq)
 		RigID: rigID,
 		Pass:  pass,
 		Perm:  perm.MinerOwner,
+		HiveOsConfig: utils.HiveOsConfig{
+			HiveOsUrl:     hiveOsUrl,
+			ApiHiveOsUrls: hiveOsUrl,
+			WorkerName:    req.Name,
+			FarmID:        req.FarmID,
+		},
 	}
 
 	// 创建矿机
@@ -88,16 +96,6 @@ func (s *MinerService) DeleteMiner(ctx context.Context, req *dto.DeleteMinerReq)
 	return nil
 }
 
-// GetMinerByID 获取矿机信息
-func (s *MinerService) GetMinerByID(ctx context.Context, minerID string) (*info.Miner, error) {
-	userID, exists := ctx.Value("user_id").(string)
-	if !exists {
-		return nil, errors.New("invalid user_id in context")
-	}
-	miner, err := s.minerRDB.GetByID(ctx, userID, minerID)
-	return miner, err
-}
-
 // UpdateMiner 更新矿机信息
 func (s *MinerService) UpdateMiner(ctx context.Context, req *dto.UpdateMinerReq) error {
 	_, exists := ctx.Value("user_id").(string)
@@ -114,12 +112,7 @@ func (s *MinerService) UpdateMiner(ctx context.Context, req *dto.UpdateMinerReq)
 	}
 
 	// 更新矿机信息
-	for key, value := range req.UpdateInfo {
-		switch key {
-		case "name":
-			miner.Name = value.(string)
-		}
-	}
+	utils.UpdateStructObjFromMap(miner, req.UpdateInfo)
 
 	// 保存更新
 	if err := s.minerRDB.Set(ctx, req.FarmID, miner); err != nil {
@@ -127,6 +120,16 @@ func (s *MinerService) UpdateMiner(ctx context.Context, req *dto.UpdateMinerReq)
 	}
 
 	return nil
+}
+
+// GetMinerByID 获取矿机信息
+func (s *MinerService) GetMinerByID(ctx context.Context, minerID string) (*info.Miner, error) {
+	userID, exists := ctx.Value("user_id").(string)
+	if !exists {
+		return nil, errors.New("invalid user_id in context")
+	}
+	miner, err := s.minerRDB.GetByID(ctx, userID, minerID)
+	return miner, err
 }
 
 // GetMiner 获取用户在矿场的所有矿机

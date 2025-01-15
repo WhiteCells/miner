@@ -14,8 +14,8 @@ type User struct {
 	Secret         string            `json:"secret"`
 	Address        string            `json:"address"`
 	Role           role.RoleType     `json:"role"`
-	InvitePoints   int               `json:"invite_points"`
-	RechargePoints int               `json:"recharge_points"`
+	InvitePoints   float32           `json:"invite_points"`
+	RechargePoints float32           `json:"recharge_points"`
 	Status         status.UserStatus `json:"status"`
 	LastLoginAt    time.Time         `json:"last_login_at"`
 	LastLoginIP    string            `json:"last_login_ip"`

@@ -1,8 +1,9 @@
 package utils
 
 import (
+	"errors"
 	"fmt"
-	"log"
+	"strconv"
 
 	"github.com/spf13/viper"
 )
@@ -55,19 +56,21 @@ type ServerConfig struct {
 
 var Config ServerConfig
 
-func InitConfig(configFile string, configType string) {
+func InitConfig(configFile string, configType string) error {
 	viper.SetConfigFile(configFile)
 	viper.SetConfigType(configType)
 
 	err := viper.ReadInConfig()
 	if err != nil {
-		log.Fatalf("Failed to read config %v", err)
+		return errors.New("Failed to read config " + err.Error())
 	}
 
 	err = viper.Unmarshal(&Config)
 	if err != nil {
-		log.Fatalf("Failed to Unmarshal config %v", err)
+		return errors.New("Failed to Unmarshal config " + err.Error())
 	}
+
+	return nil
 }
 
 type HiveOsConfig struct {
@@ -202,4 +205,8 @@ func GenerateHiveOsUrl() string {
 	host := Config.Server.Host
 	port := Config.Server.Port
 	return fmt.Sprintf("http://%s:%d/hiveos", host, port)
+}
+
+func GeneratePort() string {
+	return ":" + strconv.Itoa(Config.Server.Port)
 }

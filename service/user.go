@@ -188,7 +188,7 @@ func (s *UserService) UpdateUserInfo(ctx *gin.Context, req *dto.UpdateInfoReq) e
 }
 
 // GetPointsBalance 获取用户积分余额
-func (s *UserService) GetPointsBalance(ctx *gin.Context) (int, error) {
+func (s *UserService) GetPointsBalance(ctx *gin.Context) (float32, error) {
 	userID, exists := ctx.Value("user_id").(string)
 	if !exists {
 		return -1, errors.New("invalid user_id in context")
