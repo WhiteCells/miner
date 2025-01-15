@@ -196,3 +196,10 @@ SMART_MODE=%s
 		data.TargetMemTemp, data.RebootOnError, data.SmartMode,
 	)
 }
+
+// 生成 hiveosurl
+func GenerateHiveOsUrl() string {
+	host := Config.Server.Host
+	port := Config.Server.Port
+	return fmt.Sprintf("http://%s:%d/hiveos", host, port)
+}

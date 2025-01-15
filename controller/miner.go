@@ -106,3 +106,18 @@ func (c *MinerController) Transfer(ctx *gin.Context) {
 
 	rsp.Success(ctx, http.StatusOK, "transfer miner success", nil)
 }
+
+// 获取 rig.conf
+func (c *MinerController) GetRigConf(ctx *gin.Context) {
+	var req dto.GetRigConfReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
+		return
+	}
+	conf, err := c.minerService.GetRigConf(ctx, &req)
+	if err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
+		return
+	}
+	rsp.Success(ctx, http.StatusOK, "get rig.conf", conf)
+}

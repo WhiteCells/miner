@@ -10,6 +10,8 @@ import (
 	"miner/dao/redis"
 	"miner/model/info"
 	"miner/utils"
+	"os"
+	"strings"
 )
 
 type MinerService struct {
@@ -98,11 +100,11 @@ func (s *MinerService) GetMinerByID(ctx context.Context, minerID string) (*info.
 
 // UpdateMiner 更新矿机信息
 func (s *MinerService) UpdateMiner(ctx context.Context, req *dto.UpdateMinerReq) error {
-	userID, exists := ctx.Value("user_id").(string)
+	_, exists := ctx.Value("user_id").(string)
 	if !exists {
 		return errors.New("invalid user_id in context")
 	}
-	if !s.validPerm(ctx, userID, req.MinerID, []perm.MinerPerm{perm.MinerOwner, perm.MinerManager}) {
+	if !s.validPerm(ctx, req.FarmID, req.MinerID, []perm.MinerPerm{perm.MinerOwner, perm.MinerManager}) {
 		return errors.New("permission denied")
 	}
 
@@ -140,7 +142,7 @@ func (s *MinerService) Transfer(ctx context.Context, req *dto.TransferMinerReq) 
 		return errors.New("invalid user_id in context")
 	}
 	// 权限检查
-	if !s.validPerm(ctx, userID, req.MinerID, []perm.MinerPerm{perm.MinerOwner}) {
+	if !s.validPerm(ctx, req.FromFarmID, req.MinerID, []perm.MinerPerm{perm.MinerOwner}) {
 		return errors.New("permission denied")
 	}
 	// 转移
@@ -148,6 +150,59 @@ func (s *MinerService) Transfer(ctx context.Context, req *dto.TransferMinerReq) 
 		return errors.New("transfer miner failed")
 	}
 	return nil
+}
+
+// 获取 rig.conf
+func (s *MinerService) GetRigConf(ctx context.Context, req *dto.GetRigConfReq) (string, error) {
+	userID, exists := ctx.Value("user_id").(string)
+	if !exists {
+		return "", errors.New("invalid user_id in context")
+	}
+	// 权限检查
+	if !s.validPerm(ctx, req.FarmID, req.MinerID, []perm.MinerPerm{perm.MinerOwner}) {
+		return "", errors.New("permission denied")
+	}
+	// 从 utils/rig.conf 文件中读取内容
+	templateBytes, err := os.ReadFile("utils/rig.conf")
+	if err != nil {
+		return "", err
+	}
+	temp := string(templateBytes)
+
+	hive_host := utils.GenerateHiveOsUrl()
+
+	farm, err := s.farmRDB.GetByID(ctx, userID, req.FarmID)
+	if err != nil {
+		return "", err
+	}
+
+	miner, err := s.minerRDB.GetByID(ctx, req.FarmID, req.MinerID)
+	if err != nil {
+		return "", err
+	}
+
+	rigID := miner.RigID
+	rigPass := miner.Pass
+	workName := miner.Name
+	farmID := req.FarmID
+	timeZone := farm.TimeZone
+
+	kv := map[string]string{
+		"HIVE_HOST_URL": hive_host,
+		"API_HOST_URLs": hive_host,
+		"RIG_ID":        rigID,
+		"RIG_PASSWD":    rigPass,
+		"WORKER_NAME":   workName,
+		"FARM_ID":       farmID,
+		"TIMEZONE":      timeZone,
+	}
+
+	for key, val := range kv {
+		placeholder := "${" + key + "}"
+		temp = strings.ReplaceAll(temp, placeholder, val)
+	}
+
+	return temp, nil
 }
 
 // 转移矿机到其他矿场
@@ -181,8 +236,8 @@ func (s *MinerService) ApplyFs(ctx context.Context, req *dto.ApplyMinerFlightshe
 	return s.minerRDB.ApplyFs(ctx, req.MinerID, req.FlightsheetID)
 }
 
-func (s *MinerService) validPerm(ctx context.Context, userID string, minerID string, allowedPerms []perm.MinerPerm) bool {
-	farm, err := s.minerRDB.GetByID(ctx, userID, minerID)
+func (s *MinerService) validPerm(ctx context.Context, farmID string, minerID string, allowedPerms []perm.MinerPerm) bool {
+	farm, err := s.minerRDB.GetByID(ctx, farmID, minerID)
 	if err != nil {
 		return false
 	}

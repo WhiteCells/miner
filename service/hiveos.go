@@ -115,10 +115,8 @@ func (s *HiveOsService) helloCase(ctx *gin.Context, rigID string) {
 	//////////////////////////////
 	// config
 	//////////////////////////////
-	host := utils.Config.Server.Host
-	port := utils.Config.Server.Port
-	hive_host := fmt.Sprintf("http://%s:%d/hiveos", host, port)
 	var hiveOsConfig utils.HiveOsConfig
+	hive_host := utils.GenerateHiveOsUrl()
 	hiveOsConfig.HiveOsUrl = hive_host
 	hiveOsConfig.ApiHiveOsUrls = hive_host
 	hiveOsConfig.FarmID = farmID
@@ -219,10 +217,8 @@ func (s *HiveOsService) statsCase(ctx *gin.Context, rigID string) {
 	//////////////////////////////
 	// config
 	//////////////////////////////
-	host := utils.Config.Server.Host
-	port := utils.Config.Server.Port
-	hive_host := fmt.Sprintf("http://%s:%d/hiveos", host, port)
 	var hiveOsConfig utils.HiveOsConfig
+	hive_host := utils.GenerateHiveOsUrl()
 	hiveOsConfig.HiveOsUrl = hive_host
 	hiveOsConfig.ApiHiveOsUrls = hive_host
 	hiveOsConfig.FarmID = farmID
@@ -386,10 +382,8 @@ func (s *HiveOsService) messageCase(ctx *gin.Context, rigID string) {
 	//////////////////////////////
 	// config
 	//////////////////////////////
-	host := utils.Config.Server.Host
-	port := utils.Config.Server.Port
-	hive_host := fmt.Sprintf("http://%s:%d/hiveos", host, port)
 	var hiveOsConfig utils.HiveOsConfig
+	hive_host := utils.GenerateHiveOsUrl()
 	hiveOsConfig.HiveOsUrl = hive_host
 	hiveOsConfig.ApiHiveOsUrls = hive_host
 	hiveOsConfig.FarmID = farmID
