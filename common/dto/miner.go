@@ -17,6 +17,7 @@ type UpdateMinerReq struct {
 }
 
 type ApplyMinerFlightsheetReq struct {
+	FarmID        string `json:"farm_id" binding:"required"`
 	MinerID       string `json:"miner_id" binding:"required"`
 	FlightsheetID string `json:"fs_id" binding:"required"`
 }

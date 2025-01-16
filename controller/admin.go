@@ -313,3 +313,141 @@ func (c *AdminController) IncrBscApiKeyScore(ctx *gin.Context) {
 	}
 	rsp.Success(ctx, http.StatusOK, "increment bsc apikey success", "")
 }
+
+// coin
+func (c *AdminController) AddCoin(ctx *gin.Context) {
+	var req dto.AdminAddCoinReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		rsp.Error(ctx, http.StatusBadRequest, "invalid request", err.Error())
+		return
+	}
+	if err := c.adminService.AddCoin(ctx, &req.Coin); err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, "failed to add coin", err.Error())
+		return
+	}
+	rsp.Success(ctx, http.StatusOK, "add coin success", "")
+}
+
+func (c *AdminController) DelCoin(ctx *gin.Context) {
+	var req dto.AdminDelCoinReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		rsp.Error(ctx, http.StatusBadRequest, "invalid request", err.Error())
+		return
+	}
+	if err := c.adminService.DelCoin(ctx, req.Name); err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, "failed to del coin", err.Error())
+		return
+	}
+	rsp.Success(ctx, http.StatusOK, "del coin success", "")
+}
+
+func (c *AdminController) GetCoinByName(ctx *gin.Context) {
+	coinName := ctx.Query("name")
+	pool, err := c.adminService.GetCoinByName(ctx, coinName)
+	if err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, "failed to get coin", err.Error())
+		return
+	}
+	rsp.Success(ctx, http.StatusOK, "get coin success", pool)
+}
+
+func (c *AdminController) GetAllCoin(ctx *gin.Context) {
+	coins, err := c.adminService.GetAllCoin(ctx)
+	if err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, "failed to get all coin", err.Error())
+		return
+	}
+	rsp.Success(ctx, http.StatusOK, "get all coin success", coins)
+}
+
+// pool
+func (c *AdminController) AddPool(ctx *gin.Context) {
+	var req dto.AdminAddPoolReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		rsp.Error(ctx, http.StatusBadRequest, "invalid request", err.Error())
+		return
+	}
+	if err := c.adminService.AddPool(ctx, &req.Pool); err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, "failed to add pool", err.Error())
+		return
+	}
+	rsp.Success(ctx, http.StatusOK, "add pool success", "")
+}
+
+func (c *AdminController) DelPool(ctx *gin.Context) {
+	var req dto.AdminDelPoolReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		rsp.Error(ctx, http.StatusBadRequest, "invalid request", err.Error())
+		return
+	}
+	if err := c.adminService.DelPool(ctx, req.Name); err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, "failed to del pool", err.Error())
+		return
+	}
+	rsp.Success(ctx, http.StatusOK, "del pool success", "")
+}
+
+func (c *AdminController) GetPoolByName(ctx *gin.Context) {
+	poolName := ctx.Query("name")
+	pool, err := c.adminService.GetPoolByName(ctx, poolName)
+	if err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, "failed to get pool", err.Error())
+		return
+	}
+	rsp.Success(ctx, http.StatusOK, "get pool success", pool)
+}
+
+func (c *AdminController) GetAllPool(ctx *gin.Context) {
+	pools, err := c.adminService.GetAllPool(ctx)
+	if err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, "failed to get all pool", err.Error())
+		return
+	}
+	rsp.Success(ctx, http.StatusOK, "get all pool success", pools)
+}
+
+// soft
+func (c *AdminController) AddSoft(ctx *gin.Context) {
+	var req dto.AdminAddSoftReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		rsp.Error(ctx, http.StatusBadRequest, "invalid request", err.Error())
+		return
+	}
+	if err := c.adminService.AddSoft(ctx, &req.Soft); err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, "failed to add soft", err.Error())
+		return
+	}
+	rsp.Success(ctx, http.StatusOK, "add soft success", "")
+}
+
+func (c *AdminController) DelSoft(ctx *gin.Context) {
+	var req dto.AdminDelSoftReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		rsp.Error(ctx, http.StatusBadRequest, "invalid request", err.Error())
+		return
+	}
+	if err := c.adminService.DelSoft(ctx, req.Name); err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, "failed to del soft", err.Error())
+		return
+	}
+	rsp.Success(ctx, http.StatusOK, "del soft success", "")
+}
+
+func (c *AdminController) GetSoftByName(ctx *gin.Context) {
+	softName := ctx.Query("name")
+	soft, err := c.adminService.GetSoftByName(ctx, softName)
+	if err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, "failed to get soft", err.Error())
+		return
+	}
+	rsp.Success(ctx, http.StatusOK, "get soft success", soft)
+}
+
+func (c *AdminController) GetAllSoft(ctx *gin.Context) {
+	softs, err := c.adminService.GetAllSoft(ctx)
+	if err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, "failed to get all soft", err.Error())
+		return
+	}
+	rsp.Success(ctx, http.StatusOK, "get all soft success", softs)
+}

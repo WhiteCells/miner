@@ -148,7 +148,7 @@ func IPAuth() gin.HandlerFunc {
 
 		// TODO 如果 IP 不同，需要重新验证
 		if user.LastLoginIP != ctx.ClientIP() {
-			rsp.Error(ctx, http.StatusUnauthorized, "New IP detected", nil)
+			rsp.Error(ctx, http.StatusUnauthorized, "New IP detected", ctx.ClientIP())
 			ctx.Abort()
 			return
 		}

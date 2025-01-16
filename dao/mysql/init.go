@@ -1,5 +1,5 @@
 package mysql
 
-func Init() {
-	AutoMigrate()
+func Init() error {
+	return AutoMigrate()
 }

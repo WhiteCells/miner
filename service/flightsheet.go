@@ -31,11 +31,11 @@ func (s *FlightsheetService) CreateFlightsheet(ctx context.Context, req *dto.Cre
 		return nil, err
 	}
 	flightsheet := &info.Fs{
-		ID:     id,
-		Name:   req.Name,
-		CoinID: req.CoinID,
-		MineID: req.MineID,
-		SoftID: req.SoftID,
+		ID:   id,
+		Name: req.Name,
+		Coin: req.Coin,
+		Pool: req.Pool,
+		Soft: req.Soft,
 	}
 
 	if err := s.fsRDB.Set(ctx, userID, flightsheet); err != nil {
@@ -77,11 +77,11 @@ func (s *FlightsheetService) UpdateFlightsheet(ctx context.Context, req *dto.Upd
 		case "name":
 			flightsheet.Name = value.(string)
 		case "coin_id":
-			flightsheet.CoinID = value.(string)
+			flightsheet.Coin = value.(string)
 		case "mine_id":
-			flightsheet.MineID = value.(string)
+			flightsheet.Pool = value.(string)
 		case "soft_id":
-			flightsheet.SoftID = value.(string)
+			flightsheet.Soft = value.(string)
 		}
 	}
 

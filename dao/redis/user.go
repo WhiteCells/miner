@@ -85,7 +85,7 @@ func (c *UserRDB) GetByID(ctx context.Context, userID string) (*info.User, error
 // 通过姓名获取用户信息
 func (c *UserRDB) GetByName(ctx context.Context, name string) (*info.User, error) {
 	// 通过 name 找到对应 ID
-	nKey := MakeKey("name_id", name)
+	nKey := MakeKey(NameIDField, name)
 	id, err := utils.RDB.Get(ctx, nKey)
 	if err != nil {
 		return nil, err
@@ -95,7 +95,7 @@ func (c *UserRDB) GetByName(ctx context.Context, name string) (*info.User, error
 
 // 通过邮箱获取用户信息
 func (c *UserRDB) GetByEmail(ctx context.Context, email string) (*info.User, error) {
-	eKey := MakeKey("email_id", email)
+	eKey := MakeKey(EmailIDField, email)
 	id, err := utils.RDB.Get(ctx, eKey)
 	if err != nil {
 		return nil, err

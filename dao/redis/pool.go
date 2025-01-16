@@ -7,22 +7,22 @@ import (
 	"miner/utils"
 )
 
-type CoinRDB struct {
+type PoolRDB struct {
 }
 
-func NewCoinRDB() *CoinRDB {
-	return &CoinRDB{}
+func NewPoolRDB() *PoolRDB {
+	return &PoolRDB{}
 }
 
-// 使用 hash 便于查找所有的 coin
+// 使用 hash 便于查找所有的 pool
 // +--------+---------+--------+
 // | field  | key     | val    |
 // +--------+---------+--------+
-// | coin   | <name>  | <info> |
+// | pool   | <name>  | <info> |
 // +--------+---------+--------+
 
-func (c *CoinRDB) Set(ctx context.Context, info *info.Coin) error {
-	field := MakeField(CoinField)
+func (c *PoolRDB) Set(ctx context.Context, info *info.Pool) error {
+	field := MakeField(PoolField)
 	key := MakeKey(info.Name)
 	infoByte, err := json.Marshal(info)
 	if err != nil {
@@ -31,47 +31,47 @@ func (c *CoinRDB) Set(ctx context.Context, info *info.Coin) error {
 	return utils.RDB.HSet(ctx, field, key, string(infoByte))
 }
 
-func (c *CoinRDB) Del(ctx context.Context, name string) error {
-	field := MakeField(CoinField)
+func (c *PoolRDB) Del(ctx context.Context, name string) error {
+	field := MakeField(PoolField)
 	key := MakeKey(name)
 	return utils.RDB.HDel(ctx, field, key)
 }
 
-func (c *CoinRDB) GetByName(ctx context.Context, name string) (*info.Coin, error) {
-	field := MakeField(CoinField)
+func (c *PoolRDB) GetByName(ctx context.Context, name string) (*info.Pool, error) {
+	field := MakeField(PoolField)
 	key := MakeKey(name)
 	infoStr, err := utils.RDB.HGet(ctx, field, key)
 	if err != nil {
 		return nil, err
 	}
-	var info info.Coin
+	var info info.Pool
 	if err := json.Unmarshal([]byte(infoStr), &info); err != nil {
 		return nil, err
 	}
 	return &info, nil
 }
 
-func (c *CoinRDB) GetAll(ctx context.Context) (*[]info.Coin, error) {
-	field := MakeField(CoinField)
+func (c *PoolRDB) GetAll(ctx context.Context) (*[]info.Pool, error) {
+	field := MakeField(PoolField)
 
 	infos, err := utils.RDB.HGetAll(ctx, field)
 	if err != nil {
 		return nil, err
 	}
 
-	var coins []info.Coin
+	var pools []info.Pool
 	for _, infoStr := range infos {
-		var info info.Coin
+		var info info.Pool
 		if err := json.Unmarshal([]byte(infoStr), &info); err != nil {
 			return nil, err
 		}
-		coins = append(coins, info)
+		pools = append(pools, info)
 	}
 
-	return &coins, nil
+	return &pools, nil
 }
 
-func (c *CoinRDB) Exists(ctx context.Context, name string) bool {
+func (c *PoolRDB) Exists(ctx context.Context, name string) bool {
 	_, err := c.GetByName(ctx, name)
 	return err == nil
 }

@@ -43,6 +43,24 @@ func (ar *AdminRoute) InitAdminRoute(r *gin.Engine) {
 		route.POST("/bsc_apikey", ar.adminController.AddBscApiKey)
 		route.GET("/bsc_apikey", ar.adminController.GetBscApiKey)
 		route.DELETE("/bsc_apikey", ar.adminController.DelBscApiKey)
+		// coin
+		route.POST("/coin", ar.adminController.AddCoin)
+		route.PUT("/coin", ar.adminController.AddCoin)
+		route.DELETE("/coin", ar.adminController.DelCoin)
+		route.GET("/coin", ar.adminController.GetCoinByName)
+		route.GET("/all_coin", ar.adminController.GetAllCoin)
+		// pool
+		route.POST("/pool", ar.adminController.AddPool)
+		route.PUT("/pool", ar.adminController.AddPool)
+		route.DELETE("/pool", ar.adminController.DelPool)
+		route.GET("/pool", ar.adminController.GetPoolByName)
+		route.GET("/all_pool", ar.adminController.GetAllPool)
+		// soft
+		route.POST("/soft", ar.adminController.AddSoft)
+		route.PUT("/soft", ar.adminController.AddSoft)
+		route.DELETE("/soft", ar.adminController.DelSoft)
+		route.GET("/soft", ar.adminController.GetSoftByName)
+		route.GET("/all_soft", ar.adminController.GetAllSoft)
 		// test
 		route.POST("incr_bsc_apikey", ar.adminController.IncrBscApiKeyScore)
 	}

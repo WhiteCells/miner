@@ -8,13 +8,11 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"miner/common/status"
 	"miner/model/info"
 	"miner/utils"
 	"strconv"
-	"time"
 )
 
 type AdminRDB struct {
@@ -33,28 +31,6 @@ func NewAdminRDB() *AdminRDB {
 		SystemRDB:   NewSystemRDB(),
 		minepoolRDB: NewMinpoolRDB(),
 	}
-}
-
-func InitAdminRDB() error {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
-	keys := map[string]interface{}{}
-	keys[MakeKey(AdminField, AdminInviteRewardField)] = 10
-	keys[MakeKey(AdminField, AdminRechargeRatioField)] = 1
-	keys[MakeKey(AdminField, AdminSwitchRegisterField)] = 1
-
-	for key, value := range keys {
-		set, err := utils.RDB.Client.SetNX(ctx, key, value, 0).Result()
-		if err != nil {
-			return err
-		}
-		if !set {
-			fmt.Printf("Key %s already exists, skipping.\n", key)
-		}
-	}
-
-	return nil
 }
 
 // 获取所有用户信息

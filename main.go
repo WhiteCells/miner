@@ -11,23 +11,30 @@ import (
 
 func initialize() error {
 	if err := utils.InitConfig("./config.yml", "yml"); err != nil {
+		utils.Logger.Error(err.Error())
 		return err
 	}
 	utils.InitJWT()
 	if err := utils.InitLogger(); err != nil {
-		utils.Logger.Error("" + err.Error())
+		utils.Logger.Error(err.Error())
 		return err
 	}
 	if err := utils.InitRDB(); err != nil {
-		utils.Logger.Error("" + err.Error())
+		utils.Logger.Error(err.Error())
 		return err
 	}
-	redis.Init()
+	if err := redis.Init(); err != nil {
+		utils.Logger.Error(err.Error())
+		return err
+	}
 	if err := utils.InitDB(); err != nil {
-		utils.Logger.Error("" + err.Error())
+		utils.Logger.Error(err.Error())
 		return err
 	}
-	mysql.Init()
+	if err := mysql.Init(); err != nil {
+		utils.Logger.Error(err.Error())
+		return err
+	}
 	return nil
 }
 

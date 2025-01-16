@@ -236,7 +236,7 @@ func (s *MinerService) ApplyFs(ctx context.Context, req *dto.ApplyMinerFlightshe
 	if !s.validPerm(ctx, userID, req.MinerID, []perm.MinerPerm{perm.MinerOwner, perm.MinerManager}) {
 		return errors.New("permission denied")
 	}
-	return s.minerRDB.ApplyFs(ctx, req.MinerID, req.FlightsheetID)
+	return s.minerRDB.ApplyFs(ctx, req.FarmID, req.MinerID, req.FlightsheetID)
 }
 
 func (s *MinerService) validPerm(ctx context.Context, farmID string, minerID string, allowedPerms []perm.MinerPerm) bool {

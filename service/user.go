@@ -55,7 +55,7 @@ func (s *UserService) Register(ctx *gin.Context, req *dto.RegisterReq) (string, 
 	uid := s.generateUserID(ctx)
 
 	// 用户 password
-	password, err := s.encryptPassword(req.Password)
+	password, err := utils.EncryptPassword(req.Password)
 	if err != nil {
 		return "", err
 	}
@@ -67,19 +67,20 @@ func (s *UserService) Register(ctx *gin.Context, req *dto.RegisterReq) (string, 
 	}
 
 	// 交易地址
-	address, key, err := s.GenerateAddress(ctx, uid)
+	address, key, _ := s.GenerateAddress(ctx, uid)
 
 	user := &info.User{
-		ID:         uid,
-		Name:       req.Username,
-		Password:   password,
-		Secret:     secret,
-		Address:    address,
-		Email:      req.Email,
-		Role:       role.User,
-		Status:     status.UserOn,
-		InviteCode: uid,
-		Key:        key,
+		ID:          uid,
+		Name:        req.Username,
+		Password:    password,
+		Secret:      secret,
+		Address:     address,
+		Email:       req.Email,
+		Role:        role.User,
+		LastBalance: 0.0,
+		Status:      status.UserOn,
+		InviteCode:  uid,
+		Key:         key,
 	}
 
 	// 如果有邀请码，处理邀请关系
@@ -144,7 +145,7 @@ func (s *UserService) Login(ctx *gin.Context, req *dto.LoginReq) (string, *info.
 	ctx.Set("user_id", user.ID)
 
 	if err := s.userRDB.Set(ctx, user); err != nil {
-		return "", nil, errors.New("RDB failed")
+		return "", nil, errors.New("failed to update")
 	}
 
 	return token, user, nil
@@ -212,15 +213,6 @@ func (s *UserService) GetUserInfo(ctx *gin.Context, userID string) (*info.User, 
 // func (s *UserService) GetUserAddress(ctx *gin.Context, userID string) (string, error) {
 // 	return s.userRDB.
 // }
-
-// 加密用户密码
-func (c *UserService) encryptPassword(password string) (string, error) {
-	hashPassword, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
-	if err != nil {
-		return "", errors.New("failed to encrypt password")
-	}
-	return string(hashPassword), nil
-}
 
 // 验证密码
 func (s *UserService) validPassword(user *info.User, password string) bool {

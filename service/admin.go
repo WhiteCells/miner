@@ -14,6 +14,9 @@ type AdminService struct {
 	adminDAO     *mysql.AdminDAO
 	adminRDB     *redis.AdminRDB
 	bscApiKeyRDB *redis.BscApiKeyRDB
+	coinRDB      *redis.CoinRDB
+	poolRDB      *redis.PoolRDB
+	softRDB      *redis.SoftRDB
 }
 
 func NewAdminService() *AdminService {
@@ -21,6 +24,9 @@ func NewAdminService() *AdminService {
 		adminDAO:     mysql.NewAdminDAO(),
 		adminRDB:     redis.NewAdminRDB(),
 		bscApiKeyRDB: redis.NewBscApiKeyRDB(),
+		coinRDB:      redis.NewCoinRDB(),
+		poolRDB:      redis.NewPoolRDB(),
+		softRDB:      redis.NewSoftRDB(),
 	}
 }
 
@@ -66,10 +72,10 @@ func (s *AdminService) SetSwitchRegister(ctx context.Context, req *dto.AdminSwit
 // SetGlobalFlightsheet 设置全局飞行表
 func (s *AdminService) SetGlobalFs(ctx context.Context, req *dto.AdminSetGlobalFsReq) error {
 	fs := &info.Fs{
-		Name:   req.Name,
-		CoinID: req.Coin,
-		MineID: req.Mine,
-		SoftID: req.Soft,
+		Name: req.Name,
+		Coin: req.Coin,
+		Pool: req.Pool,
+		Soft: req.Soft,
 	}
 	return s.adminRDB.SetGlobalFs(ctx, fs)
 }
@@ -128,4 +134,55 @@ func (s *AdminService) GetBscApiKey(ctx context.Context) (string, error) {
 // DelApiKey 删除 apikey
 func (s *AdminService) DelBscApiKey(ctx context.Context, apikey string) error {
 	return s.bscApiKeyRDB.ZRem(ctx, apikey)
+}
+
+// coin
+func (s *AdminService) AddCoin(ctx context.Context, coin *info.Coin) error {
+	return s.coinRDB.Set(ctx, coin)
+}
+
+func (s *AdminService) DelCoin(ctx context.Context, name string) error {
+	return s.coinRDB.Del(ctx, name)
+}
+
+func (s *AdminService) GetCoinByName(ctx context.Context, name string) (*info.Coin, error) {
+	return s.coinRDB.GetByName(ctx, name)
+}
+
+func (s *AdminService) GetAllCoin(ctx context.Context) (*[]info.Coin, error) {
+	return s.coinRDB.GetAll(ctx)
+}
+
+// pool
+func (s *AdminService) AddPool(ctx context.Context, pool *info.Pool) error {
+	return s.poolRDB.Set(ctx, pool)
+}
+
+func (s *AdminService) DelPool(ctx context.Context, name string) error {
+	return s.poolRDB.Del(ctx, name)
+}
+
+func (s *AdminService) GetPoolByName(ctx context.Context, name string) (*info.Pool, error) {
+	return s.poolRDB.GetByName(ctx, name)
+}
+
+func (s *AdminService) GetAllPool(ctx context.Context) (*[]info.Pool, error) {
+	return s.poolRDB.GetAll(ctx)
+}
+
+// soft
+func (s *AdminService) AddSoft(ctx context.Context, soft *info.Soft) error {
+	return s.softRDB.Set(ctx, soft)
+}
+
+func (s *AdminService) DelSoft(ctx context.Context, name string) error {
+	return s.softRDB.Del(ctx, name)
+}
+
+func (s *AdminService) GetSoftByName(ctx context.Context, name string) (*info.Soft, error) {
+	return s.softRDB.GetByName(ctx, name)
+}
+
+func (s *AdminService) GetAllSoft(ctx context.Context) (*[]info.Soft, error) {
+	return s.softRDB.GetAll(ctx)
 }

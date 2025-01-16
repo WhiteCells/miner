@@ -106,9 +106,33 @@ func (c *MinerRDB) Transfer(ctx context.Context, fromUserID, fromFarmID, MinerID
 // +---------------------+------------+
 // | miner_fs:<miner_id> |  <fs_id>   |
 // +---------------------+------------+
-func (c *MinerRDB) ApplyFs(ctx context.Context, minerID string, fsID string) error {
+func (c *MinerRDB) ApplyFs(ctx context.Context, farmID string, minerID string, fsID string) error {
+	pipe := utils.RDB.Client.TxPipeline()
+	// 更新 miner
+	// 获取 miner
+	field := MakeField(MinerField, farmID)
+	minerJSON, err := pipe.HGet(ctx, field, minerID).Result()
+	if err != nil {
+		return err
+	}
+	var miner info.Miner
+	if err = json.Unmarshal([]byte(minerJSON), &miner); err != nil {
+		return err
+	}
+	miner.FS = fsID
+	miner.HiveOsWallet.FsID = fsID
+	minerByte, err := json.Marshal(miner)
+	if err != nil {
+		return err
+	}
+	pipe.HSet(ctx, field, miner.ID, string(minerByte))
+
 	key := MakeKey(MinerFsField, minerID)
-	return utils.RDB.Set(ctx, key, fsID)
+	pipe.Set(ctx, key, fsID, 0)
+
+	_, err = pipe.Exec(ctx)
+
+	return err
 }
 
 // 获取应用的飞行表

@@ -1,6 +1,9 @@
 package dto
 
-import "miner/common/status"
+import (
+	"miner/common/status"
+	"miner/model/info"
+)
 
 type AdminSwitchRegisterReq struct {
 	Status status.RegisterStatus `json:"status"`
@@ -10,7 +13,7 @@ type AdminSetGlobalFsReq struct {
 	Name     string `json:"name" binding:"required"`
 	Coin     string `json:"coin" binding:"required"`
 	WalletID string `json:"wallet_id" binding:"required"`
-	Mine     string `json:"miner" binding:"required"`
+	Pool     string `json:"pool" binding:"required"`
 	Soft     string `json:"soft" binding:"required"`
 }
 
@@ -33,19 +36,69 @@ type AdminSetMinePoolCostReq struct {
 }
 
 type AdminSetMnemonicReq struct {
-	Mnemonic string `json:"mnemonic"`
+	Mnemonic string `json:"mnemonic" binding:"required"`
 }
 
 type AdminAddBscApiKeyReq struct {
-	Apikey string `json:"apikey"`
+	Apikey string `json:"apikey" binding:"required"`
 }
 
 type AdminDelBscApiKeyReq struct {
-	Apikey string `json:"apikey"`
+	Apikey string `json:"apikey" binding:"required"`
 }
 
 // test
 type AdminIncrBscApiKeyReq struct {
-	Apikey string  `json:"apikey"`
-	Score  float64 `json:"score"`
+	Apikey string  `json:"apikey" binding:"required"`
+	Score  float64 `json:"score" binding:"required"`
+}
+
+// coin
+/*
+{
+	"coin": {
+		"name": ""
+	}
+}
+*/
+type AdminAddCoinReq struct {
+	Coin info.Coin `json:"coin" binding:"required"`
+}
+
+type AdminDelCoinReq struct {
+	Name string `json:"name" binding:"required"`
+}
+
+// pool
+/*
+{
+	"pool": {
+		"name": "",
+		"server": []
+	}
+}
+*/
+type AdminAddPoolReq struct {
+	Pool info.Pool `json:"pool" binding:"required"`
+}
+
+type AdminDelPoolReq struct {
+	Name string `json:"name" binding:"required"`
+}
+
+// soft
+/*
+{
+	"soft": {
+		"name": "",
+		...
+	}
+}
+*/
+type AdminAddSoftReq struct {
+	Soft info.Soft `json:"soft" binding:"required"`
+}
+
+type AdminDelSoftReq struct {
+	Name string `json:"name"`
 }

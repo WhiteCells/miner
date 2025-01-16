@@ -9,6 +9,8 @@ var AdminGfsField = "gfs"
 
 // User
 var UserField = "user"
+var NameIDField = "name_id"
+var EmailIDField = "email_id"
 var FarmField = "farm"
 var MinerField = "miner"
 var FsField = "fs"
@@ -36,6 +38,10 @@ var Non = "non"
 
 // api
 var ApiKeyBscField = "apikey:bsc"
+
+var CoinField = "coin"
+var PoolField = "pool"
+var SoftField = "soft"
 
 func MakeKey(str ...string) string {
 	b := false
