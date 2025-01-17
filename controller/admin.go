@@ -300,20 +300,6 @@ func (c *AdminController) DelBscApiKey(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "del bsc apikey success", "")
 }
 
-// test
-func (c *AdminController) IncrBscApiKeyScore(ctx *gin.Context) {
-	var req dto.AdminIncrBscApiKeyReq
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		rsp.Error(ctx, http.StatusBadRequest, "invalid request", err.Error())
-		return
-	}
-	if err := c.adminService.IncrBscApiKeyScore(ctx, req.Apikey, req.Score); err != nil {
-		rsp.Error(ctx, http.StatusInternalServerError, "failed to increment bsc apikey", err.Error())
-		return
-	}
-	rsp.Success(ctx, http.StatusOK, "increment bsc apikey success", "")
-}
-
 // coin
 func (c *AdminController) AddCoin(ctx *gin.Context) {
 	var req dto.AdminAddCoinReq

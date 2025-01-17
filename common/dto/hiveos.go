@@ -1,10 +1,6 @@
 package dto
 
 // Hiveos 轮询
-// hello
-// stats
-// Hiveos ---> Server
-
 type HelloReq struct {
 	Method  string `json:"method"`
 	Jsonrpc string `json:"jsonrpc"`
@@ -101,7 +97,6 @@ type HiveosReq struct {
 }
 
 // message
-// Hiveos ---> Server
 type HiveosResReq struct {
 	Method  string `json:"method"`
 	Jsonrpc string `json:"jsonrpc"`

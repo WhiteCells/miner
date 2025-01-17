@@ -1,9 +1,9 @@
 package dto
 
 type CreateWalletReq struct {
-	Name string `json:"name" binding:"required"`
-	Addr string `json:"address" binding:"required"`
-	Coin string `json:"coin_type" binding:"required"`
+	Name string `json:"name" binding:"required,min=3,max=20"`
+	Addr string `json:"address" binding:"required,len=42"`
+	Coin string `json:"coin_type" binding:"required,min=2,max=20"`
 }
 
 type DeleteWalletReq struct {

@@ -1,16 +1,16 @@
 package dto
 
 type CreateFarmReq struct {
-	Name     string `json:"name" binding:"required"`
-	TimeZone string `json:"time_zone" binding:"required"`
+	Name     string `json:"name" binding:"required,min=3,max=20"`
+	TimeZone string `json:"time_zone" binding:"required,min=3,max=20"`
 }
 
 type DeleteFarmReq struct {
-	FarmID string `json:"farm_id" binding:"required"`
+	FarmID string `json:"farm_id" binding:"required,min=3,max=20"`
 }
 
 type UpdateFarmReq struct {
-	FarmID     string                 `json:"farm_id" binding:"required"`
+	FarmID     string                 `json:"farm_id" binding:"required,max=19"`
 	UpdateInfo map[string]interface{} `json:"update_info" binding:"required"`
 }
 

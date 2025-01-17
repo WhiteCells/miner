@@ -82,13 +82,13 @@ func (s *FarmService) UpdateFarm(ctx context.Context, req *dto.UpdateFarmReq) er
 		switch key {
 		case "name":
 			name := value.(string)
-			if name == "" || len(name) > 100 {
+			if name == "" || len(name) > 20 {
 				return errors.New("invalid farm name")
 			}
 			farm.Name = name
 		case "time_zone":
 			timeZone := value.(string)
-			if timeZone == "" {
+			if timeZone == "" || len(timeZone) >= 20 {
 				return errors.New("invalid farm time zone")
 			}
 			farm.TimeZone = timeZone

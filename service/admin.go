@@ -120,12 +120,6 @@ func (s *AdminService) AddBscApiKey(ctx context.Context, apikey string) error {
 	return s.bscApiKeyRDB.ZAdd(ctx, apikey)
 }
 
-// test
-// 增加 apikey 调用次数
-func (s *AdminService) IncrBscApiKeyScore(ctx context.Context, apikey string, score float64) error {
-	return s.bscApiKeyRDB.ZIncrBy(ctx, apikey, score)
-}
-
 // GetApiKey 获取 apikey（最少使用）
 func (s *AdminService) GetBscApiKey(ctx context.Context) (string, error) {
 	return s.bscApiKeyRDB.ZRangeWithScore(ctx)

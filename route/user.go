@@ -4,6 +4,7 @@ import (
 	"miner/common/role"
 	"miner/controller"
 	"miner/middleware"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -32,10 +33,12 @@ func (ur *UserRoute) InitUserRoute(r *gin.Engine) {
 	route.Use(middleware.IPAuth()) // IP 验证要在 token 解析之后
 	route.Use(middleware.RoleAuth(role.User, role.Admin))
 	route.Use(middleware.StatusAuth())
+	limiter := middleware.NewLimiter(1, time.Second)
 	{
 		route.POST("/logout", ur.userController.Logout)
-		route.GET("/balance", ur.userController.GetPointsBalance)
+		route.GET("/balance", limiter.Limit(), ur.userController.GetPointsBalance)
 		route.GET("/oper_logs", ur.operLogController.GetOperLogs)
 		route.GET("/points_records", ur.pointsRecordController.GetPointsRecords)
+		route.POST("/audit", limiter.Limit(), ur.userController.AuditAmount)
 	}
 }

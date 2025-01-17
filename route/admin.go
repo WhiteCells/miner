@@ -61,7 +61,5 @@ func (ar *AdminRoute) InitAdminRoute(r *gin.Engine) {
 		route.DELETE("/soft", ar.adminController.DelSoft)
 		route.GET("/soft", ar.adminController.GetSoftByName)
 		route.GET("/all_soft", ar.adminController.GetAllSoft)
-		// test
-		route.POST("incr_bsc_apikey", ar.adminController.IncrBscApiKeyScore)
 	}
 }

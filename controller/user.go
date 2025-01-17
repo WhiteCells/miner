@@ -70,3 +70,22 @@ func (c *UserController) GetPointsBalance(ctx *gin.Context) {
 	}
 	rsp.Success(ctx, http.StatusOK, "get points balance success", balance)
 }
+
+// AuditAmount 查账
+func (c *UserController) AuditAmount(ctx *gin.Context) {
+	resultChan, errorChan := c.userService.AuditAmount(ctx)
+
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		select {
+		case result := <-resultChan:
+			rsp.Success(ctx, http.StatusOK, "success aduit", result)
+		case err := <-errorChan:
+			rsp.Error(ctx, http.StatusInternalServerError, "failed aduit", err.Error())
+		case <-ctx.Done(): // 超时或取消
+			rsp.Error(ctx, http.StatusGatewayTimeout, "request timeout", nil)
+		}
+	}()
+	<-done
+}

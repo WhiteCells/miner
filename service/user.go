@@ -1,6 +1,8 @@
 package service
 
 import (
+	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"math/rand"
@@ -13,6 +15,7 @@ import (
 	"miner/model"
 	"miner/model/info"
 	"miner/utils"
+	"net/http"
 	"strconv"
 	"strings"
 	"time"
@@ -27,6 +30,7 @@ type UserService struct {
 	adminRDB        *redis.AdminRDB
 	operLogDAO      *mysql.OperLogDAO
 	pointsRecordDAO *mysql.PointsRecordDAO
+	bscApiKeyRDB    *redis.BscApiKeyRDB
 }
 
 func NewUserSerivce() *UserService {
@@ -36,6 +40,7 @@ func NewUserSerivce() *UserService {
 		adminRDB:        redis.NewAdminRDB(),
 		operLogDAO:      mysql.NewOperLogDAO(),
 		pointsRecordDAO: mysql.NewPointRecordDAO(),
+		bscApiKeyRDB:    redis.NewBscApiKeyRDB(),
 	}
 }
 
@@ -174,20 +179,6 @@ func (s *UserService) Logout(ctx *gin.Context) error {
 	return nil
 }
 
-// 更新用户信息
-func (s *UserService) UpdateUserInfo(ctx *gin.Context, req *dto.UpdateInfoReq) error {
-	userID, exists := ctx.Value("user_id").(string)
-	if !exists {
-		return errors.New("invalid user_id in context")
-	}
-	user, err := s.userRDB.GetByID(ctx, userID)
-	if err != nil {
-		return err
-	}
-
-	return s.userRDB.Set(ctx, user)
-}
-
 // GetPointsBalance 获取用户积分余额
 func (s *UserService) GetPointsBalance(ctx *gin.Context) (float32, error) {
 	userID, exists := ctx.Value("user_id").(string)
@@ -199,9 +190,145 @@ func (s *UserService) GetPointsBalance(ctx *gin.Context) (float32, error) {
 	if err != nil {
 		return -1, errors.New("user not found")
 	}
+
+	// 取出用户的上次代币余额
+	lastBalanceF := user.LastBalance
+
+	// 获取代币转换率
+	ratio, err := s.adminRDB.GetRechargeRatio(ctx)
+	if err != nil {
+		return 0, err
+	}
+
+	// 获取当前用户代币余额
+	curBalance, err := s.getUserCurBalance(ctx, user.Address)
+	if err != nil {
+		return 0, err
+	}
+
+	curBalanceF64, err := strconv.ParseFloat(curBalance, 32)
+	if err != nil {
+		return 0, errors.New("str conversion failed")
+	}
+
+	recharge := float32(curBalanceF64) - lastBalanceF
+
+	// 兑换比率
+	addPoints := recharge * float32(ratio)
+
+	// 用户增加积分
+	user.RechargePoints += addPoints
+	// 更新余额
+	user.LastBalance += recharge
+
+	// 更新用户
+	s.userRDB.Set(ctx, user)
+
 	// 邀请所获得的积分 + 充值所获的积分
 	points := user.InvitePoints + user.RechargePoints
+
 	return points, nil
+}
+
+func (s *UserService) getUserCurBalance(ctx context.Context, address string) (string, error) {
+	apikey, err := s.bscApiKeyRDB.ZRangeWithScore(ctx)
+	if err != nil {
+		return "", err
+	}
+	// 增加 apikey 使用次数
+	if err := s.bscApiKeyRDB.ZIncrBy(ctx, apikey, 1); err != nil {
+		return "", err
+	}
+	result, err := s.requestBscApi(address, apikey)
+	defer func() {
+		// 减少 apikey 使用次数
+		if err := s.bscApiKeyRDB.ZIncrBy(ctx, apikey, -1); err != nil {
+			return
+		}
+	}()
+	if err != nil {
+		return "", err
+	}
+
+	return result, nil
+}
+
+// AuditAmount
+func (s *UserService) AuditAmount(ctx *gin.Context) (chan string, chan error) {
+	userID, exists := ctx.Value("user_id").(string)
+	if !exists {
+		return nil, nil
+	}
+
+	user, err := s.userRDB.GetByID(ctx, userID)
+	if err != nil {
+		return nil, nil
+	}
+	address := user.Address
+
+	resultChan := make(chan string, 1)
+	errorChan := make(chan error, 1)
+
+	go func() {
+		defer close(resultChan)
+		defer close(errorChan)
+
+		apikey, err := s.bscApiKeyRDB.ZRangeWithScore(ctx)
+		if err != nil {
+			errorChan <- err
+			return
+		}
+		// 增加 apikey 使用次数
+		if err := s.bscApiKeyRDB.ZIncrBy(ctx, apikey, 1); err != nil {
+			errorChan <- err
+			return
+		}
+		result, err := s.requestBscApi(address, apikey)
+		// 减少 apikey 使用次数
+		defer func() {
+			if err := s.bscApiKeyRDB.ZIncrBy(ctx, apikey, -1); err != nil {
+				errorChan <- err
+				return
+			}
+		}()
+		if err != nil {
+			errorChan <- err
+			return
+		}
+
+		resultChan <- result
+	}()
+
+	return resultChan, errorChan
+}
+
+// 调用 bsc api
+func (s *UserService) requestBscApi(address string, apikey string) (string, error) {
+	url := fmt.Sprintf(utils.Config.Bsc.Api, address, apikey)
+	go func() {
+		utils.Logger.Info("generate " + url + "failed")
+	}()
+
+	// client := http.Client{
+	// 	Timeout: 2 * time.Second,
+	// }
+	rsp, err := http.Get(url)
+
+	if err != nil {
+		return "", fmt.Errorf("HTTP request failed: %v", err)
+	}
+	defer rsp.Body.Close()
+
+	if rsp.StatusCode != http.StatusOK {
+		return "", fmt.Errorf("BSC API returned non-200 status code: %d", rsp.StatusCode)
+	}
+
+	var body dto.BscApiRspBody
+	if err := json.NewDecoder(rsp.Body).Decode(&body); err != nil {
+		return "", fmt.Errorf("failed to parse response: %v", err)
+	}
+
+	return body.Result, nil
 }
 
 // 获取用户信息

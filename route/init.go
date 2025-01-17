@@ -16,5 +16,4 @@ func Init(ctx *gin.Engine) {
 	NewWalletRoute().InitWalletRoute(ctx)
 	NewAdminRoute().InitAdminRoute(ctx)
 	NewHiveosRoute().InitHiveosRoute(ctx)
-	NewBscApiKeyRoute().InitBscApiKeyRoute(ctx)
 }
