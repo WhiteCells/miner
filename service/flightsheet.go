@@ -76,11 +76,11 @@ func (s *FlightsheetService) UpdateFlightsheet(ctx context.Context, req *dto.Upd
 		switch key {
 		case "name":
 			flightsheet.Name = value.(string)
-		case "coin_id":
+		case "coin":
 			flightsheet.Coin = value.(string)
-		case "mine_id":
+		case "pool":
 			flightsheet.Pool = value.(string)
-		case "soft_id":
+		case "soft":
 			flightsheet.Soft = value.(string)
 		}
 	}

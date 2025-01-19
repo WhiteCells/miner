@@ -32,7 +32,7 @@ func (c *WalletRDB) Set(ctx context.Context, userID string, wallet *info.Wallet)
 // 删除钱包
 func (c *WalletRDB) Del(ctx context.Context, userID string, walletID string) error {
 	field := MakeField(WalletField, userID)
-	return utils.RDB.Del(ctx, field, walletID)
+	return utils.RDB.HDel(ctx, field, walletID)
 }
 
 // 通过 ID 获取钱包

@@ -22,7 +22,7 @@ func NewOperLogController() *OperLogController {
 
 // GetOperLogs 获取用户日志
 func (c *OperLogController) GetOperLogs(ctx *gin.Context) {
-	userID, exists := ctx.Value("user_id").(int)
+	userID, exists := ctx.Value("user_id").(string)
 	if !exists {
 		rsp.Error(ctx, http.StatusBadRequest, "invalid user_id in context", nil)
 		return

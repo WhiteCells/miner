@@ -2,7 +2,7 @@ package dto
 
 type CreateMinerReq struct {
 	FarmID string `json:"farm_id" binding:"required,min=3,max=20"`
-	Name   string `json:"name" binding:"required,min=3max=20"`
+	Name   string `json:"name" binding:"required,min=3,max=20"`
 }
 
 type DeleteMinerReq struct {

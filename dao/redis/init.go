@@ -60,19 +60,19 @@ func InitAdminRDB() error {
 	if err != nil {
 		return err
 	}
-	_, err = utils.RDB.Client.HSetNX(ctx, field, key, string(userByte)).Result()
+	_, err = utils.RDB.Client.HSet(ctx, field, key, string(userByte)).Result()
 	if err != nil {
 		return err
 	}
 
 	field = MakeKey(NameIDField, name)
-	_, err = utils.RDB.Client.SetNX(ctx, field, uid, 0).Result()
+	_, err = utils.RDB.Client.Set(ctx, field, uid, 0).Result()
 	if err != nil {
 		return err
 	}
 
 	field = MakeKey(EmailIDField, email)
-	_, err = utils.RDB.Client.SetNX(ctx, field, uid, 0).Result()
+	_, err = utils.RDB.Client.Set(ctx, field, uid, 0).Result()
 	if err != nil {
 		return err
 	}

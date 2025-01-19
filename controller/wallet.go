@@ -5,7 +5,6 @@ import (
 	"miner/common/rsp"
 	"miner/service"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -70,22 +69,8 @@ func (c *WalletController) UpdateWallet(ctx *gin.Context) {
 }
 
 // GetUserAllWallet 获取用户所有钱包
-func (c *WalletController) GetWallet(ctx *gin.Context) {
-	pageNum, err := strconv.Atoi(ctx.Query("page_num"))
-	if err != nil || pageNum <= 0 {
-		rsp.Error(ctx, http.StatusBadRequest, "invalid page_numt", nil)
-		return
-	}
-	pageSize, err := strconv.Atoi(ctx.Query("page_size"))
-	if err != nil || pageSize <= 0 {
-		rsp.Error(ctx, http.StatusBadRequest, "invalid page_size", nil)
-		return
-	}
-	query := map[string]interface{}{
-		"page_num":  pageNum,
-		"page_size": pageSize,
-	}
-	wallets, err := c.walletService.GetWallet(ctx, query)
+func (c *WalletController) GetAllWallet(ctx *gin.Context) {
+	wallets, err := c.walletService.GetAllWallet(ctx)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
@@ -96,13 +81,8 @@ func (c *WalletController) GetWallet(ctx *gin.Context) {
 
 // GetUserWalletByID 通过钱包 ID 获取指定钱包
 func (c *WalletController) GetUserWalletByID(ctx *gin.Context) {
-	var req dto.GetUserWalletByIDReq
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
-		return
-	}
-
-	wallet, err := c.walletService.GetUserWalletByID(ctx, &req)
+	walletID := ctx.Query("wallet_id")
+	wallet, err := c.walletService.GetUserWalletByID(ctx, walletID)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return

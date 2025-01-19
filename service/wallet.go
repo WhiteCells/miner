@@ -5,7 +5,6 @@ import (
 	"errors"
 	"miner/common/dto"
 	"miner/dao/redis"
-	"miner/model"
 	"miner/model/info"
 	"miner/utils"
 )
@@ -43,63 +42,47 @@ func (s *WalletService) CreateWallet(ctx context.Context, req *dto.CreateWalletR
 }
 
 func (s *WalletService) DeleteWallet(ctx context.Context, req *dto.DeleteWalletReq) error {
-	_, exists := ctx.Value("user_id").(int)
+	userID, exists := ctx.Value("user_id").(string)
 	if !exists {
 		return errors.New("invalid user_id in context")
 	}
-
-	return nil
+	return s.walletRDB.Del(ctx, userID, req.WalletID)
 }
 
 func (s *WalletService) UpdateWallet(ctx context.Context, req *dto.UpdateWalletReq) error {
-	_, exists := ctx.Value("user_id").(int)
+	userID, exists := ctx.Value("user_id").(string)
 	if !exists {
 		return errors.New("invalid user_id in context")
 	}
-	// wallet, err := s.walletDAO.GetWalletByID(req.WalletID)
-	// if err != nil {
-	// 	return errors.New("wallet not found")
-	// }
-	// for key, value := range req.UpdateInfo {
-	// 	switch key {
-	// 	case "name":
-	// 		wallet.Name = value.(string)
-	// 	case "address":
-	// 		wallet.Address = value.(string)
-	// 	case "coin_type":
-	// 		wallet.CoinType = value.(string)
-	// 	}
-	// }
-	// if err := s.walletDAO.UpdateWallet(wallet); err != nil {
-	// 	return errors.New("update wallet failed")
-	// }
+	wallet, err := s.walletRDB.GetByID(ctx, userID, req.WalletID)
+	if err != nil {
+		return errors.New("wallet not found")
+	}
+
+	for key, value := range req.UpdateInfo {
+		switch key {
+		case "name":
+			wallet.Name = value.(string)
+		case "addr":
+			wallet.Addr = value.(string)
+		case "coin":
+			wallet.Coin = value.(string)
+		}
+	}
+
+	if err := s.walletRDB.Set(ctx, userID, wallet); err != nil {
+		return errors.New("update wallet failed")
+	}
+
 	return nil
 }
 
-func (s *WalletService) GetWallet(ctx context.Context, query map[string]interface{}) (*[]model.Wallet, error) {
-	// userID, exists := ctx.Value("user_id").(int)
-	// if !exists {
-	// 	return nil, -1, errors.New("invalid user_id in context")
-	// }
-	// var wallets *[]model.Wallet
-	// wallets, total, err := s.walletDAO.GetWallet(userID, query)
-	// if err != nil {
-	// 	return nil, -1, errors.New("get user all wallet failed")
-	// }
-	// return wallets, total, nil
-	return nil, nil
+func (s *WalletService) GetAllWallet(ctx context.Context) (*[]info.Wallet, error) {
+	userID := ctx.Value("user_id").(string)
+	return s.walletRDB.GetAll(ctx, userID)
 }
 
-func (s *WalletService) GetUserWalletByID(ctx context.Context, req *dto.GetUserWalletByIDReq) (*model.Wallet, error) {
-	// _, exists := ctx.Value("user_id").(int)
-	// if !exists {
-	// 	return nil, errors.New("invalid user_id in context")
-	// }
-	// var wallet *model.Wallet
-	// wallet, err := s.walletDAO.GetWalletByID(req.WalletID)
-	// if err != nil {
-	// 	return nil, errors.New("get user wallet failed")
-	// }
-	// return wallet, nil
-	return nil, nil
+func (s *WalletService) GetUserWalletByID(ctx context.Context, walletID string) (*info.Wallet, error) {
+	userID := ctx.Value("user_id").(string)
+	return s.walletRDB.GetByID(ctx, userID, walletID)
 }
