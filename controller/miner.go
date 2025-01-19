@@ -79,8 +79,9 @@ func (c *MinerController) GetMiner(ctx *gin.Context) {
 
 // GetMinerByID
 func (c *MinerController) GetMinerByID(ctx *gin.Context) {
+	farmID := ctx.Query("farm_id")
 	minerID := ctx.Query("miner_id")
-	miner, err := c.minerService.GetMinerByID(ctx, minerID)
+	miner, err := c.minerService.GetMinerByID(ctx, farmID, minerID)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return

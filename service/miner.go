@@ -123,12 +123,8 @@ func (s *MinerService) UpdateMiner(ctx context.Context, req *dto.UpdateMinerReq)
 }
 
 // GetMinerByID 获取矿机信息
-func (s *MinerService) GetMinerByID(ctx context.Context, minerID string) (*info.Miner, error) {
-	userID, exists := ctx.Value("user_id").(string)
-	if !exists {
-		return nil, errors.New("invalid user_id in context")
-	}
-	miner, err := s.minerRDB.GetByID(ctx, userID, minerID)
+func (s *MinerService) GetMinerByID(ctx context.Context, farmID string, minerID string) (*info.Miner, error) {
+	miner, err := s.minerRDB.GetByID(ctx, farmID, minerID)
 	return miner, err
 }
 
