@@ -51,6 +51,11 @@ func (c *BscApiKeyRDB) ZRangeWithScore(ctx context.Context) (string, error) {
 	return utils.RDB.ZRangeWithScore(ctx, ApiKeyBscField)
 }
 
+// 获取所有 apikey
+func (c *BscApiKeyRDB) ZRange(ctx context.Context) (*[]string, error) {
+	return utils.RDB.ZRange(ctx, ApiKeyBscField)
+}
+
 // ZScore 获取 apikey 分数
 func (c *BscApiKeyRDB) ZScore(ctx context.Context, apikey string) (float64, error) {
 	return utils.RDB.ZScore(ctx, ApiKeyBscField, apikey)

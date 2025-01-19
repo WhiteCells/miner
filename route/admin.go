@@ -42,6 +42,7 @@ func (ar *AdminRoute) InitAdminRoute(r *gin.Engine) {
 		route.GET("/all_mnemonic", ar.adminController.GetAllMnemonic)
 		route.POST("/bsc_apikey", ar.adminController.AddBscApiKey)
 		route.GET("/bsc_apikey", ar.adminController.GetBscApiKey)
+		route.GET("/all_bsc_apikey", ar.adminController.GetAllBscApiKey)
 		route.DELETE("/bsc_apikey", ar.adminController.DelBscApiKey)
 		// coin
 		route.POST("/coin", ar.adminController.AddCoin)

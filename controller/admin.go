@@ -286,6 +286,16 @@ func (c *AdminController) GetBscApiKey(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "get bsc apikey success", apikey)
 }
 
+// GetAllBscApiKey 获取所有 apikey
+func (c *AdminController) GetAllBscApiKey(ctx *gin.Context) {
+	apikeys, err := c.adminService.GetAllBscApiKey(ctx)
+	if err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, "failed to get bsc apikey", err.Error())
+		return
+	}
+	rsp.Success(ctx, http.StatusOK, "get bsc apikey success", apikeys)
+}
+
 // DelBscApiKey 删除 apikey
 func (c *AdminController) DelBscApiKey(ctx *gin.Context) {
 	var req dto.AdminDelBscApiKeyReq

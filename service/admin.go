@@ -125,6 +125,11 @@ func (s *AdminService) GetBscApiKey(ctx context.Context) (string, error) {
 	return s.bscApiKeyRDB.ZRangeWithScore(ctx)
 }
 
+// GetAllApiKey 获取所有 apikey
+func (s *AdminService) GetAllBscApiKey(ctx context.Context) (*[]string, error) {
+	return s.bscApiKeyRDB.ZRange(ctx)
+}
+
 // DelApiKey 删除 apikey
 func (s *AdminService) DelBscApiKey(ctx context.Context, apikey string) error {
 	return s.bscApiKeyRDB.ZRem(ctx, apikey)
