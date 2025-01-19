@@ -55,7 +55,7 @@ func (c *HiveOsRDB) SetMinerStats(ctx context.Context, rigID string, stats *info
 	return utils.RDB.Set(ctx, key, string(minerStatsByte))
 }
 
-func (c *HiveOsRDB) GetMinerStatus(ctx context.Context, rigID string) (*info.MinerStats, error) {
+func (c *HiveOsRDB) GetMinerStats(ctx context.Context, rigID string) (*info.MinerStats, error) {
 	key := MakeKey(OsStatsField, rigID)
 	minerStatsByte, err := utils.RDB.Get(ctx, key)
 	if err != nil {

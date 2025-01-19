@@ -457,7 +457,7 @@ func (s *HiveOsService) GetTaskStats(ctx context.Context, taskID string) (info.T
 }
 
 func (s *HiveOsService) GetMinerStats(ctx context.Context, rigID string) (*info.MinerStats, error) {
-	return s.hiveOsRDB.GetMinerStatus(ctx, rigID)
+	return s.hiveOsRDB.GetMinerStats(ctx, rigID)
 }
 
 func (s *HiveOsService) GetMinerInfo(ctx context.Context, rigID string) (*info.MinerInfo, error) {

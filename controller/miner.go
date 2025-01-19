@@ -77,6 +77,18 @@ func (c *MinerController) GetMiner(ctx *gin.Context) {
 	rsp.QuerySuccess(ctx, http.StatusOK, "get user all miner success", miners)
 }
 
+// GetMinerByID
+func (c *MinerController) GetMinerByID(ctx *gin.Context) {
+	minerID := ctx.Query("miner_id")
+	miner, err := c.minerService.GetMinerByID(ctx, minerID)
+	if err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
+		return
+	}
+
+	rsp.QuerySuccess(ctx, http.StatusOK, "get miner by id success", miner)
+}
+
 // ApplyFlightsheet 矿机应用飞行表
 func (c *MinerController) ApplyFlightsheet(ctx *gin.Context) {
 	var req dto.ApplyMinerFlightsheetReq
