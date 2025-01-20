@@ -133,9 +133,9 @@ func (s *UserService) Login(ctx *gin.Context, req *dto.LoginReq) (string, *info.
 	}
 
 	// 检查IP是否变化
-	if user.LastLoginIP != "" && user.LastLoginIP != ctx.ClientIP() {
-		return "", nil, errors.New("new ip detected")
-	}
+	//if user.LastLoginIP != "" && user.LastLoginIP != ctx.ClientIP() {
+	//	return "", nil, errors.New("new ip detected")
+	//}
 
 	// 生成 JWT token
 	token, err := utils.GenerateToken(user.ID, user.Name, 24)

@@ -45,6 +45,7 @@ func (s *MinerService) CreateMiner(ctx context.Context, req *dto.CreateMinerReq)
 	}
 
 	rigID, err := s.generateRigID(ctx, 8)
+	//log.Panicln("rigId", rigID)
 	if err != nil {
 		return nil, err
 	}
@@ -68,6 +69,8 @@ func (s *MinerService) CreateMiner(ctx context.Context, req *dto.CreateMinerReq)
 			ApiHiveOsUrls: hiveOsUrl,
 			WorkerName:    req.Name,
 			FarmID:        req.FarmID,
+			RigID:         rigID,
+			RigPasswd:     pass,
 		},
 	}
 

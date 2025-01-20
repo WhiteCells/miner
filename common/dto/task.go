@@ -7,5 +7,5 @@ type PostTaskReq struct {
 	MinerID string        `json:"miner_id" binding:"required,max=20"`
 	RigID   string        `json:"rig_id" binding:"required,max=8"`
 	Type    info.TaskType `json:"type" binding:"required,oneof=cmd config"`
-	Content string        `json:"content" binding:"required,max=20"`
+	Content string        `json:"content" binding:"required,max=40"`
 }

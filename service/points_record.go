@@ -23,7 +23,7 @@ func NewPointRecordService() *PointsRecordService {
 
 // GetPointsRecords 获取用户积分记录
 func (s *PointsRecordService) GetPointsRecords(ctx *gin.Context) (*[]model.PointsRecord, int64, error) {
-	userID, exists := ctx.Value("user_id").(int)
+	userID, exists := ctx.Value("user_id").(string)
 	if !exists {
 		return nil, -1, errors.New("invalid user_id in context")
 	}

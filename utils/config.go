@@ -10,9 +10,10 @@ import (
 
 type ServerConfig struct {
 	Server struct {
-		Host string `mapstructure:"host"`
-		Port int    `mapstructure:"port"`
-		Mode string `mapstructure:"mode"`
+		HiveOsUrl string `mapstructure:"hive_os_url"`
+		Host      string `mapstructure:"host"`
+		Port      int    `mapstructure:"port"`
+		Mode      string `mapstructure:"mode"`
 	} `mapstructure:"server"`
 
 	MySQL struct {
@@ -202,9 +203,11 @@ SMART_MODE=%s
 
 // 生成 hiveosurl
 func GenerateHiveOsUrl() string {
-	host := Config.Server.Host
-	port := Config.Server.Port
-	return fmt.Sprintf("http://%s:%d/hiveos", host, port)
+	//host := Config.Server.Host
+	//port := Config.Server.Port
+	//return fmt.Sprintf("http://%s:%d/hiveos", host, port)
+	hiveOsUrl := Config.Server.HiveOsUrl
+	return fmt.Sprintf(hiveOsUrl)
 }
 
 func GeneratePort() string {
