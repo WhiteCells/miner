@@ -70,7 +70,8 @@ func (c *WalletController) UpdateWallet(ctx *gin.Context) {
 
 // GetUserAllWallet 获取用户所有钱包
 func (c *WalletController) GetAllWallet(ctx *gin.Context) {
-	wallets, err := c.walletService.GetAllWallet(ctx)
+	coin := ctx.Query("coin")
+	wallets, err := c.walletService.GetAllWalletByCoin(ctx, coin)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
@@ -89,4 +90,15 @@ func (c *WalletController) GetUserWalletByID(ctx *gin.Context) {
 	}
 
 	rsp.Success(ctx, http.StatusOK, "get user wallet by id success", wallet)
+}
+
+// GetAllCoin
+func (c *WalletController) GetAllWalletAllCoin(ctx *gin.Context) {
+	wallets, err := c.walletService.GetAllWalletAllCoin(ctx)
+	if err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
+		return
+	}
+
+	rsp.QuerySuccess(ctx, http.StatusOK, "get user all wallet success", wallets)
 }

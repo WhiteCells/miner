@@ -64,3 +64,23 @@ func (c *WalletRDB) GetAll(ctx context.Context, userID string) (*[]info.Wallet, 
 	}
 	return &wallets, nil
 }
+
+// 获取用户的所有钱包
+func (c *WalletRDB) GetAllByCoin(ctx context.Context, userID string, coin string) (*[]info.Wallet, error) {
+	field := MakeField(WalletField, userID)
+	idInfo, err := utils.RDB.HGetAll(ctx, field)
+	if err != nil {
+		return nil, err
+	}
+	var wallets []info.Wallet
+	for walletID := range idInfo {
+		wallet, err := c.GetByID(ctx, userID, walletID)
+		if wallet.Coin == coin {
+			if err != nil {
+				return nil, err
+			}
+			wallets = append(wallets, *wallet)
+		}
+	}
+	return &wallets, nil
+}

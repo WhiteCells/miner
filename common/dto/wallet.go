@@ -2,7 +2,7 @@ package dto
 
 type CreateWalletReq struct {
 	Name string `json:"name" binding:"required,min=3,max=20"`
-	Addr string `json:"addr" binding:"required,len=42"`
+	Addr string `json:"addr" binding:"required,min=1,max=256"`
 	Coin string `json:"coin" binding:"required,min=2,max=20"`
 }
 

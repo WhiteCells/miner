@@ -86,3 +86,22 @@ func (s *WalletService) GetUserWalletByID(ctx context.Context, walletID string) 
 	userID := ctx.Value("user_id").(string)
 	return s.walletRDB.GetByID(ctx, userID, walletID)
 }
+
+func (s *WalletService) GetAllWalletByCoin(ctx context.Context, coin string) (*[]info.Wallet, error) {
+	userID := ctx.Value("user_id").(string)
+	if coin == "" {
+		return s.walletRDB.GetAll(ctx, userID)
+	}
+	return s.walletRDB.GetAllByCoin(ctx, userID, coin)
+}
+
+// GetAllWalletAllCoin
+func (s *WalletService) GetAllWalletAllCoin(ctx context.Context) (*[]string, error) {
+	//userID := ctx.Value("user_id").(string)
+	// todo 返回[]string coin列表
+	return nil, nil
+	//if coin == "" {
+	//	return s.walletRDB.GetAll(ctx, userID)
+	//}
+	//return s.walletRDB.GetAllByCoin(ctx, userID, coin)
+}
