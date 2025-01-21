@@ -6,6 +6,7 @@ type HelloReq struct {
 	Jsonrpc string `json:"jsonrpc"`
 	ID      int    `json:"id"`
 	Params  struct {
+		FarmHash      string   `json:"farm_hash"`
 		RigID         string   `json:"rig_id"`
 		Passwd        string   `json:"passwd"`
 		ServerUrl     string   `json:"server_url"`
@@ -45,7 +46,7 @@ type HelloReq struct {
 			Cores string `json:"cores"`
 			Aes   string `json:"aes"`
 			CpuID string `json:"cpu_id"`
-		}
+		} `json:"cpu"`
 		DiskModel         string `json:"disk_model"`
 		ImageVersion      string `json:"image_version"`
 		Kernel            string `json:"kernel"`
@@ -59,7 +60,7 @@ type HelloReq struct {
 	} `json:"params"`
 }
 
-type HiveosReq struct {
+type HiveOsReq struct {
 	Method string `json:"method"` // 请求方法 hello、stats 或 message
 	Params struct {
 		V      int    `json:"v"`      //
@@ -97,7 +98,7 @@ type HiveosReq struct {
 }
 
 // message
-type HiveosResReq struct {
+type HiveOsResReq struct {
 	Method  string `json:"method"`
 	Jsonrpc string `json:"jsonrpc"`
 	ID      int    `json:"id"`
@@ -123,5 +124,19 @@ type ServerRsp struct {
 		Command   string `json:"command"`
 		Exec      string `json:"exec"`
 		Confseq   int    `json:"confseq"`
+	} `json:"result"`
+}
+
+type ServerHashRsp struct {
+	Jsonrpc string `json:"jsonrpc"`
+	ID      int    `json:"id"`
+	Result  struct {
+		RigName         string `json:"rig_name"`
+		RespositoryList string `json:"respository_list"`
+		Config          string `json:"config"`
+		Wallet          string `json:"wallet"`
+		NvidiaOc        string `json:"nvidia_oc"`
+		Autofan         string `json:"autofan"`
+		Confseq         int    `json:"confseq"`
 	} `json:"result"`
 }

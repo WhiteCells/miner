@@ -19,7 +19,7 @@ func NewHiveosRoute() *HiveOsRoute {
 }
 
 func (hr *HiveOsRoute) InitHiveosRoute(r *gin.Engine) {
-	route := r.Group("/hiveos")
+	route := r.Group("")
 	{
 		route.POST("/worker/api", hr.hiveOsController.Poll)
 		route.Use(middleware.JWTAuth())

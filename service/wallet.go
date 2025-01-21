@@ -97,11 +97,18 @@ func (s *WalletService) GetAllWalletByCoin(ctx context.Context, coin string) (*[
 
 // GetAllWalletAllCoin
 func (s *WalletService) GetAllWalletAllCoin(ctx context.Context) (*[]string, error) {
-	//userID := ctx.Value("user_id").(string)
-	// todo 返回[]string coin列表
-	return nil, nil
-	//if coin == "" {
-	//	return s.walletRDB.GetAll(ctx, userID)
-	//}
-	//return s.walletRDB.GetAllByCoin(ctx, userID, coin)
+	userID := ctx.Value("user_id").(string)
+	var coins []string
+	wallets, err := s.walletRDB.GetAll(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	contaion := make(map[string]bool)
+	for wallet := range *wallets {
+		if contaion[(*wallets)[wallet].Coin] {
+			continue
+		}
+		coins = append(coins, (*wallets)[wallet].Coin)
+	}
+	return &coins, nil
 }

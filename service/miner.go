@@ -55,6 +55,8 @@ func (s *MinerService) CreateMiner(ctx context.Context, req *dto.CreateMinerReq)
 		return nil, err
 	}
 
+	hash := utils.GenerateFarmHash(uid + rigID + pass)
+
 	hiveOsUrl := utils.GenerateHiveOsUrl()
 
 	// 创建矿机
@@ -64,6 +66,7 @@ func (s *MinerService) CreateMiner(ctx context.Context, req *dto.CreateMinerReq)
 		RigID: rigID,
 		Pass:  pass,
 		Perm:  perm.MinerOwner,
+		Hash:  hash,
 		HiveOsConfig: utils.HiveOsConfig{
 			HiveOsUrl:     hiveOsUrl,
 			ApiHiveOsUrls: hiveOsUrl,
@@ -79,7 +82,13 @@ func (s *MinerService) CreateMiner(ctx context.Context, req *dto.CreateMinerReq)
 		return nil, err
 	}
 
+	// 建立关系（需要改为事务）
 	if err = s.hiveosRDB.SetRig(ctx, rigID, req.FarmID, miner.ID); err != nil {
+		return nil, err
+	}
+
+	// 建立关系（需要改为事务）
+	if err = s.hiveosRDB.SetRigFarmHash(ctx, hash, req.FarmID, miner.ID); err != nil {
 		return nil, err
 	}
 

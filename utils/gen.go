@@ -2,6 +2,8 @@ package utils
 
 import (
 	"crypto/rand"
+	"crypto/sha1"
+	"encoding/hex"
 	"errors"
 	"math/big"
 
@@ -31,4 +33,13 @@ func GenerateUID() (string, error) {
 	}
 	id := node.Generate() // 不会以 0 开头
 	return id.String(), nil
+}
+
+// 28a0259f06d50b134d1c90bd11521ceb0d9fc282
+// 3c658db850c04e9728e0ff51f5116998af8e1ae5
+func GenerateFarmHash(data string) string {
+	hash := sha1.New()
+	hash.Write([]byte(data))
+	rawHash := hash.Sum(nil)
+	return hex.EncodeToString(rawHash)
 }

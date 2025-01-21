@@ -94,11 +94,11 @@ func (c *WalletController) GetUserWalletByID(ctx *gin.Context) {
 
 // GetAllCoin
 func (c *WalletController) GetAllWalletAllCoin(ctx *gin.Context) {
-	wallets, err := c.walletService.GetAllWalletAllCoin(ctx)
+	coins, err := c.walletService.GetAllWalletAllCoin(ctx)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
 
-	rsp.QuerySuccess(ctx, http.StatusOK, "get user all wallet success", wallets)
+	rsp.QuerySuccess(ctx, http.StatusOK, "get user all wallet success", coins)
 }

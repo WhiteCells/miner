@@ -203,11 +203,11 @@ SMART_MODE=%s
 
 // 生成 hiveosurl
 func GenerateHiveOsUrl() string {
-	//host := Config.Server.Host
-	//port := Config.Server.Port
-	//return fmt.Sprintf("http://%s:%d/hiveos", host, port)
-	hiveOsUrl := Config.Server.HiveOsUrl
-	return fmt.Sprintf(hiveOsUrl)
+	host := Config.Server.Host
+	port := Config.Server.Port
+	return fmt.Sprintf("http://%s:%d", host, port)
+	// hiveOsUrl := Config.Server.HiveOsUrl
+	// return fmt.Sprintf(hiveOsUrl)
 }
 
 func GeneratePort() string {

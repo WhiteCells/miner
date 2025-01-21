@@ -30,7 +30,6 @@ func (c *HiveOsRDB) SetRig(ctx context.Context, rigID string, farmID string, min
 // 获取 OS 矿机
 func (c *HiveOsRDB) GetRigMinerID(ctx context.Context, rigID string) (string, error) {
 	key := MakeField(OsField, rigID)
-	//log.Fatalln(key)
 	return utils.RDB.Get(ctx, key)
 }
 
@@ -94,4 +93,21 @@ func (c *HiveOsRDB) GetMinerInfo(ctx context.Context, rigID string) (*info.Miner
 		return nil, err
 	}
 	return &minerInfo, nil
+}
+
+// 矿场 hash 作为索引
+// +-------------+------------------------+
+// | key         | value                  |
+// +-------------+------------------------+
+// | os:<hash>   | <farm_id>:<miner_id>   |
+// +-------------+------------------------+
+func (c *HiveOsRDB) SetRigFarmHash(ctx context.Context, farmHash string, farmID string, minerID string) error {
+	key := MakeKey(OsFarmHashField, farmHash)
+	val := MakeVal(farmID, minerID)
+	return utils.RDB.Set(ctx, key, val)
+}
+
+func (c *HiveOsRDB) GetRigFarmMinerByHash(ctx context.Context, farmHash string) (string, error) {
+	key := MakeKey(OsFarmHashField, farmHash)
+	return utils.RDB.Get(ctx, key)
 }

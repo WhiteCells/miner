@@ -30,6 +30,7 @@ var OsStatsField = "os:stats"
 var OsMinerField = "os_miner"
 var TaskIDField = "task_id"
 var TaskInfoField = "task_info"
+var OsFarmHashField = "os:farm_hash"
 
 // Mnemonic
 var Mnemonic = "mnemonic"
