@@ -103,12 +103,13 @@ func (s *WalletService) GetAllWalletAllCoin(ctx context.Context) (*[]string, err
 	if err != nil {
 		return nil, err
 	}
-	contaion := make(map[string]bool)
+	contation := make(map[string]bool)
 	for wallet := range *wallets {
-		if contaion[(*wallets)[wallet].Coin] {
+		if contation[(*wallets)[wallet].Coin] {
 			continue
 		}
 		coins = append(coins, (*wallets)[wallet].Coin)
+		contation[(*wallets)[wallet].Coin] = true
 	}
 	return &coins, nil
 }
