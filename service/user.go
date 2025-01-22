@@ -28,6 +28,7 @@ type UserService struct {
 	userDAO         *mysql.UserDAO
 	userRDB         *redis.UserRDB
 	adminRDB        *redis.AdminRDB
+	coinRDB         *redis.CoinRDB
 	operLogDAO      *mysql.OperLogDAO
 	pointsRecordDAO *mysql.PointsRecordDAO
 	bscApiKeyRDB    *redis.BscApiKeyRDB
@@ -38,6 +39,7 @@ func NewUserSerivce() *UserService {
 		userDAO:         mysql.NewUserDAO(),
 		userRDB:         redis.NewUserRDB(),
 		adminRDB:        redis.NewAdminRDB(),
+		coinRDB:         redis.NewCoinRDB(),
 		operLogDAO:      mysql.NewOperLogDAO(),
 		pointsRecordDAO: mysql.NewPointRecordDAO(),
 		bscApiKeyRDB:    redis.NewBscApiKeyRDB(),
@@ -82,7 +84,7 @@ func (s *UserService) Register(ctx *gin.Context, req *dto.RegisterReq) (string, 
 		Address:     address,
 		Email:       req.Email,
 		Role:        role.User,
-		LastBalance: 0.0,
+		LastBalance: 0,
 		Status:      status.UserOn,
 		InviteCode:  uid,
 		Key:         key,
@@ -302,6 +304,18 @@ func (s *UserService) AuditAmount(ctx *gin.Context) (chan string, chan error) {
 	return resultChan, errorChan
 }
 
+func (s *UserService) GetCoins(ctx context.Context) (*[]string, error) {
+	infos, err := s.coinRDB.GetAll(ctx)
+	if err != nil {
+		return nil, err
+	}
+	var coins []string
+	for _, info := range *infos {
+		coins = append(coins, info.Name)
+	}
+	return &coins, nil
+}
+
 // 调用 bsc api
 func (s *UserService) requestBscApi(address string, apikey string) (string, error) {
 	url := fmt.Sprintf(utils.Config.Bsc.Api, address, apikey)
@@ -337,9 +351,13 @@ func (s *UserService) GetUserInfo(ctx *gin.Context, userID string) (*info.User, 
 }
 
 // 获取用户充值地址
-// func (s *UserService) GetUserAddress(ctx *gin.Context, userID string) (string, error) {
-// 	return s.userRDB.
-// }
+func (s *UserService) GetUserAddress(ctx *gin.Context, userID string) (string, error) {
+	user, err := s.GetUserInfo(ctx, userID)
+	if err != nil {
+		return "", err
+	}
+	return user.Address, nil
+}
 
 // 验证密码
 func (s *UserService) validPassword(user *info.User, password string) bool {

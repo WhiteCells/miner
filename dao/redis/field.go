@@ -8,18 +8,19 @@ var AdminRechargeRatioField = "recharge_ratio"
 var AdminGfsField = "gfs"
 
 // User
-var UserField = "user"
-var NameIDField = "name_id"
-var EmailIDField = "email_id"
+var UserField = "user:user"
+var NameIDField = "user:name"
+var EmailIDField = "user:email"
 var FarmField = "farm"
+var FarmHashField = "farm:hash"
 var MinerField = "miner"
 var FsField = "fs"
 var WalletField = "wallet"
 var MpField = "mp"
 
-var MinerFsField = "miner_fs"
-var FsWalletField = "fs_wallet"
-var FsMinepoolField = "fs_minepool"
+var MinerFsField = "miner:fs"
+var FsWalletField = "fs:wallet"
+var FsPoolField = "fs:pool"
 
 var BanToken = "ban_token"
 
@@ -27,9 +28,9 @@ var BanToken = "ban_token"
 var OsField = "os"
 var OsInfoField = "os:info"
 var OsStatsField = "os:stats"
-var OsMinerField = "os_miner"
-var TaskIDField = "task_id"
-var TaskInfoField = "task_info"
+var OsMinerField = "os:miner"
+var TaskIDField = "task:id"
+var TaskInfoField = "task:info"
 var OsFarmHashField = "os:farm_hash"
 
 // Mnemonic

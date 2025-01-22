@@ -1,6 +1,6 @@
 package dto
 
-// Hiveos 轮询
+// hello
 type HelloReq struct {
 	Method  string `json:"method"`
 	Jsonrpc string `json:"jsonrpc"`
@@ -60,6 +60,7 @@ type HelloReq struct {
 	} `json:"params"`
 }
 
+// stats
 type HiveOsReq struct {
 	Method string `json:"method"` // 请求方法 hello、stats 或 message
 	Params struct {
@@ -112,6 +113,7 @@ type HiveOsResReq struct {
 	} `json:"params"`
 }
 
+// hello rsp
 type ServerRsp struct {
 	ID      int    `json:"id"`
 	Jsonrpc string `json:"jsonrpc"`
@@ -127,6 +129,7 @@ type ServerRsp struct {
 	} `json:"result"`
 }
 
+// hello rsp, hello with hash
 type ServerHashRsp struct {
 	Jsonrpc string `json:"jsonrpc"`
 	ID      int    `json:"id"`

@@ -31,17 +31,29 @@ func (s *FarmService) CreateFarm(ctx context.Context, req *dto.CreateFarmReq) (*
 	if err != nil {
 		return nil, err
 	}
+
+	hash := utils.GenerateFarmHash(req.Name)
+
 	farm := &info.Farm{
 		ID:       id,
 		Name:     req.Name,
 		TimeZone: req.TimeZone,
 		Perm:     perm.FarmOwner,
+		Hash:     hash,
 	}
 
 	// 创建矿场
-	err = s.farmRDB.Set(ctx, userID, farm, perm.FarmOwner)
+	if err = s.farmRDB.Set(ctx, userID, farm, perm.FarmOwner); err != nil {
+		return nil, err
+	}
 
-	return farm, err
+	// 建立 hash-> farmID 的映射
+	if err := s.farmRDB.SetFarmHashMapping(ctx, hash, userID, farm.ID); err != nil {
+		defer s.farmRDB.Del(ctx, userID, farm.ID)
+		return nil, err
+	}
+
+	return farm, nil
 }
 
 // DeleteFarm 删除矿场
@@ -62,6 +74,7 @@ func (s *FarmService) DeleteFarm(ctx context.Context, req *dto.DeleteFarmReq) er
 }
 
 // UpdateFarm 更新矿场信息
+// 需要修改
 func (s *FarmService) UpdateFarm(ctx context.Context, req *dto.UpdateFarmReq) error {
 	userID, exists := ctx.Value("user_id").(string)
 	if !exists {
@@ -97,6 +110,49 @@ func (s *FarmService) UpdateFarm(ctx context.Context, req *dto.UpdateFarmReq) er
 
 	// 更新
 	return s.farmRDB.Set(ctx, userID, farm, farm.Perm)
+}
+
+// UpdateFarmHash 修改矿场 Hash
+func (s *FarmService) UpdateFarmHash(ctx context.Context, req *dto.UpdateFarmHashReq) error {
+	userID, exists := ctx.Value("user_id").(string)
+	if !exists {
+		return errors.New("invalid user_id in context")
+	}
+	// 权限
+	if !s.validPerm(ctx, userID, req.FarmID, []perm.FarmPerm{perm.FarmOwner, perm.FarmManager}) {
+		return errors.New("permission denied")
+	}
+
+	// Hash 不能已经存在
+	if s.farmRDB.ExistsFarmHash(ctx, req.Hash) {
+		return errors.New("farm hash already exists")
+	}
+
+	// 查找矿场
+	farm, err := s.farmRDB.GetByID(ctx, userID, req.FarmID)
+	if err != nil {
+		return errors.New("get farm failed")
+	}
+
+	oldHash := farm.Hash
+	farm.Hash = req.Hash
+
+	// 更新 farm
+	if err := s.farmRDB.Set(ctx, userID, farm, farm.Perm); err != nil {
+		return errors.New("update farm hash failed")
+	}
+
+	// 删除原有映射
+	if err := s.farmRDB.DelFarmHashMapping(ctx, oldHash); err != nil {
+		return errors.New("delete farm hash mapping failed")
+	}
+
+	// 更新映射
+	if err := s.farmRDB.SetFarmHashMapping(ctx, req.Hash, userID, req.FarmID); err != nil {
+		return errors.New("set farm hash mapping failed")
+	}
+
+	return nil
 }
 
 // GetFarm 获取用户的所有矿场信息

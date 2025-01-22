@@ -68,6 +68,22 @@ func (c *FarmController) UpdateFarm(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "update farm success", nil)
 }
 
+// UpdateFarmHash 更新矿场hash
+func (c *FarmController) UpdateFarmHash(ctx *gin.Context) {
+	var req dto.UpdateFarmHashReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
+		return
+	}
+
+	if err := c.farmService.UpdateFarmHash(ctx, &req); err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
+		return
+	}
+
+	rsp.Success(ctx, http.StatusOK, "update farm hash success", nil)
+}
+
 // GetFarm 获取用户所有的矿场
 func (c *FarmController) GetFarm(ctx *gin.Context) {
 	farms, err := c.farmService.GetFarm(ctx)

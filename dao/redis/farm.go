@@ -6,6 +6,7 @@ import (
 	"miner/common/perm"
 	"miner/model/info"
 	"miner/utils"
+	"strings"
 )
 
 type FarmRDB struct{}
@@ -98,4 +99,36 @@ func (c *FarmRDB) AddMember(ctx context.Context, userID string, farmID string, m
 func (c *FarmRDB) DelMember(ctx context.Context, userID string, farmID string, memID string) error {
 	field := MakeField(FarmField, memID)
 	return utils.RDB.HDel(ctx, field, farmID)
+}
+
+// +--------------------+---------------------+
+// | key                | val                 |
+// +--------------------+---------------------+
+// | farm:hash:<hash>   | <user_id>:<farm_id> |
+// +--------------------+---------------------+
+func (c *FarmRDB) SetFarmHashMapping(ctx context.Context, farmHash string, userID string, farmID string) error {
+	key := MakeKey(FarmHashField, farmHash)
+	val := MakeVal(userID, farmID)
+	return utils.RDB.Set(ctx, key, val)
+}
+
+func (c *FarmRDB) DelFarmHashMapping(ctx context.Context, farmHash string) error {
+	key := MakeKey(FarmHashField, farmHash)
+	return utils.RDB.Del(ctx, key)
+}
+
+func (s *FarmRDB) GetUserAndFarmIDByHash(ctx context.Context, farmHash string) (userID string, farmID string, err error) {
+	key := MakeKey(FarmHashField, farmHash)
+	farmMinerID, err := utils.RDB.Get(ctx, key)
+	if err != nil {
+		return "", "", err
+	}
+	parts := strings.Split(farmMinerID, ":")
+	userID, farmID = parts[0], parts[1]
+	return userID, farmID, err
+}
+
+func (s *FarmRDB) ExistsFarmHash(ctx context.Context, farmHash string) bool {
+	key := MakeKey(FarmHashField, farmHash)
+	return utils.RDB.Exists(ctx, key)
 }

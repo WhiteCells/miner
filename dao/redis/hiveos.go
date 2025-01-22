@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"miner/model/info"
 	"miner/utils"
+	"strings"
 )
 
 type HiveOsRDB struct {
@@ -21,16 +22,28 @@ func NewHiveOsRDB() *HiveOsRDB {
 // +-------------+------------------------+
 // | os:<rig_id> | <farm_id>:<miner_id>   |
 // +-------------+------------------------+
-func (c *HiveOsRDB) SetRig(ctx context.Context, rigID string, farmID string, minerID string) error {
+func (c *HiveOsRDB) SetRigMapping(ctx context.Context, rigID string, farmID string, minerID string) error {
 	key := MakeField(OsField, rigID)
 	val := MakeVal(farmID, minerID)
 	return utils.RDB.Set(ctx, key, val)
 }
 
-// 获取 OS 矿机
-func (c *HiveOsRDB) GetRigMinerID(ctx context.Context, rigID string) (string, error) {
+// 删除映射关系
+func (c *HiveOsRDB) DelRigMapping(ctx context.Context, rigID string) error {
 	key := MakeField(OsField, rigID)
-	return utils.RDB.Get(ctx, key)
+	return utils.RDB.Del(ctx, key)
+}
+
+// 获取 OS 矿机对应的 farmID 及 minerID
+func (c *HiveOsRDB) GetRigFarmAndMinerID(ctx context.Context, rigID string) (farmID string, minerID string, err error) {
+	key := MakeField(OsField, rigID)
+	farmMinerID, err := utils.RDB.Get(ctx, key)
+	if err != nil {
+		return "", "", err
+	}
+	parts := strings.Split(farmMinerID, ":")
+	farmID, minerID = parts[0], parts[1]
+	return farmID, minerID, err
 }
 
 // rig_id 是否存在
@@ -101,13 +114,13 @@ func (c *HiveOsRDB) GetMinerInfo(ctx context.Context, rigID string) (*info.Miner
 // +-------------+------------------------+
 // | os:<hash>   | <farm_id>:<miner_id>   |
 // +-------------+------------------------+
-func (c *HiveOsRDB) SetRigFarmHash(ctx context.Context, farmHash string, farmID string, minerID string) error {
-	key := MakeKey(OsFarmHashField, farmHash)
-	val := MakeVal(farmID, minerID)
-	return utils.RDB.Set(ctx, key, val)
-}
+// func (c *HiveOsRDB) SetRigFarmHash(ctx context.Context, farmHash string, farmID string, minerID string) error {
+// 	key := MakeKey(OsFarmHashField, farmHash)
+// 	val := MakeVal(farmID, minerID)
+// 	return utils.RDB.Set(ctx, key, val)
+// }
 
-func (c *HiveOsRDB) GetRigFarmMinerByHash(ctx context.Context, farmHash string) (string, error) {
-	key := MakeKey(OsFarmHashField, farmHash)
-	return utils.RDB.Get(ctx, key)
-}
+// func (c *HiveOsRDB) GetRigFarmMinerByHash(ctx context.Context, farmHash string) (string, error) {
+// 	key := MakeKey(OsFarmHashField, farmHash)
+// 	return utils.RDB.Get(ctx, key)
+// }

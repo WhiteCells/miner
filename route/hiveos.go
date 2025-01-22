@@ -23,7 +23,7 @@ func (hr *HiveOsRoute) InitHiveosRoute(r *gin.Engine) {
 	{
 		route.POST("/worker/api", hr.hiveOsController.Poll)
 		route.Use(middleware.JWTAuth())
-		route.Use(middleware.IPAuth())
+		// route.Use(middleware.IPAuth())
 		route.Use(middleware.RoleAuth(role.User, role.Admin))
 		route.Use(middleware.StatusAuth())
 		route.POST("/task", hr.hiveOsController.PostTask)

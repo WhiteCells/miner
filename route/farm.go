@@ -24,7 +24,7 @@ func (fr *FarmRoute) InitFarmRoute(r *gin.Engine) {
 	// 测试 limiter
 	limiter := middleware.NewLimiter(10, time.Minute) // 每个用户每分钟请求限制 10 次请求
 	route.Use(middleware.JWTAuth())
-	route.Use(middleware.IPAuth())
+	// route.Use(middleware.IPAuth())
 	route.Use(middleware.RoleAuth(role.User, role.Admin))
 	route.Use(middleware.StatusAuth())
 	route.Use(limiter.Limit())
@@ -35,5 +35,7 @@ func (fr *FarmRoute) InitFarmRoute(r *gin.Engine) {
 		route.GET("", fr.farmController.GetFarm)
 		route.PUT("/apply_fs", fr.farmController.ApplyFs)
 		route.PUT("/transfer", fr.farmController.Transfer)
+		route.PUT("/hash", fr.farmController.UpdateFarmHash)
+		// route.PUT("/farm_hash", fr.farmController.UpdateFarmHash)
 	}
 }

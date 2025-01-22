@@ -21,7 +21,7 @@ func NewFlightsheetRoute() *FlightsheetRoute {
 func (fr *FlightsheetRoute) InitFlightsheetRoute(r *gin.Engine) {
 	route := r.Group("/fs")
 	route.Use(middleware.JWTAuth())
-	route.Use(middleware.IPAuth())
+	// route.Use(middleware.IPAuth())
 	route.Use(middleware.RoleAuth(role.User, role.Admin))
 	route.Use(middleware.StatusAuth())
 	{

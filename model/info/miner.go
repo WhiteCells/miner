@@ -12,7 +12,6 @@ type Miner struct {
 	Pass  string         `json:"pass"`
 	FS    string         `json:"fs"`
 	Perm  perm.MinerPerm `json:"perm"`
-	Hash  string         `json:"hash"`
 
 	// HiveOS 单独客户端配置
 	HiveOsConfig  utils.HiveOsConfig  `json:"hive_os_config"`

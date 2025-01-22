@@ -14,6 +14,11 @@ type UpdateFarmReq struct {
 	UpdateInfo map[string]interface{} `json:"update_info" binding:"required"`
 }
 
+type UpdateFarmHashReq struct {
+	FarmID string `json:"farm_id" binding:"required"`
+	Hash   string `json:"hash" binding:"required,len=40"`
+}
+
 type ApplyFarmFlightsheetReq struct {
 	FarmID        string `json:"farm_id" binding:"required"`
 	FlightsheetID string `json:"fs_id" binding:"required"`

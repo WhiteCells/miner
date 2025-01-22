@@ -77,12 +77,12 @@ func (c *FsRDB) ApplyWallet(ctx context.Context, userID, fsID, walletID string) 
 }
 
 // 应用矿池
-// +----------------------+----------------+
-// | key                  |   val          |
-// +----------------------+----------------+
-// | fs_minepool:<fs_id>  | <minepool_id>  |
-// +----------------------+----------------+
+// +------------------+----------------+
+// | key              |   val          |
+// +------------------+----------------+
+// | fs:pool:<fs_id>  | <pool_id>      |
+// +------------------+----------------+
 func (c *FsRDB) ApplyMinepool(ctx context.Context, userID, fsID, minepoolID string) error {
-	key := MakeKey(FsMinepoolField, fsID)
+	key := MakeKey(FsPoolField, fsID)
 	return utils.RDB.Set(ctx, key, minepoolID)
 }

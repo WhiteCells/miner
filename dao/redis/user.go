@@ -36,8 +36,8 @@ func (c *UserRDB) Set(ctx context.Context, user *info.User) error {
 		return err
 	}
 
-	nKey := MakeField("name_id", user.Name)
-	eKey := MakeField("email_id", user.Email)
+	nKey := MakeField(NameIDField, user.Name)
+	eKey := MakeField(EmailIDField, user.Email)
 
 	pipe := utils.RDB.Client.TxPipeline()
 
@@ -57,8 +57,8 @@ func (c *UserRDB) Del(ctx context.Context, userID string) error {
 		return err
 	}
 
-	nKey := MakeKey("name_id", user.Name)
-	eKey := MakeKey("email_id", user.Email)
+	nKey := MakeField(NameIDField, user.Name)
+	eKey := MakeField(EmailIDField, user.Email)
 
 	pipe := utils.RDB.Client.TxPipeline()
 

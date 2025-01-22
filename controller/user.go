@@ -89,3 +89,22 @@ func (c *UserController) AuditAmount(ctx *gin.Context) {
 	}()
 	<-done
 }
+
+func (c *UserController) GetUserAddress(ctx *gin.Context) {
+	userID := ctx.GetString("user_id")
+	address, err := c.userService.GetUserAddress(ctx, userID)
+	if err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
+		return
+	}
+	rsp.Success(ctx, http.StatusOK, "get user address success", address)
+}
+
+func (c *UserController) GetCoins(ctx *gin.Context) {
+	coins, err := c.userService.GetCoins(ctx)
+	if err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
+		return
+	}
+	rsp.Success(ctx, http.StatusOK, "get coins success", coins)
+}

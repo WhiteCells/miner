@@ -45,7 +45,6 @@ func (s *MinerService) CreateMiner(ctx context.Context, req *dto.CreateMinerReq)
 	}
 
 	rigID, err := s.generateRigID(ctx, 8)
-	//log.Panicln("rigId", rigID)
 	if err != nil {
 		return nil, err
 	}
@@ -54,8 +53,6 @@ func (s *MinerService) CreateMiner(ctx context.Context, req *dto.CreateMinerReq)
 	if err != nil {
 		return nil, err
 	}
-
-	hash := utils.GenerateFarmHash(uid + rigID + pass)
 
 	hiveOsUrl := utils.GenerateHiveOsUrl()
 
@@ -66,7 +63,6 @@ func (s *MinerService) CreateMiner(ctx context.Context, req *dto.CreateMinerReq)
 		RigID: rigID,
 		Pass:  pass,
 		Perm:  perm.MinerOwner,
-		Hash:  hash,
 		HiveOsConfig: utils.HiveOsConfig{
 			HiveOsUrl:     hiveOsUrl,
 			ApiHiveOsUrls: hiveOsUrl,
@@ -82,13 +78,64 @@ func (s *MinerService) CreateMiner(ctx context.Context, req *dto.CreateMinerReq)
 		return nil, err
 	}
 
-	// 建立关系（需要改为事务）
-	if err = s.hiveosRDB.SetRig(ctx, rigID, req.FarmID, miner.ID); err != nil {
+	// 建立 rigID->{farmID:minerID} 映射
+	if err = s.hiveosRDB.SetRigMapping(ctx, rigID, req.FarmID, miner.ID); err != nil {
+		defer s.minerRDB.Del(ctx, req.FarmID, miner.ID)
 		return nil, err
 	}
 
-	// 建立关系（需要改为事务）
-	if err = s.hiveosRDB.SetRigFarmHash(ctx, hash, req.FarmID, miner.ID); err != nil {
+	return miner, err
+}
+
+// CreateMiner 创建矿机
+func (s *MinerService) CreateMinerByUserID(ctx context.Context, userID string, farmID string, minerName string) (*info.Miner, error) {
+	// 检查用户对矿场的权限
+	if !s.validFarmPerm(ctx, userID, farmID, []perm.FarmPerm{perm.FarmOwner, perm.FarmManager}) {
+		return nil, errors.New("permission denied")
+	}
+
+	uid, err := utils.GenerateUID()
+	if err != nil {
+		return nil, err
+	}
+
+	rigID, err := s.generateRigID(ctx, 8)
+	if err != nil {
+		return nil, err
+	}
+
+	pass, err := utils.GeneratePass(8)
+	if err != nil {
+		return nil, err
+	}
+
+	hiveOsUrl := utils.GenerateHiveOsUrl()
+
+	// 创建矿机
+	miner := &info.Miner{
+		ID:    uid,
+		Name:  minerName,
+		RigID: rigID,
+		Pass:  pass,
+		Perm:  perm.MinerOwner,
+		HiveOsConfig: utils.HiveOsConfig{
+			HiveOsUrl:     hiveOsUrl,
+			ApiHiveOsUrls: hiveOsUrl,
+			WorkerName:    minerName,
+			FarmID:        farmID,
+			RigID:         rigID,
+			RigPasswd:     pass,
+		},
+	}
+
+	// 创建矿机
+	if err = s.minerRDB.Set(ctx, farmID, miner); err != nil {
+		return nil, err
+	}
+
+	// 建立 rigID->{farmID:minerID} 映射
+	if err = s.hiveosRDB.SetRigMapping(ctx, rigID, farmID, miner.ID); err != nil {
+		defer s.minerRDB.Del(ctx, farmID, miner.ID)
 		return nil, err
 	}
 

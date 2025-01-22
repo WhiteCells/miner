@@ -14,28 +14,29 @@ import (
 	"miner/utils"
 	"net/http"
 	"strconv"
-	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
 type HiveOsService struct {
-	hiveOsRDB *redis.HiveOsRDB
-	farmRDB   *redis.FarmRDB
-	minerRDB  *redis.MinerRDB
-	taskRDB   *redis.TaskRDB
-	fsRDB     *redis.FsRDB
-	taskDAO   *mysql.TaskDAO
+	hiveOsRDB    *redis.HiveOsRDB
+	farmRDB      *redis.FarmRDB
+	minerRDB     *redis.MinerRDB
+	taskRDB      *redis.TaskRDB
+	fsRDB        *redis.FsRDB
+	taskDAO      *mysql.TaskDAO
+	minerService *MinerService
 }
 
 func NewHiveOsService() *HiveOsService {
 	return &HiveOsService{
-		hiveOsRDB: redis.NewHiveOsRDB(),
-		farmRDB:   redis.NewFarmRDB(),
-		minerRDB:  redis.NewMinerRDB(),
-		taskRDB:   redis.NewTaskRDB(),
-		fsRDB:     redis.NewFsRDB(),
-		taskDAO:   mysql.NewTaskDAO(),
+		hiveOsRDB:    redis.NewHiveOsRDB(),
+		farmRDB:      redis.NewFarmRDB(),
+		minerRDB:     redis.NewMinerRDB(),
+		taskRDB:      redis.NewTaskRDB(),
+		fsRDB:        redis.NewFsRDB(),
+		taskDAO:      mysql.NewTaskDAO(),
+		minerService: NewMinerService(),
 	}
 }
 
@@ -69,15 +70,12 @@ func (s *HiveOsService) helloCase(ctx *gin.Context, rigID string) {
 	// 对 req 的数据进行存储
 	s.setMinerInfo(ctx, rigID, &req)
 	// 从 req 中获取 rigID，根据 rigID 查询 hiveOsRDB farmID:minerID
-	farmMiner, err := s.hiveOsRDB.GetRigMinerID(ctx, rigID)
+	farmID, minerID, err := s.hiveOsRDB.GetRigFarmAndMinerID(ctx, rigID)
 	if err != nil {
-		log.Println(rigID, "hiveOsRDB.GetRigMinerID")
+		log.Println(rigID, "hiveOsRDB.GetRigFarmAndMinerID")
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), "")
 		return
 	}
-	parts := strings.Split(farmMiner, ":")
-	farmID := parts[0]
-	minerID := parts[1]
 	// 通过 farmID 和 minerID 获取 miner
 	miner, err := s.minerRDB.GetByID(ctx, farmID, minerID)
 	if err != nil {
@@ -94,18 +92,12 @@ func (s *HiveOsService) helloCase(ctx *gin.Context, rigID string) {
 
 	// 通过 minerID 获取其 fsID
 
-	rigIDInt, err := strconv.Atoi(rigID)
-	if err != nil {
-		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), "")
-		return
-	}
-
 	config := utils.GenerateHiveOsConfig(&miner.HiveOsConfig)
 	wallet := utils.GenerateHiveOsWallet(&miner.HiveOsWallet)
 	autofan := utils.GenerateHiveOsAutofan(&miner.HiveOsAutoFan)
 
 	rsp := &dto.ServerRsp{
-		ID:      rigIDInt,
+		ID:      0,
 		Jsonrpc: "2.0",
 		Result: struct {
 			ID        int    `json:"id"`
@@ -138,27 +130,18 @@ func (s *HiveOsService) helloCaseUseHash(ctx *gin.Context) {
 		return
 	}
 	s.formatOutput(&req)
-	// 使用 FarmHash
-	// 查找对应的 rigID
-	farmMinerID, err := s.hiveOsRDB.GetRigFarmMinerByHash(ctx, req.Params.FarmHash)
+
+	// 如果用户在已连接的情况下，再次使用 hash 连接，此时已经存在连接
+	// 第二次请求不会携带上一次使用的 rig_id 及 pass
+
+	userID, farmID, err := s.farmRDB.GetUserAndFarmIDByHash(ctx, req.Params.FarmHash)
 	if err != nil {
-		log.Println("hiveOsRDB.GetRigFarmMinerByHash")
-		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), "")
+		rsp.Error(ctx, http.StatusBadRequest, err.Error(), "")
 		return
 	}
-	parts := strings.Split(farmMinerID, ":")
-	farmID := parts[0]
-	minerID := parts[1]
-	log.Println("******", farmID, minerID)
-	miner, err := s.minerRDB.GetByID(ctx, farmID, minerID)
+	miner, err := s.minerService.CreateMinerByUserID(ctx, userID, farmID, req.Params.Mb.Bios)
 	if err != nil {
-		log.Println("minerRDB.GetByID")
-		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), "")
-		return
-	}
-	if err := s.setMinerInfo(ctx, req.Params.RigID, &req); err != nil {
-		log.Println("setMinerInfo")
-		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), "")
+		rsp.Error(ctx, http.StatusBadRequest, err.Error(), "")
 		return
 	}
 
@@ -204,17 +187,11 @@ func (s *HiveOsService) statsCase(ctx *gin.Context, rigID string) {
 	// 对 req 的数据进行存储
 	s.setMinerStats(ctx, rigID, &req)
 	// 从 req 中获取 rigID，根据 rigID 查询 hiveOsRDB farmID:minerID
-	// rigID := req.Params.RigID
-	farmMiner, err := s.hiveOsRDB.GetRigMinerID(ctx, rigID)
+	farmID, minerID, err := s.hiveOsRDB.GetRigFarmAndMinerID(ctx, rigID)
 	if err != nil {
-		log.Println(rigID)
-		log.Println("hiveOsRDB.GetRigMinerID")
-		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), "")
+		rsp.Error(ctx, http.StatusBadRequest, err.Error(), "")
 		return
 	}
-	parts := strings.Split(farmMiner, ":")
-	farmID := parts[0]
-	minerID := parts[1]
 	// 通过 farmID 和 minerID 获取 miner
 	miner, err := s.minerRDB.GetByID(ctx, farmID, minerID)
 	if err != nil {
@@ -311,124 +288,6 @@ func (s *HiveOsService) statsCase(ctx *gin.Context, rigID string) {
 	}
 }
 
-// func (s *HiveOsService) statsCaseUseHash(ctx *gin.Context, rigID string) {
-// 	var req dto.HiveOsReq
-// 	if err := ctx.ShouldBindJSON(&req); err != nil {
-// 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), "")
-// 		return
-// 	}
-// 	s.formatOutput(&req)
-// 	// 对 req 的数据进行存储
-// 	// 从 req 中获取 rigID，根据 rigID 查询 hiveOsRDB farmID:minerID
-// 	farmMiner, err := s.hiveOsRDB.GetRigFarmMinerByHash(ctx, rigID)
-// 	if err != nil {
-// 		log.Println("hiveOsRDB.GetRigMinerID")
-// 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), "")
-// 		return
-// 	}
-// 	parts := strings.Split(farmMiner, ":")
-// 	farmID := parts[0]
-// 	minerID := parts[1]
-
-// 	// 通过 farmID 和 minerID 获取 miner
-// 	miner, err := s.minerRDB.GetByID(ctx, farmID, minerID)
-// 	if err != nil {
-// 		log.Println(farmID, minerID, "minerRDB.GetByID")
-// 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), "")
-// 		return
-// 	}
-
-// 	s.setMinerStats(ctx, miner.RigID, &req)
-
-// 	// 验证密码
-// 	if req.Params.Passwd != miner.Pass {
-// 		log.Println(req.Params.Passwd, miner.Pass, "req.Params.Passwd")
-// 		rsp.Error(ctx, http.StatusInternalServerError, "invalid pass", "")
-// 		return
-// 	}
-
-// 	// 通过 minerID 获取其 fsID
-
-// 	rigIDInt, err := strconv.Atoi(rigID)
-// 	if err != nil {
-// 		rsp.Error(ctx, http.StatusInternalServerError, "convertion failed", err.Error())
-// 		return
-// 	}
-
-// 	config := utils.GenerateHiveOsConfig(&miner.HiveOsConfig)
-// 	wallet := utils.GenerateHiveOsWallet(&miner.HiveOsWallet)
-// 	autofan := utils.GenerateHiveOsAutofan(&miner.HiveOsAutoFan)
-
-// 	// 从 taskRDB 中拿出对应的 task
-// 	task, err := s.taskRDB.GetTask(ctx, rigID)
-// 	if err != nil {
-// 		// 没有任务则结束
-// 		log.Println("=============================================")
-// 		log.Println(err.Error())
-// 		log.Println("=============================================")
-// 		return
-// 	}
-
-// 	taskIDInt, err := strconv.Atoi(task.ID)
-// 	if err != nil {
-// 		return
-// 	}
-
-// 	log.Println("===> stats  taskID", taskIDInt)
-
-// 	// 对任务分类讨论
-// 	switch task.Type {
-// 	case info.Cmd:
-// 		ctx.JSON(http.StatusOK, &dto.ServerRsp{
-// 			ID:      rigIDInt,
-// 			Jsonrpc: "2.0",
-// 			Result: struct {
-// 				ID        int    `json:"id"`
-// 				Config    string `json:"config"`
-// 				Wallet    string `json:"wallet"`
-// 				Autofan   string `json:"autofan"`
-// 				Justwrite int    `json:"justwrite"`
-// 				Command   string `json:"command"`
-// 				Exec      string `json:"exec"`
-// 				Confseq   int    `json:"confseq"`
-// 			}{
-// 				ID:        taskIDInt,
-// 				Config:    config,
-// 				Wallet:    wallet,
-// 				Autofan:   autofan,
-// 				Justwrite: 1,
-// 				Command:   "exec",
-// 				Exec:      task.Content,
-// 				Confseq:   1,
-// 			},
-// 		})
-
-// 	case info.Config:
-// 		ctx.JSON(http.StatusOK, &dto.ServerRsp{
-// 			ID:      rigIDInt,
-// 			Jsonrpc: "2.0",
-// 			Result: struct {
-// 				ID        int    `json:"id"`
-// 				Config    string `json:"config"`
-// 				Wallet    string `json:"wallet"`
-// 				Autofan   string `json:"autofan"`
-// 				Justwrite int    `json:"justwrite"`
-// 				Command   string `json:"command"`
-// 				Exec      string `json:"exec"`
-// 				Confseq   int    `json:"confseq"`
-// 			}{
-// 				ID:        taskIDInt,
-// 				Config:    config,
-// 				Wallet:    wallet,
-// 				Autofan:   autofan,
-// 				Justwrite: 1,
-// 				Command:   "config",
-// 				Confseq:   1,
-// 			},
-// 		})
-// 	}
-// }
-
 // Poll message case
 func (s *HiveOsService) messageCase(ctx *gin.Context, rigID string) {
 	// 这一次 hiveos 的请求为上一次 服务器 回包（命令、配置）的结果
@@ -458,20 +317,13 @@ func (s *HiveOsService) messageCase(ctx *gin.Context, rigID string) {
 		return
 	}
 
-	log.Println("=======================", task)
+	log.Println("=======================")
+	log.Println("task:", task)
+	log.Println("=======================")
 
 	// 从 req 中获取 rigID，根据 rigID 查询 hiveOsRDB farmID:minerID
 	// rigID := req.Params.RigID
-	farmMiner, err := s.hiveOsRDB.GetRigMinerID(ctx, rigID)
-	if err != nil {
-		log.Println(rigID)
-		log.Println("hiveOsRDB.GetRigMinerID")
-		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), "")
-		return
-	}
-	parts := strings.Split(farmMiner, ":")
-	farmID := parts[0]
-	minerID := parts[1]
+	farmID, minerID, err := s.hiveOsRDB.GetRigFarmAndMinerID(ctx, rigID)
 	// 通过 farmID 和 minerID 获取 miner
 	miner, err := s.minerRDB.GetByID(ctx, farmID, minerID)
 	if err != nil {
@@ -487,28 +339,15 @@ func (s *HiveOsService) messageCase(ctx *gin.Context, rigID string) {
 		rsp.Error(ctx, http.StatusInternalServerError, "invalid pass", "")
 		return
 	}
+
 	// 通过 minerID 获取其 fsID
-	// _, err = s.minerRDB.GetApplyFs(ctx, minerID)
-	// if err != nil {
-	// 	log.Println(minerID)
-	// 	log.Fatalln("minerRDB.GetApplyFs")
-	// 	rsp.Error(ctx, http.StatusInternalServerError, err.Error(), "")
-	//  没找到不退出
-	// 	return
-	// }
 
 	config := utils.GenerateHiveOsConfig(&miner.HiveOsConfig)
 	wallet := utils.GenerateHiveOsWallet(&miner.HiveOsWallet)
 	autofan := utils.GenerateHiveOsAutofan(&miner.HiveOsAutoFan)
 
-	rigIDInt, err := strconv.Atoi(rigID)
-	if err != nil {
-		rsp.Error(ctx, http.StatusInternalServerError, "string conversion", err.Error())
-		return
-	}
-
 	ctx.JSON(http.StatusOK, &dto.ServerRsp{
-		ID:      rigIDInt,
+		ID:      0,
 		Jsonrpc: "2.0",
 		Result: struct {
 			ID        int    `json:"id"`

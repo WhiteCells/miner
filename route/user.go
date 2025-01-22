@@ -30,7 +30,7 @@ func (ur *UserRoute) InitUserRoute(r *gin.Engine) {
 		route.POST("/login", ur.userController.Login, middleware.LoginLog())
 	}
 	route.Use(middleware.JWTAuth())
-	route.Use(middleware.IPAuth()) // IP 验证要在 token 解析之后
+	// route.Use(middleware.IPAuth()) // IP 验证要在 token 解析之后
 	route.Use(middleware.RoleAuth(role.User, role.Admin))
 	route.Use(middleware.StatusAuth())
 	limiter := middleware.NewLimiter(1, time.Second)
@@ -39,6 +39,8 @@ func (ur *UserRoute) InitUserRoute(r *gin.Engine) {
 		route.GET("/balance", limiter.Limit(), ur.userController.GetPointsBalance)
 		route.GET("/oper_logs", ur.operLogController.GetOperLogs)
 		route.GET("/points_records", ur.pointsRecordController.GetPointsRecords)
+		route.GET("/address", ur.userController.GetUserAddress)
+		route.GET("/coins", ur.userController.GetCoins)
 		route.POST("/audit", limiter.Limit(), ur.userController.AuditAmount)
 	}
 }
