@@ -70,7 +70,7 @@ func (s *HiveOsService) helloCase(ctx *gin.Context, rigID string) {
 	// 对 req 的数据进行存储
 	s.setMinerInfo(ctx, rigID, &req)
 	// 从 req 中获取 rigID，根据 rigID 查询 hiveOsRDB farmID:minerID
-	farmID, minerID, err := s.hiveOsRDB.GetRigFarmAndMinerID(ctx, rigID)
+	userID, farmID, minerID, err := s.hiveOsRDB.GetRigFarmAndMinerID(ctx, rigID)
 	if err != nil {
 		log.Println(rigID, "hiveOsRDB.GetRigFarmAndMinerID")
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), "")
@@ -91,6 +91,14 @@ func (s *HiveOsService) helloCase(ctx *gin.Context, rigID string) {
 	}
 
 	// 通过 minerID 获取其 fsID
+
+	// 更新 miner GpuNum
+	miner.GpuNum = len(req.Params.Gpu)
+
+	// 更新 farm GpuNum
+	farm, err := s.farmRDB.GetByID(ctx, userID, farmID)
+	farm.GpuNum += miner.GpuNum
+	s.farmRDB.Set(ctx, userID, farm, farm.Perm)
 
 	config := utils.GenerateHiveOsConfig(&miner.HiveOsConfig)
 	wallet := utils.GenerateHiveOsWallet(&miner.HiveOsWallet)
@@ -170,7 +178,7 @@ func (s *HiveOsService) statsCase(ctx *gin.Context, rigID string) {
 	// 对 req 的数据进行存储
 	s.setMinerStats(ctx, rigID, &req)
 	// 从 req 中获取 rigID，根据 rigID 查询 hiveOsRDB farmID:minerID
-	farmID, minerID, err := s.hiveOsRDB.GetRigFarmAndMinerID(ctx, rigID)
+	_, farmID, minerID, err := s.hiveOsRDB.GetRigFarmAndMinerID(ctx, rigID)
 	if err != nil {
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), "")
 		return
@@ -286,7 +294,7 @@ func (s *HiveOsService) messageCase(ctx *gin.Context, rigID string) {
 	log.Println("task:", task)
 	log.Println("=======================")
 
-	farmID, minerID, err := s.hiveOsRDB.GetRigFarmAndMinerID(ctx, rigID)
+	_, farmID, minerID, err := s.hiveOsRDB.GetRigFarmAndMinerID(ctx, rigID)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), "hiveOsRDB.GetRigFarmAndMinerID")
 		return

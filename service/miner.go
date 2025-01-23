@@ -78,8 +78,8 @@ func (s *MinerService) CreateMiner(ctx context.Context, req *dto.CreateMinerReq)
 		return nil, err
 	}
 
-	// 建立 rigID->{farmID:minerID} 映射
-	if err = s.hiveosRDB.SetRigMapping(ctx, rigID, req.FarmID, miner.ID); err != nil {
+	// 建立 rigID->{userID:farmID:minerID} 映射
+	if err = s.hiveosRDB.SetRigMapping(ctx, userID, rigID, req.FarmID, miner.ID); err != nil {
 		defer s.minerRDB.Del(ctx, req.FarmID, miner.ID)
 		return nil, err
 	}
@@ -133,8 +133,8 @@ func (s *MinerService) CreateMinerByUserID(ctx context.Context, userID string, f
 		return nil, err
 	}
 
-	// 建立 rigID->{farmID:minerID} 映射
-	if err = s.hiveosRDB.SetRigMapping(ctx, rigID, farmID, miner.ID); err != nil {
+	// 建立 rigID->{userID:farmID:minerID} 映射
+	if err = s.hiveosRDB.SetRigMapping(ctx, userID, rigID, farmID, miner.ID); err != nil {
 		defer s.minerRDB.Del(ctx, farmID, miner.ID)
 		return nil, err
 	}

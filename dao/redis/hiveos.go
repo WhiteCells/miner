@@ -17,12 +17,12 @@ func NewHiveOsRDB() *HiveOsRDB {
 
 // 设置 OS 矿机
 // 更新 OS 矿机
-// +-------------+------------------------+
-// | key         | value                  |
-// +-------------+------------------------+
-// | os:<rig_id> | <farm_id>:<miner_id>   |
-// +-------------+------------------------+
-func (c *HiveOsRDB) SetRigMapping(ctx context.Context, rigID string, farmID string, minerID string) error {
+// +-------------+----------------------------------+
+// | key         | value                            |
+// +-------------+----------------------------------+
+// | os:<rig_id> | <user_id>:<farm_id>:<miner_id>   |
+// +-------------+----------------------------------+
+func (c *HiveOsRDB) SetRigMapping(ctx context.Context, userID string, rigID string, farmID string, minerID string) error {
 	key := MakeField(OsField, rigID)
 	val := MakeVal(farmID, minerID)
 	return utils.RDB.Set(ctx, key, val)
@@ -35,15 +35,15 @@ func (c *HiveOsRDB) DelRigMapping(ctx context.Context, rigID string) error {
 }
 
 // 获取 OS 矿机对应的 farmID 及 minerID
-func (c *HiveOsRDB) GetRigFarmAndMinerID(ctx context.Context, rigID string) (farmID string, minerID string, err error) {
+func (c *HiveOsRDB) GetRigFarmAndMinerID(ctx context.Context, rigID string) (userID string, farmID string, minerID string, err error) {
 	key := MakeField(OsField, rigID)
 	farmMinerID, err := utils.RDB.Get(ctx, key)
 	if err != nil {
-		return "", "", err
+		return "", "", "", err
 	}
 	parts := strings.Split(farmMinerID, ":")
-	farmID, minerID = parts[0], parts[1]
-	return farmID, minerID, err
+	userID, farmID, minerID = parts[0], parts[1], parts[2]
+	return userID, farmID, minerID, err
 }
 
 // rig_id 是否存在
