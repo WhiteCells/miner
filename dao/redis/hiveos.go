@@ -24,7 +24,7 @@ func NewHiveOsRDB() *HiveOsRDB {
 // +-------------+----------------------------------+
 func (c *HiveOsRDB) SetRigMapping(ctx context.Context, userID string, rigID string, farmID string, minerID string) error {
 	key := MakeField(OsField, rigID)
-	val := MakeVal(farmID, minerID)
+	val := MakeVal(userID, farmID, minerID)
 	return utils.RDB.Set(ctx, key, val)
 }
 
@@ -37,11 +37,11 @@ func (c *HiveOsRDB) DelRigMapping(ctx context.Context, rigID string) error {
 // 获取 OS 矿机对应的 farmID 及 minerID
 func (c *HiveOsRDB) GetRigFarmAndMinerID(ctx context.Context, rigID string) (userID string, farmID string, minerID string, err error) {
 	key := MakeField(OsField, rigID)
-	farmMinerID, err := utils.RDB.Get(ctx, key)
+	userFarmMinerID, err := utils.RDB.Get(ctx, key)
 	if err != nil {
 		return "", "", "", err
 	}
-	parts := strings.Split(farmMinerID, ":")
+	parts := strings.Split(userFarmMinerID, ":")
 	userID, farmID, minerID = parts[0], parts[1], parts[2]
 	return userID, farmID, minerID, err
 }

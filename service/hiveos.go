@@ -97,6 +97,10 @@ func (s *HiveOsService) helloCase(ctx *gin.Context, rigID string) {
 
 	// 更新 farm GpuNum
 	farm, err := s.farmRDB.GetByID(ctx, userID, farmID)
+	if err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, "get farm failed", "")
+		return
+	}
 	farm.GpuNum += miner.GpuNum
 	s.farmRDB.Set(ctx, userID, farm, farm.Perm)
 

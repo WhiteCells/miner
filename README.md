@@ -79,8 +79,8 @@ https://api.bscscan.com/api
 ![](./assets/recharge.png)
 
 
-### 计划
+### 部署
 
-1.13 完成支付检查模块
-
-1.14 完成客户端配置文件模块
+```sh
+go build -o miner main.go
+```
