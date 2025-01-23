@@ -16,10 +16,10 @@ type UpdateMinerReq struct {
 	UpdateInfo map[string]interface{} `json:"update_info" binding:"required"`
 }
 
-type ApplyMinerFlightsheetReq struct {
-	FarmID        string `json:"farm_id" binding:"required"`
-	MinerID       string `json:"miner_id" binding:"required"`
-	FlightsheetID string `json:"fs_id" binding:"required"`
+type ApplyMinerFsReq struct {
+	FarmID  string `json:"farm_id" binding:"required"`
+	MinerID string `json:"miner_id" binding:"required"`
+	FsID    string `json:"fs_id" binding:"required"`
 }
 
 type TransferMinerReq struct {

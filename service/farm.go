@@ -156,7 +156,7 @@ func (s *FarmService) UpdateFarmHash(ctx context.Context, req *dto.UpdateFarmHas
 }
 
 // GetFarm 获取用户的所有矿场信息
-func (s *FarmService) GetFarm(ctx context.Context) (*[]info.Farm, error) {
+func (s *FarmService) GetAllFarm(ctx context.Context) (*[]info.Farm, error) {
 	userID, exists := ctx.Value("user_id").(string)
 	if !exists {
 		return nil, errors.New("invalid user_id in context")
@@ -174,7 +174,7 @@ func (s *FarmService) GetFarmByID(ctx context.Context, farmID string) (*info.Far
 }
 
 // ApplyFs 矿场应用飞行表
-func (s *FarmService) ApplyFs(ctx context.Context, req *dto.ApplyFarmFlightsheetReq) error {
+func (s *FarmService) ApplyFs(ctx context.Context, req *dto.ApplyFarmFsReq) error {
 	// userID, exists := ctx.Value("user_id").(string)
 	// if !exists {
 	// 	return errors.New("invalid user_id in context")

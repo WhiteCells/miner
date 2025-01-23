@@ -20,6 +20,7 @@ type User struct {
 	Status         status.UserStatus `json:"status"`
 	LastLoginAt    time.Time         `json:"last_login_at"`
 	LastLoginIP    string            `json:"last_login_ip"`
+	LastCheckAt    time.Time         `json:"last_check_at"`
 	InviteCode     string            `json:"invite_code"`
 	InviteBy       string            `json:"invite_by"`
 

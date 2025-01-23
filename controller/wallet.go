@@ -82,7 +82,7 @@ func (c *WalletController) GetAllWallet(ctx *gin.Context) {
 
 // GetUserWalletByID 通过钱包 ID 获取指定钱包
 func (c *WalletController) GetUserWalletByID(ctx *gin.Context) {
-	walletID := ctx.Query("wallet_id")
+	walletID := ctx.Param("wallet_id")
 	wallet, err := c.walletService.GetUserWalletByID(ctx, walletID)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)

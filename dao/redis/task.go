@@ -86,5 +86,3 @@ func (c *TaskRDB) GetTask(ctx context.Context, rigID string) (*model.Task, error
 	}
 	return &task, nil
 }
-
-// func (c *TaskRDB) GetTaskUseHash(ctx context.Context, rigID)

@@ -102,3 +102,7 @@ type AdminAddSoftReq struct {
 type AdminDelSoftReq struct {
 	Name string `json:"name" binding:"required"`
 }
+
+type AdminSetFreeGpuNumReq struct {
+	GpuNum int `json:"gpu_num" binding:"required"`
+}

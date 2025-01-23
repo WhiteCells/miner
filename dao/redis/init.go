@@ -77,5 +77,11 @@ func InitAdminRDB() error {
 		return err
 	}
 
+	// SetFreeGPUNum
+	key = MakeKey(AdminField, FreeGpuNumField)
+	if err := utils.RDB.Set(ctx, key, 2); err != nil {
+		return err
+	}
+
 	return nil
 }

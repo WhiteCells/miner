@@ -99,16 +99,7 @@ func (s *HiveOsService) helloCase(ctx *gin.Context, rigID string) {
 	rsp := &dto.ServerRsp{
 		ID:      0,
 		Jsonrpc: "2.0",
-		Result: struct {
-			ID        int    `json:"id"`
-			Config    string `json:"config"`
-			Wallet    string `json:"wallet"`
-			Autofan   string `json:"autofan"`
-			Justwrite int    `json:"justwrite"`
-			Command   string `json:"command"`
-			Exec      string `json:"exec"`
-			Confseq   int    `json:"confseq"`
-		}{
+		Result: dto.ServerRsp_Result{
 			ID:        99999,
 			Config:    config,
 			Wallet:    wallet,
@@ -152,15 +143,7 @@ func (s *HiveOsService) helloCaseUseHash(ctx *gin.Context) {
 	rsp := &dto.ServerHashRsp{
 		Jsonrpc: "2.0",
 		ID:      0,
-		Result: struct {
-			RigName         string `json:"rig_name"`
-			RespositoryList string `json:"respository_list"`
-			Config          string `json:"config"`
-			Wallet          string `json:"wallet"`
-			NvidiaOc        string `json:"nvidia_oc"`
-			Autofan         string `json:"autofan"`
-			Confseq         int    `json:"confseq"`
-		}{
+		Result: dto.ServerHashRsp_Result{
 			RigName:         miner.Name,
 			RespositoryList: "",
 			Config:          config,
@@ -241,16 +224,7 @@ func (s *HiveOsService) statsCase(ctx *gin.Context, rigID string) {
 		ctx.JSON(http.StatusOK, &dto.ServerRsp{
 			ID:      rigIDInt,
 			Jsonrpc: "2.0",
-			Result: struct {
-				ID        int    `json:"id"`
-				Config    string `json:"config"`
-				Wallet    string `json:"wallet"`
-				Autofan   string `json:"autofan"`
-				Justwrite int    `json:"justwrite"`
-				Command   string `json:"command"`
-				Exec      string `json:"exec"`
-				Confseq   int    `json:"confseq"`
-			}{
+			Result: dto.ServerRsp_Result{
 				ID:        taskIDInt,
 				Config:    config,
 				Wallet:    wallet,
@@ -266,16 +240,7 @@ func (s *HiveOsService) statsCase(ctx *gin.Context, rigID string) {
 		ctx.JSON(http.StatusOK, &dto.ServerRsp{
 			ID:      rigIDInt,
 			Jsonrpc: "2.0",
-			Result: struct {
-				ID        int    `json:"id"`
-				Config    string `json:"config"`
-				Wallet    string `json:"wallet"`
-				Autofan   string `json:"autofan"`
-				Justwrite int    `json:"justwrite"`
-				Command   string `json:"command"`
-				Exec      string `json:"exec"`
-				Confseq   int    `json:"confseq"`
-			}{
+			Result: dto.ServerRsp_Result{
 				ID:        taskIDInt,
 				Config:    config,
 				Wallet:    wallet,
@@ -321,9 +286,11 @@ func (s *HiveOsService) messageCase(ctx *gin.Context, rigID string) {
 	log.Println("task:", task)
 	log.Println("=======================")
 
-	// 从 req 中获取 rigID，根据 rigID 查询 hiveOsRDB farmID:minerID
-	// rigID := req.Params.RigID
 	farmID, minerID, err := s.hiveOsRDB.GetRigFarmAndMinerID(ctx, rigID)
+	if err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), "hiveOsRDB.GetRigFarmAndMinerID")
+		return
+	}
 	// 通过 farmID 和 minerID 获取 miner
 	miner, err := s.minerRDB.GetByID(ctx, farmID, minerID)
 	if err != nil {
@@ -349,17 +316,8 @@ func (s *HiveOsService) messageCase(ctx *gin.Context, rigID string) {
 	ctx.JSON(http.StatusOK, &dto.ServerRsp{
 		ID:      0,
 		Jsonrpc: "2.0",
-		Result: struct {
-			ID        int    `json:"id"`
-			Config    string `json:"config"`
-			Wallet    string `json:"wallet"`
-			Autofan   string `json:"autofan"`
-			Justwrite int    `json:"justwrite"`
-			Command   string `json:"command"`
-			Exec      string `json:"exec"`
-			Confseq   int    `json:"confseq"`
-		}{
-			ID:        000,
+		Result: dto.ServerRsp_Result{
+			ID:        0,
 			Config:    config,
 			Wallet:    wallet,
 			Autofan:   autofan,
@@ -368,10 +326,6 @@ func (s *HiveOsService) messageCase(ctx *gin.Context, rigID string) {
 		},
 	})
 }
-
-// func (s *HiveOsService) messageCaseUseHash(ctx context.Context) {
-
-// }
 
 func (s *HiveOsService) setMinerInfo(ctx context.Context, rigID string, req *dto.HelloReq) error {
 	var info info.MinerInfo

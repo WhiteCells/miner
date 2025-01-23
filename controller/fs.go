@@ -9,25 +9,25 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type FlightsheetController struct {
-	flightsheetService *service.FlightsheetService
+type FsController struct {
+	fsService *service.FsService
 }
 
-func NewFlightsheetController() *FlightsheetController {
-	return &FlightsheetController{
-		flightsheetService: service.NewFlightsheetService(),
+func NewFsController() *FsController {
+	return &FsController{
+		fsService: service.NewFsService(),
 	}
 }
 
-// CreateFlightsheet 创建飞行表
-func (c *FlightsheetController) CreateFlightsheet(ctx *gin.Context) {
+// CreateFs 创建飞行表
+func (c *FsController) CreateFs(ctx *gin.Context) {
 	var req dto.CreateFsReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
 
-	flightsheet, err := c.flightsheetService.CreateFlightsheet(ctx, &req)
+	flightsheet, err := c.fsService.CreateFs(ctx, &req)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
@@ -36,15 +36,15 @@ func (c *FlightsheetController) CreateFlightsheet(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "create flightsheet success", flightsheet)
 }
 
-// DeleteFlightsheet 删除飞行表
-func (c *FlightsheetController) DeleteFlightsheet(ctx *gin.Context) {
+// DeleteFs 删除飞行表
+func (c *FsController) DeleteFs(ctx *gin.Context) {
 	var req dto.DeleteFsReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
 
-	if err := c.flightsheetService.DeleteFlightsheet(ctx, &req); err != nil {
+	if err := c.fsService.DeleteFs(ctx, &req); err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
@@ -52,15 +52,15 @@ func (c *FlightsheetController) DeleteFlightsheet(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "delete flightsheet success", nil)
 }
 
-// UpdateFlightsheet 更新飞行表
-func (c *FlightsheetController) UpdateFlightsheet(ctx *gin.Context) {
+// UpdateFs 更新飞行表
+func (c *FsController) UpdateFs(ctx *gin.Context) {
 	var req dto.UpdateFsReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
 
-	if err := c.flightsheetService.UpdateFlightsheet(ctx, &req); err != nil {
+	if err := c.fsService.UpdateFs(ctx, &req); err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
@@ -68,26 +68,38 @@ func (c *FlightsheetController) UpdateFlightsheet(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "update flightsheet success", nil)
 }
 
-// GetFlightsheet 获取所有飞行表
-func (c *FlightsheetController) GetFs(ctx *gin.Context) {
-	flightsheets, err := c.flightsheetService.GetFlightsheet(ctx)
+// GetAllFs 获取所有飞行表
+func (c *FsController) GetAllFs(ctx *gin.Context) {
+	fss, err := c.fsService.GetAllFs(ctx)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInsufficientStorage, err.Error(), nil)
 		return
 	}
 
-	rsp.QuerySuccess(ctx, http.StatusOK, "get user all flightsheet success", flightsheets)
+	rsp.QuerySuccess(ctx, http.StatusOK, "get user all flightsheet success", fss)
+}
+
+// GetFsByID 获取指定 fs
+func (c *FsController) GetFsByID(ctx *gin.Context) {
+	fsID := ctx.Param("fs_id")
+	fs, err := c.fsService.GetFsByID(ctx, fsID)
+	if err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
+		return
+	}
+
+	rsp.QuerySuccess(ctx, http.StatusOK, "get user all flightsheet success", fs)
 }
 
 // ApplyWallet 飞行表应用钱包
-func (c *FlightsheetController) ApplyWallet(ctx *gin.Context) {
+func (c *FsController) ApplyWallet(ctx *gin.Context) {
 	var req dto.ApplyWalletReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
 
-	if err := c.flightsheetService.ApplyWallet(ctx, &req); err != nil {
+	if err := c.fsService.ApplyWallet(ctx, &req); err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}

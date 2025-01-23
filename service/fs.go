@@ -9,18 +9,18 @@ import (
 	"miner/utils"
 )
 
-type FlightsheetService struct {
+type FsService struct {
 	fsRDB *redis.FsRDB
 }
 
-func NewFlightsheetService() *FlightsheetService {
-	return &FlightsheetService{
+func NewFsService() *FsService {
+	return &FsService{
 		fsRDB: redis.NewFsRDB(),
 	}
 }
 
-// CreateFlightsheet 创建飞行表
-func (s *FlightsheetService) CreateFlightsheet(ctx context.Context, req *dto.CreateFsReq) (*info.Fs, error) {
+// CreateFs 创建飞行表
+func (s *FsService) CreateFs(ctx context.Context, req *dto.CreateFsReq) (*info.Fs, error) {
 	userID, exists := ctx.Value("user_id").(string)
 	if !exists {
 		return nil, errors.New("invalid user_id in context")
@@ -30,7 +30,7 @@ func (s *FlightsheetService) CreateFlightsheet(ctx context.Context, req *dto.Cre
 	if err != nil {
 		return nil, err
 	}
-	flightsheet := &info.Fs{
+	fs := &info.Fs{
 		ID:   id,
 		Name: req.Name,
 		Coin: req.Coin,
@@ -38,15 +38,15 @@ func (s *FlightsheetService) CreateFlightsheet(ctx context.Context, req *dto.Cre
 		Soft: req.Soft,
 	}
 
-	if err := s.fsRDB.Set(ctx, userID, flightsheet); err != nil {
+	if err := s.fsRDB.Set(ctx, userID, fs); err != nil {
 		return nil, errors.New("create flightsheet failed")
 	}
 
-	return flightsheet, nil
+	return fs, nil
 }
 
-// DeleteFlightsheet 删除飞行表
-func (s *FlightsheetService) DeleteFlightsheet(ctx context.Context, req *dto.DeleteFsReq) error {
+// DeleteFs 删除飞行表
+func (s *FsService) DeleteFs(ctx context.Context, req *dto.DeleteFsReq) error {
 	userID, exists := ctx.Value("user_id").(string)
 	if !exists {
 		return errors.New("invalid user_id in context")
@@ -59,15 +59,15 @@ func (s *FlightsheetService) DeleteFlightsheet(ctx context.Context, req *dto.Del
 	return nil
 }
 
-// UpdateFlightsheet 更新飞行表
-func (s *FlightsheetService) UpdateFlightsheet(ctx context.Context, req *dto.UpdateFsReq) error {
+// UpdateFs 更新飞行表
+func (s *FsService) UpdateFs(ctx context.Context, req *dto.UpdateFsReq) error {
 	userID, exists := ctx.Value("user_id").(string)
 	if !exists {
 		return errors.New("invalid user_id in context")
 	}
 
 	// 查找飞行表
-	flightsheet, err := s.fsRDB.GetByID(ctx, userID, req.FsID)
+	fs, err := s.fsRDB.GetByID(ctx, userID, req.FsID)
 	if err != nil {
 		return errors.New("flightsheet not found")
 	}
@@ -75,38 +75,51 @@ func (s *FlightsheetService) UpdateFlightsheet(ctx context.Context, req *dto.Upd
 	for key, value := range req.UpdateInfo {
 		switch key {
 		case "name":
-			flightsheet.Name = value.(string)
+			fs.Name = value.(string)
 		case "coin":
-			flightsheet.Coin = value.(string)
+			fs.Coin = value.(string)
 		case "pool":
-			flightsheet.Pool = value.(string)
+			fs.Pool = value.(string)
 		case "soft":
-			flightsheet.Soft = value.(string)
+			fs.Soft = value.(string)
 		}
 	}
 
-	if err := s.fsRDB.Set(ctx, userID, flightsheet); err != nil {
+	if err := s.fsRDB.Set(ctx, userID, fs); err != nil {
 		return errors.New("update flightsheet failed")
 	}
 
 	return nil
 }
 
-// GetFlightsheet 获取用户的所有飞行表
-func (s *FlightsheetService) GetFlightsheet(ctx context.Context) (*[]info.Fs, error) {
+// GetAllFs 获取用户的所有飞行表
+func (s *FsService) GetAllFs(ctx context.Context) (*[]info.Fs, error) {
 	userID, exists := ctx.Value("user_id").(string)
 	if !exists {
 		return nil, errors.New("invalid user_id in context")
 	}
-	user, err := s.fsRDB.GetAll(ctx, userID)
+	fss, err := s.fsRDB.GetAll(ctx, userID)
 	if err != nil {
 		return nil, errors.New("get flightsheet failed")
 	}
-	return user, err
+	return fss, err
+}
+
+// GetFsByID
+func (s *FsService) GetFsByID(ctx context.Context, fsID string) (*info.Fs, error) {
+	userID, exists := ctx.Value("user_id").(string)
+	if !exists {
+		return nil, errors.New("invalid user_id in context")
+	}
+	fs, err := s.fsRDB.GetByID(ctx, userID, fsID)
+	if err != nil {
+		return nil, errors.New("get flightsheet failed")
+	}
+	return fs, err
 }
 
 // ApplyWallet 飞行表应用钱包
-func (s *FlightsheetService) ApplyWallet(ctx context.Context, req *dto.ApplyWalletReq) error {
+func (s *FsService) ApplyWallet(ctx context.Context, req *dto.ApplyWalletReq) error {
 	userID, exists := ctx.Value("user_id").(string)
 	if !exists {
 		return errors.New("invalid user_id in context")

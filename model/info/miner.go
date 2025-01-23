@@ -6,12 +6,13 @@ import (
 )
 
 type Miner struct {
-	ID    string         `json:"id"`
-	Name  string         `json:"name"`
-	RigID string         `json:"rig_id"`
-	Pass  string         `json:"pass"`
-	FS    string         `json:"fs"`
-	Perm  perm.MinerPerm `json:"perm"`
+	ID     string         `json:"id"`
+	Name   string         `json:"name"`
+	RigID  string         `json:"rig_id"`
+	Pass   string         `json:"pass"`
+	FS     string         `json:"fs"`
+	Perm   perm.MinerPerm `json:"perm"`
+	GpuNum int            `json:"gpu_num"`
 
 	// HiveOS 单独客户端配置
 	HiveOsConfig  utils.HiveOsConfig  `json:"hive_os_config"`

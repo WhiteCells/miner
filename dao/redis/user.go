@@ -9,10 +9,14 @@ import (
 	"time"
 )
 
-type UserRDB struct{}
+type UserRDB struct {
+	farmRDB *FarmRDB
+}
 
 func NewUserRDB() *UserRDB {
-	return &UserRDB{}
+	return &UserRDB{
+		farmRDB: NewFarmRDB(),
+	}
 }
 
 // 添加用户
@@ -152,6 +156,16 @@ func (c *UserRDB) UpdatePoints(ctx context.Context, userID string, num float32, 
 		user.RechargePoints += num
 	}
 
+	return c.Set(ctx, user)
+}
+
+// SetLastCheckAt
+func (c *UserRDB) SetLastCheckAt(ctx context.Context, userID string, t time.Time) error {
+	user, err := c.GetByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+	user.LastCheckAt = t
 	return c.Set(ctx, user)
 }
 

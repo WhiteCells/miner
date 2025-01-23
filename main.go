@@ -4,6 +4,7 @@ import (
 	"miner/dao/mysql"
 	"miner/dao/redis"
 	"miner/route"
+	"miner/settlement"
 	"miner/utils"
 
 	"github.com/gin-gonic/gin"
@@ -29,6 +30,7 @@ func initialize() error {
 	if err := mysql.Init(); err != nil {
 		return err
 	}
+	settlement.InitCronJob()
 	return nil
 }
 

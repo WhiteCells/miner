@@ -50,15 +50,6 @@ func (c *AdminRDB) GetAllUsers(ctx context.Context) (*[]info.User, error) {
 	return &users, nil
 }
 
-// 获取用户操作日志
-// func (c *AdminRDB) GetUserOperLogs(ctx context.Context) (*)
-
-// 获取用户登陆日志
-// func (c *AdminRDB) GetUserLoginLogs(ctx context.Context) (*)
-
-// 获取用户积分记录
-// func (c *AdminRDB) GetUserPointsRecords(ctx context.Context) (*)
-
 // 获取指定用户的所有矿场
 func (c *AdminRDB) GetUserFarms(ctx context.Context, userID string) (*[]info.Farm, error) {
 	return c.farmRDB.GetAll(ctx, userID)
@@ -307,4 +298,31 @@ func (c *AdminRDB) decryptMnemonic(ciphertext, key string) (string, error) {
 	stream := cipher.NewCFBDecrypter(block, iv)
 	stream.XORKeyStream(decoded, decoded)
 	return string(decoded), nil
+}
+
+// string
+// +----------------------+-------+
+// | key                  | val   |
+// +----------------------+-------+
+// | admin:free_gpu_num   | <num> |
+// +----------------------+-------+
+
+// 设置免费 GPU 数量
+func (c *AdminRDB) SetFreeGpuNum(ctx context.Context, num int) error {
+	key := MakeKey(AdminField, FreeGpuNumField)
+	return utils.RDB.Set(ctx, key, num)
+}
+
+// 获取免费 GPU 数量
+func (c *AdminRDB) GetFreeGpuNum(ctx context.Context) (int, error) {
+	key := MakeKey(AdminField, FreeGpuNumField)
+	numStr, err := utils.RDB.Get(ctx, key)
+	if err != nil {
+		return 0, errors.New("get free gpu num error")
+	}
+	numInt, err := strconv.Atoi(numStr)
+	if err != nil {
+		return 0, errors.New("invalid free gpu num")
+	}
+	return numInt, nil
 }

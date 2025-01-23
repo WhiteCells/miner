@@ -85,8 +85,8 @@ func (c *FarmController) UpdateFarmHash(ctx *gin.Context) {
 }
 
 // GetFarm 获取用户所有的矿场
-func (c *FarmController) GetFarm(ctx *gin.Context) {
-	farms, err := c.farmService.GetFarm(ctx)
+func (c *FarmController) GetAllFarm(ctx *gin.Context) {
+	farms, err := c.farmService.GetAllFarm(ctx)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
@@ -95,9 +95,21 @@ func (c *FarmController) GetFarm(ctx *gin.Context) {
 	rsp.QuerySuccess(ctx, http.StatusOK, "get farm success", farms)
 }
 
+// GetFarmByID
+func (c *FarmController) GetFarmByID(ctx *gin.Context) {
+	farmID := ctx.Param("farm_id")
+	farm, err := c.farmService.GetFarmByID(ctx, farmID)
+	if err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
+		return
+	}
+
+	rsp.QuerySuccess(ctx, http.StatusOK, "get farm success", farm)
+}
+
 // ApplyFs 矿场应用飞行表
 func (c *FarmController) ApplyFs(ctx *gin.Context) {
-	var req dto.ApplyFarmFlightsheetReq
+	var req dto.ApplyFarmFsReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return

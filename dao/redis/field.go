@@ -41,6 +41,8 @@ var Non = "non"
 // api
 var ApiKeyBscField = "apikey:bsc"
 
+var FreeGpuNumField = "free_gpu_num"
+
 var CoinField = "coin"
 var PoolField = "pool"
 var SoftField = "soft"

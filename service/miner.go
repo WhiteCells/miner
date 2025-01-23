@@ -188,7 +188,7 @@ func (s *MinerService) GetMinerByID(ctx context.Context, farmID string, minerID 
 }
 
 // GetMiner 获取用户在矿场的所有矿机
-func (s *MinerService) GetMiner(ctx context.Context, farmID string) (*[]info.Miner, error) {
+func (s *MinerService) GetFarmAllMiner(ctx context.Context, farmID string) (*[]info.Miner, error) {
 	miners, err := s.minerRDB.GetAll(ctx, farmID)
 	return miners, err
 }
@@ -283,7 +283,7 @@ func (s *MinerService) GetRigConf(ctx context.Context, req *dto.GetRigConfReq) (
 // }
 
 // ApplyFs 矿机应用飞行表
-func (s *MinerService) ApplyFs(ctx context.Context, req *dto.ApplyMinerFlightsheetReq) error {
+func (s *MinerService) ApplyFs(ctx context.Context, req *dto.ApplyMinerFsReq) error {
 	userID, exists := ctx.Value("user_id").(string)
 	if !exists {
 		return errors.New("invalid user_id in context")
@@ -291,7 +291,7 @@ func (s *MinerService) ApplyFs(ctx context.Context, req *dto.ApplyMinerFlightshe
 	if !s.validPerm(ctx, userID, req.MinerID, []perm.MinerPerm{perm.MinerOwner, perm.MinerManager}) {
 		return errors.New("permission denied")
 	}
-	return s.minerRDB.ApplyFs(ctx, req.FarmID, req.MinerID, req.FlightsheetID)
+	return s.minerRDB.ApplyFs(ctx, req.FarmID, req.MinerID, req.FsID)
 }
 
 func (s *MinerService) validPerm(ctx context.Context, farmID string, minerID string, allowedPerms []perm.MinerPerm) bool {

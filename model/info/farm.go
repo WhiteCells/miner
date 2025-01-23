@@ -8,5 +8,6 @@ type Farm struct {
 	TimeZone string        `json:"time_zone"`
 	Hash     string        `json:"hash"`
 	Perm     perm.FarmPerm `json:"perm"`
-	GpuNum   string        `json:"gpu_num"`
+	MinerNum int           `json:"miner_num"`
+	GpuNum   int           `json:"gpu_num"`
 }

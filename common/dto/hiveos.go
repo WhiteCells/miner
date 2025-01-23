@@ -115,31 +115,35 @@ type HiveOsResReq struct {
 
 // hello rsp
 type ServerRsp struct {
-	ID      int    `json:"id"`
-	Jsonrpc string `json:"jsonrpc"`
-	Result  struct {
-		ID        int    `json:"id"`
-		Config    string `json:"config"`
-		Wallet    string `json:"wallet"`
-		Autofan   string `json:"autofan"`
-		Justwrite int    `json:"justwrite"`
-		Command   string `json:"command"`
-		Exec      string `json:"exec"`
-		Confseq   int    `json:"confseq"`
-	} `json:"result"`
+	ID      int              `json:"id"`
+	Jsonrpc string           `json:"jsonrpc"`
+	Result  ServerRsp_Result `json:"result"`
+}
+
+type ServerRsp_Result struct {
+	ID        int    `json:"id"`
+	Config    string `json:"config"`
+	Wallet    string `json:"wallet"`
+	Autofan   string `json:"autofan"`
+	Justwrite int    `json:"justwrite"`
+	Command   string `json:"command"`
+	Exec      string `json:"exec"`
+	Confseq   int    `json:"confseq"`
 }
 
 // hello rsp, hello with hash
 type ServerHashRsp struct {
-	Jsonrpc string `json:"jsonrpc"`
-	ID      int    `json:"id"`
-	Result  struct {
-		RigName         string `json:"rig_name"`
-		RespositoryList string `json:"respository_list"`
-		Config          string `json:"config"`
-		Wallet          string `json:"wallet"`
-		NvidiaOc        string `json:"nvidia_oc"`
-		Autofan         string `json:"autofan"`
-		Confseq         int    `json:"confseq"`
-	} `json:"result"`
+	Jsonrpc string               `json:"jsonrpc"`
+	ID      int                  `json:"id"`
+	Result  ServerHashRsp_Result `json:"result"`
+}
+
+type ServerHashRsp_Result struct {
+	RigName         string `json:"rig_name"`
+	RespositoryList string `json:"respository_list"`
+	Config          string `json:"config"`
+	Wallet          string `json:"wallet"`
+	NvidiaOc        string `json:"nvidia_oc"`
+	Autofan         string `json:"autofan"`
+	Confseq         int    `json:"confseq"`
 }

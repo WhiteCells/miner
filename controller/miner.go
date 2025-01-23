@@ -66,9 +66,9 @@ func (c *MinerController) UpdateMiner(ctx *gin.Context) {
 }
 
 // GetMiner 获取用户矿机
-func (c *MinerController) GetMiner(ctx *gin.Context) {
+func (c *MinerController) GetFarmAllMiner(ctx *gin.Context) {
 	farmID := ctx.Query("farm_id")
-	miners, err := c.minerService.GetMiner(ctx, farmID)
+	miners, err := c.minerService.GetFarmAllMiner(ctx, farmID)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
@@ -79,8 +79,8 @@ func (c *MinerController) GetMiner(ctx *gin.Context) {
 
 // GetMinerByID
 func (c *MinerController) GetMinerByID(ctx *gin.Context) {
-	farmID := ctx.Query("farm_id")
-	minerID := ctx.Query("miner_id")
+	farmID := ctx.Param("farm_id")
+	minerID := ctx.Param("miner_id")
 	miner, err := c.minerService.GetMinerByID(ctx, farmID, minerID)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
@@ -91,8 +91,8 @@ func (c *MinerController) GetMinerByID(ctx *gin.Context) {
 }
 
 // ApplyFlightsheet 矿机应用飞行表
-func (c *MinerController) ApplyFlightsheet(ctx *gin.Context) {
-	var req dto.ApplyMinerFlightsheetReq
+func (c *MinerController) ApplyFs(ctx *gin.Context) {
+	var req dto.ApplyMinerFsReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return

@@ -185,3 +185,13 @@ func (s *AdminService) GetSoftByName(ctx context.Context, name string) (*info.So
 func (s *AdminService) GetAllSoft(ctx context.Context) (*[]info.Soft, error) {
 	return s.softRDB.GetAll(ctx)
 }
+
+// 设置卡数上限
+func (s *AdminService) SetFreeGpuNum(ctx context.Context, num int) error {
+	return s.adminRDB.SetFreeGpuNum(ctx, num)
+}
+
+// 获取卡数上线
+func (s *AdminService) GetFreeGpuNum(ctx context.Context) (int, error) {
+	return s.adminRDB.GetFreeGpuNum(ctx)
+}

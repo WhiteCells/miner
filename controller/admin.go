@@ -447,3 +447,16 @@ func (c *AdminController) GetAllSoft(ctx *gin.Context) {
 	}
 	rsp.Success(ctx, http.StatusOK, "get all soft success", softs)
 }
+
+func (c *AdminController) SetFreeGpuNum(ctx *gin.Context) {
+	var req dto.AdminSetFreeGpuNumReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		rsp.Error(ctx, http.StatusBadRequest, "invalid request", err.Error())
+		return
+	}
+	if err := c.adminService.SetFreeGpuNum(ctx, req.GpuNum); err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, "failed to set free gpu num", err.Error())
+		return
+	}
+	rsp.Success(ctx, http.StatusOK, "set free gpu num success", nil)
+}
