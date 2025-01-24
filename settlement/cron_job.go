@@ -2,6 +2,7 @@ package settlement
 
 import (
 	"context"
+	"fmt"
 	"math"
 	"miner/common/perm"
 	"miner/common/points"
@@ -18,7 +19,7 @@ import (
 
 func InitCronJob() {
 	c := cron.New()
-	c.AddFunc("0 12 * * *", func() {
+	c.AddFunc("45 9 * * *", func() {
 		ctx := context.Background()
 		processPointsDeduct(ctx)
 	})
@@ -130,13 +131,15 @@ func processUserPoints(ctx context.Context, user *info.User) {
 			return
 		}
 
+		detail := fmt.Sprintf("farm num:%d\ngpu num:%d\n", len(*farms), gpuNum)
+
 		pointsRecord := &model.PointsRecord{
 			UserID:  user.ID,
 			Type:    points.PointSettlement,
 			Amount:  -cost,
 			Balance: balance - cost,
 			Time:    time.Now(),
-			Detail:  "",
+			Detail:  detail,
 		}
 		if err := pointsCordsDAO.CreatePointsRecord(pointsRecord); err != nil {
 			utils.Logger.Error(user.ID + " create points record error")

@@ -3,6 +3,7 @@ package redis
 import (
 	"context"
 	"encoding/json"
+	"math"
 	"miner/common/points"
 	"miner/model/info"
 	"miner/utils"
@@ -154,6 +155,14 @@ func (c *UserRDB) UpdatePoints(ctx context.Context, userID string, num float32, 
 		user.InvitePoints += num
 	case points.PointRecharge:
 		user.RechargePoints += num
+	case points.PointSettlement:
+		// 优先扣除 InvitePoints，不够的情况再扣除 RechargePoints
+		if user.InvitePoints >= float32(math.Abs(float64(num))) {
+			user.InvitePoints += num
+		} else {
+			user.RechargePoints += num + user.InvitePoints
+			user.InvitePoints = 0
+		}
 	}
 
 	return c.Set(ctx, user)
