@@ -6,6 +6,7 @@ import (
 	"math"
 	"miner/common/perm"
 	"miner/common/points"
+	"miner/common/status"
 	"miner/dao/mysql"
 	"miner/dao/redis"
 	"miner/model"
@@ -48,7 +49,9 @@ func processPointsDeduct(ctx context.Context) {
 		go func() {
 			defer wg.Done()
 			for user := range userChan {
-				processUserPoints(ctx, &user)
+				if user.Status == status.UserOn {
+					processUserPoints(ctx, &user)
+				}
 			}
 		}()
 	}
@@ -138,7 +141,7 @@ func processUserPoints(ctx context.Context, user *info.User) {
 			Type:    points.PointSettlement,
 			Amount:  -cost,
 			Balance: balance - cost,
-			Time:    time.Now(),
+			Time:    now,
 			Detail:  detail,
 		}
 		if err := pointsCordsDAO.CreatePointsRecord(pointsRecord); err != nil {

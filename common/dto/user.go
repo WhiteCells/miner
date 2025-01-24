@@ -14,3 +14,13 @@ type RegisterReq struct {
 	Email      string `json:"email" binding:"required,email,max=32"`
 	InviteCode string `json:"invite_code"`
 }
+
+type GenerateCaptchaRsp struct {
+	CaptchaID string `json:"captcha_id"`
+	Base64    string `json:"base64"`
+}
+
+type VerifyCaptchaReq struct {
+	CaptchaID string `json:"captcha_id"`
+	Value     string `json:"value"`
+}

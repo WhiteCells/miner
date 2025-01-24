@@ -28,6 +28,8 @@ func (ur *UserRoute) InitUserRoute(r *gin.Engine) {
 	{
 		route.POST("/register", middleware.RegisterAuth(), ur.userController.Register)
 		route.POST("/login", ur.userController.Login, middleware.LoginLog())
+		route.GET("/gen_captcha", ur.userController.GenerateCaptcha)
+		route.POST("/verify_captcha", ur.userController.VerifyCaptcha)
 	}
 	route.Use(middleware.JWTAuth())
 	// route.Use(middleware.IPAuth()) // IP 验证要在 token 解析之后
@@ -41,6 +43,5 @@ func (ur *UserRoute) InitUserRoute(r *gin.Engine) {
 		route.GET("/points_records", ur.pointsRecordController.GetPointsRecords)
 		route.GET("/address", ur.userController.GetUserAddress)
 		route.GET("/coins", ur.userController.GetCoins)
-		route.POST("/audit", limiter.Limit(), ur.userController.AuditAmount)
 	}
 }

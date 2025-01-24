@@ -4,6 +4,7 @@ import (
 	"miner/common/dto"
 	"miner/common/rsp"
 	"miner/service"
+	"miner/utils"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -71,25 +72,6 @@ func (c *UserController) GetPointsBalance(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "get points balance success", balance)
 }
 
-// AuditAmount 查账
-func (c *UserController) AuditAmount(ctx *gin.Context) {
-	resultChan, errorChan := c.userService.AuditAmount(ctx)
-
-	done := make(chan struct{})
-	go func() {
-		defer close(done)
-		select {
-		case result := <-resultChan:
-			rsp.Success(ctx, http.StatusOK, "success aduit", result)
-		case err := <-errorChan:
-			rsp.Error(ctx, http.StatusInternalServerError, "failed aduit", err.Error())
-		case <-ctx.Done(): // 超时或取消
-			rsp.Error(ctx, http.StatusGatewayTimeout, "request timeout", nil)
-		}
-	}()
-	<-done
-}
-
 func (c *UserController) GetUserAddress(ctx *gin.Context) {
 	userID := ctx.GetString("user_id")
 	address, err := c.userService.GetUserAddress(ctx, userID)
@@ -107,4 +89,32 @@ func (c *UserController) GetCoins(ctx *gin.Context) {
 		return
 	}
 	rsp.Success(ctx, http.StatusOK, "get coins success", coins)
+}
+
+// GenerateCaptcha
+func (c *UserController) GenerateCaptcha(ctx *gin.Context) {
+	id, b64s, err := utils.GenerateCaptcha(ctx)
+	if err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
+		return
+	}
+	captcha := &dto.GenerateCaptchaRsp{
+		CaptchaID: id,
+		Base64:    b64s,
+	}
+	rsp.Success(ctx, http.StatusOK, "generate captcha success", captcha)
+}
+
+// VerifyCaptcha
+func (c *UserController) VerifyCaptcha(ctx *gin.Context) {
+	var req dto.VerifyCaptchaReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
+		return
+	}
+	if !utils.VerifyCaptcha(ctx, req.CaptchaID, req.Value) {
+		rsp.Error(ctx, http.StatusForbidden, "captcha error", nil)
+		return
+	}
+	rsp.Success(ctx, http.StatusOK, "verify captcha success", nil)
 }

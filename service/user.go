@@ -255,55 +255,6 @@ func (s *UserService) getUserCurBalance(ctx context.Context, address string) (st
 	return result, nil
 }
 
-// AuditAmount
-func (s *UserService) AuditAmount(ctx *gin.Context) (chan string, chan error) {
-	userID, exists := ctx.Value("user_id").(string)
-	if !exists {
-		return nil, nil
-	}
-
-	user, err := s.userRDB.GetByID(ctx, userID)
-	if err != nil {
-		return nil, nil
-	}
-	address := user.Address
-
-	resultChan := make(chan string, 1)
-	errorChan := make(chan error, 1)
-
-	go func() {
-		defer close(resultChan)
-		defer close(errorChan)
-
-		apikey, err := s.bscApiKeyRDB.ZRangeWithScore(ctx)
-		if err != nil {
-			errorChan <- err
-			return
-		}
-		// 增加 apikey 使用次数
-		if err := s.bscApiKeyRDB.ZIncrBy(ctx, apikey, 1); err != nil {
-			errorChan <- err
-			return
-		}
-		result, err := s.requestBscApi(address, apikey)
-		// 减少 apikey 使用次数
-		defer func() {
-			if err := s.bscApiKeyRDB.ZIncrBy(ctx, apikey, -1); err != nil {
-				errorChan <- err
-				return
-			}
-		}()
-		if err != nil {
-			errorChan <- err
-			return
-		}
-
-		resultChan <- result
-	}()
-
-	return resultChan, errorChan
-}
-
 func (s *UserService) GetCoins(ctx context.Context) (*[]string, error) {
 	infos, err := s.coinRDB.GetAll(ctx)
 	if err != nil {
