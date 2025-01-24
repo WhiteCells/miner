@@ -10,10 +10,10 @@ import (
 
 var captchaDriver = base64Captcha.NewDriverDigit(80, 240, 5, 0.7, 80)
 var store = base64Captcha.DefaultMemStore
+var captcha = base64Captcha.NewCaptcha(captchaDriver, store)
 
 // 生成验证码
 func GenerateCaptcha(ctx context.Context) (id string, b64s string, err error) {
-	captcha := base64Captcha.NewCaptcha(captchaDriver, store)
 	if captcha == nil {
 		return "", "", errors.New("failed to initialize captcha")
 	}

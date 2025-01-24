@@ -82,5 +82,5 @@ https://api.bscscan.com/api
 ### 部署
 
 ```sh
-go build -o miner main.go
+go build -ldflags="-s -w" -trimpath -o miner main.go
 ```

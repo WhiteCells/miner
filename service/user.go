@@ -121,7 +121,12 @@ func (s *UserService) Login(ctx *gin.Context, req *dto.LoginReq) (string, *info.
 
 	// 验证密码
 	if !s.validPassword(user, req.Password) {
-		return "", nil, errors.New("invalid password")
+		return "", nil, errors.New("wrong password")
+	}
+
+	// 验证 Captcha
+	if !utils.VerifyCaptcha(ctx, req.CaptchaID, req.CaptchaValue) {
+		return "", nil, errors.New("wrong captcha")
 	}
 
 	// 检查用户状态

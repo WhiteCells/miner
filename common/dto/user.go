@@ -1,9 +1,10 @@
 package dto
 
 type LoginReq struct {
-	Username string `json:"username" binding:"required,min=3,max=32"`
-	Password string `json:"password" binding:"required,min=6,max=32"`
-	// todo 图形验证码
+	Username     string `json:"username" binding:"required,min=3,max=32"`
+	Password     string `json:"password" binding:"required,min=6,max=32"`
+	CaptchaID    string `json:"captcha_id" binding:"required"`
+	CaptchaValue string `json:"captcha_value" binding:"required"`
 	// google 验证码
 	// GoogleCode string `json:"google_code" binding:"required"`
 }
