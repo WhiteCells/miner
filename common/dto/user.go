@@ -25,3 +25,8 @@ type VerifyCaptchaReq struct {
 	CaptchaID string `json:"captcha_id"`
 	Value     string `json:"value"`
 }
+
+type UpdatePasswdReq struct {
+	OldPasswd string `json:"old_passwd" binding:"required,min=6,max=32"`
+	NewPasswd string `json:"new_passwd" binding:"required,min=6,max=32"`
+}

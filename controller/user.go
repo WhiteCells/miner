@@ -62,6 +62,20 @@ func (c *UserController) Logout(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "logout success", nil)
 }
 
+// UpdatePasswd 修改密码
+func (c *UserController) UpdatePasswd(ctx *gin.Context) {
+	var req dto.UpdatePasswdReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
+		return
+	}
+	if err := c.userService.UpdatePasswd(ctx, &req); err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
+		return
+	}
+	rsp.Success(ctx, http.StatusOK, "update passwd success", nil)
+}
+
 // GetPointsBalance 获取积分余额
 func (c *UserController) GetPointsBalance(ctx *gin.Context) {
 	balance, err := c.userService.GetPointsBalance(ctx)
@@ -82,6 +96,7 @@ func (c *UserController) GetUserAddress(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "get user address success", address)
 }
 
+// GetCoins 获取币种信息
 func (c *UserController) GetCoins(ctx *gin.Context) {
 	coins, err := c.userService.GetCoins(ctx)
 	if err != nil {
@@ -89,6 +104,26 @@ func (c *UserController) GetCoins(ctx *gin.Context) {
 		return
 	}
 	rsp.Success(ctx, http.StatusOK, "get coins success", coins)
+}
+
+// GetPools 获取矿池信息
+func (c *UserController) GetPools(ctx *gin.Context) {
+	pools, err := c.userService.GetPools(ctx)
+	if err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
+		return
+	}
+	rsp.Success(ctx, http.StatusOK, "get pools success", pools)
+}
+
+// GetSofts 获取软件信息
+func (c *UserController) GetSofts(ctx *gin.Context) {
+	softs, err := c.userService.GetSofts(ctx)
+	if err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
+		return
+	}
+	rsp.Success(ctx, http.StatusOK, "get softs success", softs)
 }
 
 // GenerateCaptcha

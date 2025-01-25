@@ -29,6 +29,8 @@ type UserService struct {
 	userRDB         *redis.UserRDB
 	adminRDB        *redis.AdminRDB
 	coinRDB         *redis.CoinRDB
+	poolRDB         *redis.PoolRDB
+	softRDB         *redis.SoftRDB
 	operLogDAO      *mysql.OperLogDAO
 	pointsRecordDAO *mysql.PointsRecordDAO
 	bscApiKeyRDB    *redis.BscApiKeyRDB
@@ -40,6 +42,8 @@ func NewUserSerivce() *UserService {
 		userRDB:         redis.NewUserRDB(),
 		adminRDB:        redis.NewAdminRDB(),
 		coinRDB:         redis.NewCoinRDB(),
+		poolRDB:         redis.NewPoolRDB(),
+		softRDB:         redis.NewSoftRDB(),
 		operLogDAO:      mysql.NewOperLogDAO(),
 		pointsRecordDAO: mysql.NewPointRecordDAO(),
 		bscApiKeyRDB:    redis.NewBscApiKeyRDB(),
@@ -186,6 +190,30 @@ func (s *UserService) Logout(ctx *gin.Context) error {
 	return nil
 }
 
+// UpdatePasswd 修改用户密码
+func (s *UserService) UpdatePasswd(ctx *gin.Context, req *dto.UpdatePasswdReq) error {
+	userID, exists := ctx.Value("user_id").(string)
+	if !exists {
+		return errors.New("invalid user_id in context")
+	}
+	user, err := s.userRDB.GetByID(ctx, userID)
+	if err != nil {
+		return errors.New("user not found")
+	}
+	if !s.validPassword(user, req.OldPasswd) {
+		return errors.New("wrong old password")
+	}
+	hashPassword, err := utils.EncryptPassword(req.NewPasswd)
+	if err != nil {
+		return errors.New("failed to encrypt new password")
+	}
+	user.Password = hashPassword
+	if err := s.userRDB.Set(ctx, user); err != nil {
+		return errors.New("failed to update user password")
+	}
+	return nil
+}
+
 // GetPointsBalance 获取用户积分余额
 func (s *UserService) GetPointsBalance(ctx *gin.Context) (float32, error) {
 	userID, exists := ctx.Value("user_id").(string)
@@ -270,6 +298,14 @@ func (s *UserService) GetCoins(ctx context.Context) (*[]string, error) {
 		coins = append(coins, info.Name)
 	}
 	return &coins, nil
+}
+
+func (s *UserService) GetPools(ctx context.Context) (*[]info.Pool, error) {
+	return s.poolRDB.GetAll(ctx)
+}
+
+func (s *UserService) GetSofts(ctx context.Context) (*[]info.Soft, error) {
+	return s.softRDB.GetAll(ctx)
 }
 
 // 调用 bsc api
