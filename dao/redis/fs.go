@@ -15,18 +15,34 @@ func NewFsRDB() *FsRDB {
 
 // 添加飞行表
 // 更新飞行表
-// +--------------+-----------+-----------------+
-// | field        |    key    |  val            |
-// ---------------+-----------+-----------------+
-// | fs:<user_id> |  <fs_id>  |  info           |
-// +--------------+-----------+-----------------+
+// +--------------+-----------+--------+
+// | field        |    key    |  val   |
+// ---------------+-----------+--------+
+// | fs:<user_id> |  <fs_id>  |  info  |
+// +--------------+-----------+--------+
 func (c *FsRDB) Set(ctx context.Context, userID string, fs *info.Fs) error {
+	pipe := utils.RDB.Client.TxPipeline()
+
+	// 设置飞行表
 	field := MakeField(FsField, userID)
-	fsJSON, err := json.Marshal(fs)
+	fsByte, err := json.Marshal(fs)
 	if err != nil {
 		return err
 	}
-	return utils.RDB.HSet(ctx, field, fs.ID, string(fsJSON))
+	pipe.HSet(ctx, field, fs.ID, string(fsByte))
+	// Wallet
+	key := MakeField(FsWalletField, fs.ID)
+	pipe.Set(ctx, key, fs.WalletID, 0)
+	// Pool
+	key = MakeField(FsPoolField, fs.ID)
+	pipe.Set(ctx, key, fs.Pool, 0)
+	// Soft
+	key = MakeField(FsSoftField, fs.ID)
+	pipe.Set(ctx, key, fs.Soft, 0)
+
+	_, err = pipe.Exec(ctx)
+
+	return err
 }
 
 // 删除飞行表
@@ -69,7 +85,7 @@ func (c *FsRDB) GetByID(ctx context.Context, userID string, fsID string) (*info.
 // +--------------------+--------------+
 // | key                |   val        |
 // +--------------------+--------------+
-// | fs_wallet:<fs_id>  | <wallet_id>  |
+// | fs:wallet:<fs_id>  | <wallet_id>  |
 // +--------------------+--------------+
 func (c *FsRDB) ApplyWallet(ctx context.Context, userID, fsID, walletID string) error {
 	key := MakeKey(FsWalletField, fsID)
@@ -80,9 +96,20 @@ func (c *FsRDB) ApplyWallet(ctx context.Context, userID, fsID, walletID string) 
 // +------------------+----------------+
 // | key              |   val          |
 // +------------------+----------------+
-// | fs:pool:<fs_id>  | <pool_id>      |
+// | fs:pool:<fs_id>  | <pool>         |
 // +------------------+----------------+
-func (c *FsRDB) ApplyMinepool(ctx context.Context, userID, fsID, minepoolID string) error {
+func (c *FsRDB) ApplyPool(ctx context.Context, userID, fsID, pool string) error {
 	key := MakeKey(FsPoolField, fsID)
-	return utils.RDB.Set(ctx, key, minepoolID)
+	return utils.RDB.Set(ctx, key, pool)
+}
+
+// 应用软件
+// +-----------------+---------+
+// | key             |   val   |
+// +-----------------+---------+
+// | fs:soft:<fs_id> |  <soft> |
+// +-----------------+---------+
+func (c *FsRDB) ApplySoft(ctx context.Context, userID, fsID, soft string) error {
+	key := MakeKey(FsSoftField, fsID)
+	return utils.RDB.Set(ctx, key, soft)
 }

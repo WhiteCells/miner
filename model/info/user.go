@@ -12,6 +12,7 @@ type User struct {
 	Email          string            `json:"email"`
 	Password       string            `json:"password"`
 	Secret         string            `json:"secret"`
+	MnemonicVer    string            `json:"mnemonic_ver"` // 助记词版本
 	Address        string            `json:"address"`
 	Role           role.RoleType     `json:"role"`
 	InvitePoints   float32           `json:"invite_points"`

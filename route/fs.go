@@ -30,6 +30,6 @@ func (fr *FsRoute) InitFsRoute(r *gin.Engine) {
 		route.PUT("", fr.fsController.UpdateFs)
 		route.GET("", fr.fsController.GetAllFs)
 		route.GET("/:fs_id", fr.fsController.GetFsByID)
-		route.PUT("/apply_wallet", fr.fsController.ApplyWallet)
+		// route.PUT("/apply_wallet", fr.fsController.ApplyWallet)
 	}
 }

@@ -21,6 +21,7 @@ var MpField = "mp"
 var MinerFsField = "miner:fs"
 var FsWalletField = "fs:wallet"
 var FsPoolField = "fs:pool"
+var FsSoftField = "fs:soft"
 
 var BanToken = "ban_token"
 

@@ -31,11 +31,12 @@ func (s *FsService) CreateFs(ctx context.Context, req *dto.CreateFsReq) (*info.F
 		return nil, err
 	}
 	fs := &info.Fs{
-		ID:   id,
-		Name: req.Name,
-		Coin: req.Coin,
-		Pool: req.Pool,
-		Soft: req.Soft,
+		ID:       id,
+		Name:     req.Name,
+		Coin:     req.Coin,
+		WalletID: req.WalletID,
+		Pool:     req.Pool,
+		Soft:     req.Soft,
 	}
 
 	if err := s.fsRDB.Set(ctx, userID, fs); err != nil {
@@ -78,6 +79,8 @@ func (s *FsService) UpdateFs(ctx context.Context, req *dto.UpdateFsReq) error {
 			fs.Name = value.(string)
 		case "coin":
 			fs.Coin = value.(string)
+		case "wallet_id":
+			fs.WalletID = value.(string)
 		case "pool":
 			fs.Pool = value.(string)
 		case "soft":

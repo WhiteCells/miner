@@ -112,6 +112,7 @@ func processUserPoints(ctx context.Context, user *info.User) {
 
 		// 计算消耗积分
 		num := min(gpuNum, 6)
+		// cost := float32(gpuNum-freeGpuNum) * price[num-1] / 30 * float32(days) * discount[gpuNum]
 		cost := float32(gpuNum-freeGpuNum) * price[num-1] / 30 * float32(days)
 
 		balance := user.InvitePoints + user.RechargePoints

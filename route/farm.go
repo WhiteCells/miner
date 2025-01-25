@@ -37,6 +37,5 @@ func (fr *FarmRoute) InitFarmRoute(r *gin.Engine) {
 		route.PUT("/apply_fs", fr.farmController.ApplyFs)
 		route.PUT("/transfer", fr.farmController.Transfer)
 		route.PUT("/hash", fr.farmController.UpdateFarmHash)
-		// route.PUT("/farm_hash", fr.farmController.UpdateFarmHash)
 	}
 }
