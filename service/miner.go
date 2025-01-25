@@ -284,11 +284,7 @@ func (s *MinerService) GetRigConf(ctx context.Context, req *dto.GetRigConfReq) (
 
 // ApplyFs 矿机应用飞行表
 func (s *MinerService) ApplyFs(ctx context.Context, req *dto.ApplyMinerFsReq) error {
-	userID, exists := ctx.Value("user_id").(string)
-	if !exists {
-		return errors.New("invalid user_id in context")
-	}
-	if !s.validPerm(ctx, userID, req.MinerID, []perm.MinerPerm{perm.MinerOwner, perm.MinerManager}) {
+	if !s.validPerm(ctx, req.FarmID, req.MinerID, []perm.MinerPerm{perm.MinerOwner, perm.MinerManager}) {
 		return errors.New("permission denied")
 	}
 	return s.minerRDB.ApplyFs(ctx, req.FarmID, req.MinerID, req.FsID)

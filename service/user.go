@@ -129,9 +129,9 @@ func (s *UserService) Login(ctx *gin.Context, req *dto.LoginReq) (string, *info.
 	}
 
 	// 验证 Captcha
-	if !utils.VerifyCaptcha(ctx, req.CaptchaID, req.CaptchaValue) {
-		return "", nil, errors.New("wrong captcha")
-	}
+	// if !utils.VerifyCaptcha(ctx, req.CaptchaID, req.CaptchaValue) {
+	// 	return "", nil, errors.New("wrong captcha")
+	// }
 
 	// 检查用户状态
 	if user.Status != status.UserOn {

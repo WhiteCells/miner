@@ -122,13 +122,13 @@ func (s *FsService) GetFsByID(ctx context.Context, fsID string) (*info.Fs, error
 }
 
 // ApplyWallet 飞行表应用钱包
-func (s *FsService) ApplyWallet(ctx context.Context, req *dto.ApplyWalletReq) error {
-	userID, exists := ctx.Value("user_id").(string)
-	if !exists {
-		return errors.New("invalid user_id in context")
-	}
-	if err := s.fsRDB.ApplyWallet(ctx, userID, req.FsID, req.WaleltID); err != nil {
-		return err
-	}
-	return nil
-}
+// func (s *FsService) ApplyWallet(ctx context.Context, req *dto.ApplyWalletReq) error {
+// 	userID, exists := ctx.Value("user_id").(string)
+// 	if !exists {
+// 		return errors.New("invalid user_id in context")
+// 	}
+// 	if err := s.fsRDB.ApplyWallet(ctx, userID, req.FsID, req.WaleltID); err != nil {
+// 		return err
+// 	}
+// 	return nil
+// }

@@ -92,17 +92,17 @@ func (c *FsController) GetFsByID(ctx *gin.Context) {
 }
 
 // ApplyWallet 飞行表应用钱包
-func (c *FsController) ApplyWallet(ctx *gin.Context) {
-	var req dto.ApplyWalletReq
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
-		return
-	}
+// func (c *FsController) ApplyWallet(ctx *gin.Context) {
+// 	var req dto.ApplyWalletReq
+// 	if err := ctx.ShouldBindJSON(&req); err != nil {
+// 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
+// 		return
+// 	}
 
-	if err := c.fsService.ApplyWallet(ctx, &req); err != nil {
-		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
-		return
-	}
+// 	if err := c.fsService.ApplyWallet(ctx, &req); err != nil {
+// 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
+// 		return
+// 	}
 
-	rsp.Success(ctx, http.StatusOK, "apply wallet success", nil)
-}
+// 	rsp.Success(ctx, http.StatusOK, "apply wallet success", nil)
+// }

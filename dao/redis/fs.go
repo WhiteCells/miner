@@ -87,10 +87,10 @@ func (c *FsRDB) GetByID(ctx context.Context, userID string, fsID string) (*info.
 // +--------------------+--------------+
 // | fs:wallet:<fs_id>  | <wallet_id>  |
 // +--------------------+--------------+
-func (c *FsRDB) ApplyWallet(ctx context.Context, userID, fsID, walletID string) error {
-	key := MakeKey(FsWalletField, fsID)
-	return utils.RDB.Set(ctx, key, walletID)
-}
+// func (c *FsRDB) ApplyWallet(ctx context.Context, userID, fsID, walletID string) error {
+// 	key := MakeKey(FsWalletField, fsID)
+// 	return utils.RDB.Set(ctx, key, walletID)
+// }
 
 // 应用矿池
 // +------------------+----------------+

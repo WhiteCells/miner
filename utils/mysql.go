@@ -2,7 +2,6 @@ package utils
 
 import (
 	"fmt"
-	// "miner/model"
 	"sync"
 
 	"gorm.io/driver/mysql"

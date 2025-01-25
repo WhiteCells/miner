@@ -111,7 +111,7 @@ func (c *MinerRDB) ApplyFs(ctx context.Context, farmID string, minerID string, f
 	// 更新 miner
 	// 获取 miner
 	field := MakeField(MinerField, farmID)
-	minerJSON, err := pipe.HGet(ctx, field, minerID).Result()
+	minerJSON, err := utils.RDB.Client.HGet(ctx, field, minerID).Result()
 	if err != nil {
 		return err
 	}
