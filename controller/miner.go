@@ -79,8 +79,8 @@ func (c *MinerController) GetFarmAllMiner(ctx *gin.Context) {
 
 // GetMinerByID
 func (c *MinerController) GetMinerByID(ctx *gin.Context) {
-	farmID := ctx.Param("farm_id")
-	minerID := ctx.Param("miner_id")
+	farmID := ctx.Query("farm_id")
+	minerID := ctx.Query("miner_id")
 	miner, err := c.minerService.GetMinerByID(ctx, farmID, minerID)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
@@ -122,12 +122,9 @@ func (c *MinerController) Transfer(ctx *gin.Context) {
 
 // 获取 rig.conf
 func (c *MinerController) GetRigConf(ctx *gin.Context) {
-	var req dto.GetRigConfReq
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
-		return
-	}
-	conf, err := c.minerService.GetRigConf(ctx, &req)
+	farmID := ctx.Query("farm_id")
+	minerID := ctx.Query("miner_id")
+	conf, err := c.minerService.GetRigConf(ctx, farmID, minerID)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return

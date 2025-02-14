@@ -9,7 +9,6 @@ var AdminGfsField = "gfs"
 
 // User
 var UserField = "user:user"
-var NameIDField = "user:name"
 var EmailIDField = "user:email"
 var FarmField = "farm"
 var FarmHashField = "farm:hash"

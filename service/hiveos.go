@@ -67,8 +67,7 @@ func (s *HiveOsService) helloCase(ctx *gin.Context, rigID string) {
 		return
 	}
 	s.formatOutput(&req)
-	// 对 req 的数据进行存储
-	s.setMinerInfo(ctx, rigID, &req)
+
 	// 从 req 中获取 rigID，根据 rigID 查询 hiveOsRDB farmID:minerID
 	userID, farmID, minerID, err := s.hiveOsRDB.GetRigFarmAndMinerID(ctx, rigID)
 	if err != nil {
@@ -90,7 +89,8 @@ func (s *HiveOsService) helloCase(ctx *gin.Context, rigID string) {
 		return
 	}
 
-	// 通过 minerID 获取其 fsID
+	// 对 req 的数据进行存储
+	s.setMinerInfo(ctx, rigID, &req)
 
 	// 更新 miner GpuNum
 	miner.GpuNum = len(req.Params.Gpu)
@@ -179,12 +179,11 @@ func (s *HiveOsService) statsCase(ctx *gin.Context, rigID string) {
 		return
 	}
 	s.formatOutput(&req)
-	// 对 req 的数据进行存储
-	s.setMinerStats(ctx, rigID, &req)
+
 	// 从 req 中获取 rigID，根据 rigID 查询 hiveOsRDB farmID:minerID
 	_, farmID, minerID, err := s.hiveOsRDB.GetRigFarmAndMinerID(ctx, rigID)
 	if err != nil {
-		rsp.Error(ctx, http.StatusBadRequest, err.Error(), "")
+		rsp.Error(ctx, http.StatusNotAcceptable, err.Error(), "")
 		return
 	}
 	// 通过 farmID 和 minerID 获取 miner
@@ -200,6 +199,9 @@ func (s *HiveOsService) statsCase(ctx *gin.Context, rigID string) {
 		rsp.Error(ctx, http.StatusInternalServerError, "invalid pass", "")
 		return
 	}
+
+	// 对 req 的数据进行存储
+	s.setMinerStats(ctx, rigID, &req)
 
 	// 通过 minerID 获取其 fsID
 

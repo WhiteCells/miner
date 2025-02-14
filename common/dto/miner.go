@@ -28,8 +28,3 @@ type TransferMinerReq struct {
 	ToUserID   string `json:"to_user_id" binding:"required"`
 	ToFarmID   string `json:"to_farm_id" binding:"required"`
 }
-
-type GetRigConfReq struct {
-	FarmID  string `json:"farm_id" binding:"required"`
-	MinerID string `json:"miner_id" binding:"required"`
-}

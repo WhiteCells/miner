@@ -40,14 +40,11 @@ func (c *UserRDB) Set(ctx context.Context, user *info.User) error {
 	if err != nil {
 		return err
 	}
-
-	nKey := MakeField(NameIDField, user.Name)
 	eKey := MakeField(EmailIDField, user.Email)
 
 	pipe := utils.RDB.Client.TxPipeline()
 
 	pipe.HSet(ctx, UserField, user.ID, string(userByte))
-	pipe.Set(ctx, nKey, user.ID, 0)
 	pipe.Set(ctx, eKey, user.ID, 0)
 
 	_, err = pipe.Exec(ctx)
@@ -62,13 +59,11 @@ func (c *UserRDB) Del(ctx context.Context, userID string) error {
 		return err
 	}
 
-	nKey := MakeField(NameIDField, user.Name)
 	eKey := MakeField(EmailIDField, user.Email)
 
 	pipe := utils.RDB.Client.TxPipeline()
 
 	pipe.HDel(ctx, UserField, user.ID)
-	pipe.Del(ctx, nKey)
 	pipe.Del(ctx, eKey)
 
 	_, err = pipe.Exec(ctx)
@@ -85,17 +80,6 @@ func (c *UserRDB) GetByID(ctx context.Context, userID string) (*info.User, error
 	var user info.User
 	err = json.Unmarshal([]byte(userJSON), &user)
 	return &user, err
-}
-
-// 通过姓名获取用户信息
-func (c *UserRDB) GetByName(ctx context.Context, name string) (*info.User, error) {
-	// 通过 name 找到对应 ID
-	nKey := MakeKey(NameIDField, name)
-	id, err := utils.RDB.Get(ctx, nKey)
-	if err != nil {
-		return nil, err
-	}
-	return c.GetByID(ctx, id)
 }
 
 // 通过邮箱获取用户信息
@@ -123,12 +107,6 @@ func (c *UserRDB) GetAll(ctx context.Context) (*[]info.User, error) {
 		users = append(users, *user)
 	}
 	return &users, err
-}
-
-// 是否存在用户名
-func (c *UserRDB) ExistsName(ctx context.Context, name string) bool {
-	_, err := c.GetByName(ctx, name)
-	return err == nil
 }
 
 // 是否存在邮箱

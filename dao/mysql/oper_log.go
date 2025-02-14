@@ -3,7 +3,7 @@ package mysql
 import (
 	"miner/model"
 	"miner/utils"
-	"time"
+	"strconv"
 )
 
 type OperLogDAO struct{}
@@ -20,18 +20,22 @@ func (dao *OperLogDAO) GetOperLogs(query map[string]interface{}) (*[]model.OperL
 	db := utils.DB.Model(&model.OperLog{})
 
 	// 添加查询条件
-	if userID, ok := query["user_id"].(int); ok {
-		db = db.Where("user_id = ?", userID)
+	if userIDStr, ok := query["user_id"].(string); ok {
+		if userID, err := strconv.Atoi(userIDStr); err == nil {
+			db = db.Where("user_id = ?", userID)
+		} else {
+			return nil, -1, err
+		}
 	}
-	if action, ok := query["action"].(string); ok && action != "" {
-		db = db.Where("action = ?", action)
-	}
-	if startTime, ok := query["start_time"].(time.Time); ok {
-		db = db.Where("time >= ?", startTime)
-	}
-	if endTime, ok := query["end_time"].(time.Time); ok {
-		db = db.Where("time <= ?", endTime)
-	}
+	// if action, ok := query["action"].(string); ok && action != "" {
+	// 	db = db.Where("action = ?", action)
+	// }
+	// if startTime, ok := query["start_time"].(time.Time); ok {
+	// 	db = db.Where("time >= ?", startTime)
+	// }
+	// if endTime, ok := query["end_time"].(time.Time); ok {
+	// 	db = db.Where("time <= ?", endTime)
+	// }
 
 	// 获取总数
 	if err := db.Count(&total).Error; err != nil {
@@ -44,7 +48,7 @@ func (dao *OperLogDAO) GetOperLogs(query map[string]interface{}) (*[]model.OperL
 	// 获取分页数据
 	err := db.Offset((pageNum - 1) * pageSize).
 		Limit(pageSize).
-		Order("time").
+		Order("time desc").
 		Find(&logs).Error
 
 	return &logs, total, err

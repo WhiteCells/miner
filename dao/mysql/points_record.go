@@ -3,7 +3,6 @@ package mysql
 import (
 	"miner/model"
 	"miner/utils"
-	"time"
 )
 
 type PointsRecordDAO struct{}
@@ -27,15 +26,6 @@ func (dao *PointsRecordDAO) GetUserPointsRecords(query map[string]interface{}) (
 	// 添加查询条件
 	if userID, ok := query["user_id"].(int); ok {
 		db = db.Where("user_id = ?", userID)
-	}
-	if action, ok := query["action"].(string); ok {
-		db = db.Where("action = ?", action)
-	}
-	if startTime, ok := query["start_time"].(time.Time); ok {
-		db = db.Where("time >= ?", startTime)
-	}
-	if endTime, ok := query["end_time"].(time.Time); ok {
-		db = db.Where("time <= ?", endTime)
 	}
 
 	// 获取总数

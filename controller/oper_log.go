@@ -5,7 +5,6 @@ import (
 	"miner/service"
 	"net/http"
 	"strconv"
-	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -29,27 +28,27 @@ func (c *OperLogController) GetOperLogs(ctx *gin.Context) {
 	}
 
 	// action
-	action := ctx.Query("action")
+	// action := ctx.Query("action")
 
 	// 解析时间字符串为 time.Time 类型
-	startTimeStr := ctx.Query("start_time")
-	endTimeStr := ctx.Query("end_time")
-	var startTime, endTime time.Time
-	var err error
-	if startTimeStr != "" {
-		startTime, err = time.Parse(time.RFC3339, startTimeStr)
-		if err != nil {
-			rsp.Error(ctx, http.StatusBadRequest, "invalid start_time format", nil)
-			return
-		}
-	}
-	if endTimeStr != "" {
-		endTime, err = time.Parse(time.RFC3339, endTimeStr)
-		if err != nil {
-			rsp.Error(ctx, http.StatusBadRequest, "invalid end_time format", nil)
-			return
-		}
-	}
+	// startTimeStr := ctx.Query("start_time")
+	// endTimeStr := ctx.Query("end_time")
+	// var startTime, endTime time.Time
+	// var err error
+	// if startTimeStr != "" {
+	// 	startTime, err = time.Parse(time.RFC3339, startTimeStr)
+	// 	if err != nil {
+	// 		rsp.Error(ctx, http.StatusBadRequest, "invalid start_time format", nil)
+	// 		return
+	// 	}
+	// }
+	// if endTimeStr != "" {
+	// 	endTime, err = time.Parse(time.RFC3339, endTimeStr)
+	// 	if err != nil {
+	// 		rsp.Error(ctx, http.StatusBadRequest, "invalid end_time format", nil)
+	// 		return
+	// 	}
+	// }
 
 	// 分页参数解析
 	pageNum, err := strconv.Atoi(ctx.Query("page_num"))
@@ -64,12 +63,12 @@ func (c *OperLogController) GetOperLogs(ctx *gin.Context) {
 	}
 
 	query := map[string]interface{}{
-		"user_id":    userID,
-		"action":     action,
-		"start_time": startTime,
-		"end_time":   endTime,
-		"page_num":   pageNum,
-		"page_size":  pageSize,
+		"user_id": userID,
+		// "action":  action,
+		// "start_time": startTime,
+		// "end_time":   endTime,
+		"page_num":  pageNum,
+		"page_size": pageSize,
 	}
 
 	logs, total, err := c.operLogService.GetOperLogs(ctx, query)

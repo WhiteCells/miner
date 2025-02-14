@@ -211,13 +211,13 @@ func (s *MinerService) Transfer(ctx context.Context, req *dto.TransferMinerReq) 
 }
 
 // 获取 rig.conf
-func (s *MinerService) GetRigConf(ctx context.Context, req *dto.GetRigConfReq) (string, error) {
+func (s *MinerService) GetRigConf(ctx context.Context, farmID string, minerID string) (string, error) {
 	userID, exists := ctx.Value("user_id").(string)
 	if !exists {
 		return "", errors.New("invalid user_id in context")
 	}
 	// 权限检查
-	if !s.validPerm(ctx, req.FarmID, req.MinerID, []perm.MinerPerm{perm.MinerOwner}) {
+	if !s.validPerm(ctx, farmID, minerID, []perm.MinerPerm{perm.MinerOwner}) {
 		return "", errors.New("permission denied")
 	}
 	// 从 utils/rig.conf 文件中读取内容
@@ -229,30 +229,24 @@ func (s *MinerService) GetRigConf(ctx context.Context, req *dto.GetRigConfReq) (
 
 	hive_host := utils.GenerateHiveOsUrl()
 
-	farm, err := s.farmRDB.GetByID(ctx, userID, req.FarmID)
+	farm, err := s.farmRDB.GetByID(ctx, userID, farmID)
 	if err != nil {
 		return "", err
 	}
 
-	miner, err := s.minerRDB.GetByID(ctx, req.FarmID, req.MinerID)
+	miner, err := s.minerRDB.GetByID(ctx, farmID, minerID)
 	if err != nil {
 		return "", err
 	}
-
-	rigID := miner.RigID
-	rigPass := miner.Pass
-	workName := miner.Name
-	farmID := req.FarmID
-	timeZone := farm.TimeZone
 
 	kv := map[string]string{
 		"HIVE_HOST_URL": hive_host,
 		"API_HOST_URLs": hive_host,
-		"RIG_ID":        rigID,
-		"RIG_PASSWD":    rigPass,
-		"WORKER_NAME":   workName,
+		"RIG_ID":        miner.RigID,
+		"RIG_PASSWD":    miner.Pass,
+		"WORKER_NAME":   miner.Name,
 		"FARM_ID":       farmID,
-		"TIMEZONE":      timeZone,
+		"TIMEZONE":      farm.TimeZone,
 	}
 
 	for key, val := range kv {

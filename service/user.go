@@ -52,11 +52,6 @@ func NewUserSerivce() *UserService {
 
 // Register 用户注册
 func (s *UserService) Register(ctx *gin.Context, req *dto.RegisterReq) (string, error) {
-	// 用户名
-	if s.userRDB.ExistsName(ctx, req.Username) {
-		return "", errors.New("user Name " + req.Username + " exists")
-	}
-
 	// 邮箱
 	if s.userRDB.ExistsEmail(ctx, req.Email) {
 		return "", errors.New("user Email " + req.Email + " exists")
@@ -113,7 +108,7 @@ func (s *UserService) Register(ctx *gin.Context, req *dto.RegisterReq) (string, 
 
 // Login 用户登录
 func (s *UserService) Login(ctx *gin.Context, req *dto.LoginReq) (string, *info.User, error) {
-	user, err := s.userRDB.GetByName(ctx, req.Username)
+	user, err := s.userRDB.GetByEmail(ctx, req.Email)
 	if err != nil {
 		return "", nil, errors.New("user not found")
 	}

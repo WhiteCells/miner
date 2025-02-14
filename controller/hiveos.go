@@ -77,7 +77,7 @@ func (c *HiveOsController) GetMinerInfo(ctx *gin.Context) {
 	rigID := ctx.Query("rig_id")
 	info, err := c.hiveOsService.GetMinerInfo(ctx, rigID)
 	if err != nil {
-		rsp.Error(ctx, http.StatusInternalServerError, "get miner stats failed", err.Error())
+		rsp.Error(ctx, http.StatusInternalServerError, "get miner info failed", err.Error())
 		return
 	}
 	rsp.Success(ctx, http.StatusOK, "get miner stats success", info)
