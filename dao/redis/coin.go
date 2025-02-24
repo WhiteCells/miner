@@ -37,7 +37,7 @@ func (c *CoinRDB) Del(ctx context.Context, name string) error {
 	return utils.RDB.HDel(ctx, field, key)
 }
 
-func (c *CoinRDB) GetByName(ctx context.Context, name string) (*info.Coin, error) {
+func (c *CoinRDB) Get(ctx context.Context, name string) (*info.Coin, error) {
 	field := MakeField(CoinField)
 	key := MakeKey(name)
 	infoStr, err := utils.RDB.HGet(ctx, field, key)
@@ -72,6 +72,6 @@ func (c *CoinRDB) GetAll(ctx context.Context) (*[]info.Coin, error) {
 }
 
 func (c *CoinRDB) Exists(ctx context.Context, name string) bool {
-	_, err := c.GetByName(ctx, name)
+	_, err := c.Get(ctx, name)
 	return err == nil
 }

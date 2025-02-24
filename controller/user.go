@@ -108,7 +108,8 @@ func (c *UserController) GetCoins(ctx *gin.Context) {
 
 // GetPools 获取矿池信息
 func (c *UserController) GetPools(ctx *gin.Context) {
-	pools, err := c.userService.GetPools(ctx)
+	coinName := ctx.Query("coin_name")
+	pools, err := c.userService.GetPools(ctx, coinName)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return

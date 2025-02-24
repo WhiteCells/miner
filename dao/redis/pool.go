@@ -14,15 +14,16 @@ func NewPoolRDB() *PoolRDB {
 	return &PoolRDB{}
 }
 
-// 使用 hash 便于查找所有的 pool
-// +--------+---------+--------+
-// | field  | key     | val    |
-// +--------+---------+--------+
-// | pool   | <name>  | <info> |
-// +--------+---------+--------+
+// coin:pool
+// 每一种 coin 都对应多个 pool
+// +-------------+---------+--------+
+// | field       | key     | val    |
+// +-------------+---------+--------+
+// | <coin>:pool | <name>  | <info> |
+// +-------------+---------+--------+
 
-func (c *PoolRDB) Set(ctx context.Context, info *info.Pool) error {
-	field := MakeField(PoolField)
+func (c *PoolRDB) Set(ctx context.Context, coin string, info *info.Pool) error {
+	field := MakeField(coin, PoolField)
 	key := MakeKey(info.Name)
 	infoByte, err := json.Marshal(info)
 	if err != nil {
@@ -31,14 +32,14 @@ func (c *PoolRDB) Set(ctx context.Context, info *info.Pool) error {
 	return utils.RDB.HSet(ctx, field, key, string(infoByte))
 }
 
-func (c *PoolRDB) Del(ctx context.Context, name string) error {
-	field := MakeField(PoolField)
+func (c *PoolRDB) Del(ctx context.Context, coin string, name string) error {
+	field := MakeField(coin, PoolField)
 	key := MakeKey(name)
 	return utils.RDB.HDel(ctx, field, key)
 }
 
-func (c *PoolRDB) GetByName(ctx context.Context, name string) (*info.Pool, error) {
-	field := MakeField(PoolField)
+func (c *PoolRDB) Get(ctx context.Context, coin string, name string) (*info.Pool, error) {
+	field := MakeField(coin, PoolField)
 	key := MakeKey(name)
 	infoStr, err := utils.RDB.HGet(ctx, field, key)
 	if err != nil {
@@ -51,7 +52,7 @@ func (c *PoolRDB) GetByName(ctx context.Context, name string) (*info.Pool, error
 	return &info, nil
 }
 
-func (c *PoolRDB) GetAll(ctx context.Context) (*[]info.Pool, error) {
+func (c *PoolRDB) GetAll(ctx context.Context, coinName string) (*[]info.Pool, error) {
 	field := MakeField(PoolField)
 
 	infos, err := utils.RDB.HGetAll(ctx, field)
@@ -71,7 +72,7 @@ func (c *PoolRDB) GetAll(ctx context.Context) (*[]info.Pool, error) {
 	return &pools, nil
 }
 
-func (c *PoolRDB) Exists(ctx context.Context, name string) bool {
-	_, err := c.GetByName(ctx, name)
+func (c *PoolRDB) Exists(ctx context.Context, coin string, name string) bool {
+	_, err := c.Get(ctx, coin, name)
 	return err == nil
 }

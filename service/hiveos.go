@@ -126,6 +126,7 @@ func (s *HiveOsService) helloCase(ctx *gin.Context, rigID string) {
 	ctx.JSON(http.StatusOK, rsp)
 }
 
+// poll hello case use hash
 func (s *HiveOsService) helloCaseUseHash(ctx *gin.Context) {
 	var req dto.HelloReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {

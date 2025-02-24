@@ -1,11 +1,11 @@
 package info
 
 type Pool struct {
-	Name   string   `json:"name"`
-	Server []server `json:"server"`
+	Name string `json:"name"`
+	Urls []Url  `json:"urls"`
 }
 
-type server struct {
+type Url struct {
 	Name string `json:"name"`
 	Host string `json:"host"`
 }

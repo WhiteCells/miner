@@ -135,53 +135,62 @@ func (s *AdminService) DelBscApiKey(ctx context.Context, apikey string) error {
 	return s.bscApiKeyRDB.ZRem(ctx, apikey)
 }
 
-// coin
+// AddCoin 添加代币
 func (s *AdminService) AddCoin(ctx context.Context, coin *info.Coin) error {
 	return s.coinRDB.Set(ctx, coin)
 }
 
+// DelCoin 删除代币
 func (s *AdminService) DelCoin(ctx context.Context, name string) error {
 	return s.coinRDB.Del(ctx, name)
 }
 
-func (s *AdminService) GetCoinByName(ctx context.Context, name string) (*info.Coin, error) {
-	return s.coinRDB.GetByName(ctx, name)
+// GetCoinByName 获取代币
+func (s *AdminService) GetCoin(ctx context.Context, name string) (*info.Coin, error) {
+	return s.coinRDB.Get(ctx, name)
 }
 
+// GetAllCoin 获取所有代币
 func (s *AdminService) GetAllCoin(ctx context.Context) (*[]info.Coin, error) {
 	return s.coinRDB.GetAll(ctx)
 }
 
-// pool
-func (s *AdminService) AddPool(ctx context.Context, pool *info.Pool) error {
-	return s.poolRDB.Set(ctx, pool)
+// AddPool 添加矿池
+func (s *AdminService) AddPool(ctx context.Context, CoinName string, pool *info.Pool) error {
+	return s.poolRDB.Set(ctx, CoinName, pool)
 }
 
-func (s *AdminService) DelPool(ctx context.Context, name string) error {
-	return s.poolRDB.Del(ctx, name)
+// DelPool 删除矿池
+func (s *AdminService) DelPool(ctx context.Context, coinName string, poolName string) error {
+	return s.poolRDB.Del(ctx, coinName, poolName)
 }
 
-func (s *AdminService) GetPoolByName(ctx context.Context, name string) (*info.Pool, error) {
-	return s.poolRDB.GetByName(ctx, name)
+// GetPool 获取矿池
+func (s *AdminService) GetPool(ctx context.Context, coinName string, name string) (*info.Pool, error) {
+	return s.poolRDB.Get(ctx, coinName, name)
 }
 
-func (s *AdminService) GetAllPool(ctx context.Context) (*[]info.Pool, error) {
-	return s.poolRDB.GetAll(ctx)
+// GetAllPool 获取所有矿池
+func (s *AdminService) GetAllPool(ctx context.Context, coinName string) (*[]info.Pool, error) {
+	return s.poolRDB.GetAll(ctx, coinName)
 }
 
-// soft
+// AddSoft
 func (s *AdminService) AddSoft(ctx context.Context, soft *info.Soft) error {
 	return s.softRDB.Set(ctx, soft)
 }
 
+// DelSoft
 func (s *AdminService) DelSoft(ctx context.Context, name string) error {
 	return s.softRDB.Del(ctx, name)
 }
 
+// GetSoftByName
 func (s *AdminService) GetSoftByName(ctx context.Context, name string) (*info.Soft, error) {
 	return s.softRDB.GetByName(ctx, name)
 }
 
+// GetAllSoft
 func (s *AdminService) GetAllSoft(ctx context.Context) (*[]info.Soft, error) {
 	return s.softRDB.GetAll(ctx)
 }

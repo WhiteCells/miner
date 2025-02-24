@@ -15,6 +15,8 @@ func NewSoftRDB() *SoftRDB {
 }
 
 // 使用 hash 便于查找所有的 soft
+// soft 无需与 coin 进行关联
+// soft 目前只做 Custom
 // +--------+---------+--------+
 // | field  | key     | val    |
 // +--------+---------+--------+

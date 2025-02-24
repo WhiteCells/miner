@@ -62,39 +62,23 @@ type AdminIncrBscApiKeyReq struct {
 }
 */
 type AdminAddCoinReq struct {
-	Coin info.Coin `json:"coin" binding:"required,min=2,max=20"`
+	CoinName info.Coin `json:"coin_name" binding:"required"`
 }
 
 type AdminDelCoinReq struct {
-	Name string `json:"name" binding:"required"`
+	CoinName string `json:"coin_name" binding:"required"`
 }
 
-// pool
-/*
-{
-	"pool": {
-		"name": "",
-		"server": []
-	}
-}
-*/
 type AdminAddPoolReq struct {
-	Pool info.Pool `json:"pool" binding:"required,min=2,max=20"`
+	CoinName string    `json:"coin_name" binding:"required"`
+	Pool     info.Pool `json:"pool" binding:"required"`
 }
 
 type AdminDelPoolReq struct {
-	Name string `json:"name" binding:"required"`
+	CoinName string `json:"coin_name" binding:"required"`
+	PoolName string `json:"pool_name" binding:"required"`
 }
 
-// soft
-/*
-{
-	"soft": {
-		"name": "",
-		...
-	}
-}
-*/
 type AdminAddSoftReq struct {
 	Soft info.Soft `json:"soft" binding:"required,min=2,max=20"`
 }

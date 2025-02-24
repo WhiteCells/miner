@@ -317,7 +317,7 @@ func (c *AdminController) AddCoin(ctx *gin.Context) {
 		rsp.Error(ctx, http.StatusBadRequest, "invalid request", err.Error())
 		return
 	}
-	if err := c.adminService.AddCoin(ctx, &req.Coin); err != nil {
+	if err := c.adminService.AddCoin(ctx, &req.CoinName); err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, "failed to add coin", err.Error())
 		return
 	}
@@ -330,16 +330,16 @@ func (c *AdminController) DelCoin(ctx *gin.Context) {
 		rsp.Error(ctx, http.StatusBadRequest, "invalid request", err.Error())
 		return
 	}
-	if err := c.adminService.DelCoin(ctx, req.Name); err != nil {
+	if err := c.adminService.DelCoin(ctx, req.CoinName); err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, "failed to del coin", err.Error())
 		return
 	}
 	rsp.Success(ctx, http.StatusOK, "del coin success", "")
 }
 
-func (c *AdminController) GetCoinByName(ctx *gin.Context) {
+func (c *AdminController) GetCoin(ctx *gin.Context) {
 	coinName := ctx.Query("name")
-	pool, err := c.adminService.GetCoinByName(ctx, coinName)
+	pool, err := c.adminService.GetCoin(ctx, coinName)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, "failed to get coin", err.Error())
 		return
@@ -363,7 +363,7 @@ func (c *AdminController) AddPool(ctx *gin.Context) {
 		rsp.Error(ctx, http.StatusBadRequest, "invalid request", err.Error())
 		return
 	}
-	if err := c.adminService.AddPool(ctx, &req.Pool); err != nil {
+	if err := c.adminService.AddPool(ctx, req.CoinName, &req.Pool); err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, "failed to add pool", err.Error())
 		return
 	}
@@ -376,16 +376,17 @@ func (c *AdminController) DelPool(ctx *gin.Context) {
 		rsp.Error(ctx, http.StatusBadRequest, "invalid request", err.Error())
 		return
 	}
-	if err := c.adminService.DelPool(ctx, req.Name); err != nil {
+	if err := c.adminService.DelPool(ctx, req.CoinName, req.PoolName); err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, "failed to del pool", err.Error())
 		return
 	}
 	rsp.Success(ctx, http.StatusOK, "del pool success", "")
 }
 
-func (c *AdminController) GetPoolByName(ctx *gin.Context) {
+func (c *AdminController) GetPool(ctx *gin.Context) {
+	coinName := ctx.Query("coin")
 	poolName := ctx.Query("name")
-	pool, err := c.adminService.GetPoolByName(ctx, poolName)
+	pool, err := c.adminService.GetPool(ctx, coinName, poolName)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, "failed to get pool", err.Error())
 		return
@@ -394,7 +395,8 @@ func (c *AdminController) GetPoolByName(ctx *gin.Context) {
 }
 
 func (c *AdminController) GetAllPool(ctx *gin.Context) {
-	pools, err := c.adminService.GetAllPool(ctx)
+	coinName := ctx.Query("coin")
+	pools, err := c.adminService.GetAllPool(ctx, coinName)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, "failed to get all pool", err.Error())
 		return

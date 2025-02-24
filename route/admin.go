@@ -48,13 +48,13 @@ func (ar *AdminRoute) InitAdminRoute(r *gin.Engine) {
 		route.POST("/coin", ar.adminController.AddCoin)
 		route.PUT("/coin", ar.adminController.AddCoin)
 		route.DELETE("/coin", ar.adminController.DelCoin)
-		route.GET("/coin", ar.adminController.GetCoinByName)
+		route.GET("/coin", ar.adminController.GetCoin)
 		route.GET("/all_coin", ar.adminController.GetAllCoin)
 		// pool
 		route.POST("/pool", ar.adminController.AddPool)
 		route.PUT("/pool", ar.adminController.AddPool)
 		route.DELETE("/pool", ar.adminController.DelPool)
-		route.GET("/pool", ar.adminController.GetPoolByName)
+		route.GET("/pool", ar.adminController.GetPool)
 		route.GET("/all_pool", ar.adminController.GetAllPool)
 		// soft
 		route.POST("/soft", ar.adminController.AddSoft)

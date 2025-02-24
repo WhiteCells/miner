@@ -295,8 +295,8 @@ func (s *UserService) GetCoins(ctx context.Context) (*[]string, error) {
 	return &coins, nil
 }
 
-func (s *UserService) GetPools(ctx context.Context) (*[]info.Pool, error) {
-	return s.poolRDB.GetAll(ctx)
+func (s *UserService) GetPools(ctx context.Context, coinName string) (*[]info.Pool, error) {
+	return s.poolRDB.GetAll(ctx, coinName)
 }
 
 func (s *UserService) GetSofts(ctx context.Context) (*[]info.Soft, error) {
