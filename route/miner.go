@@ -33,5 +33,14 @@ func (mr *MinerRoute) InitMinerRoute(r *gin.Engine) {
 		route.PUT("/apply_fs", mr.minerController.ApplyFs)
 		route.PUT("/transfer", mr.minerController.Transfer)
 		route.GET("/rig_conf", mr.minerController.GetRigConf)
+		// watchdog
+		route.POST("/watchdog", mr.minerController.SetWatchdog)
+		route.GET("/watchdog", mr.minerController.GetWatchdog)
+		// autofan
+		route.POST("/autofan", mr.minerController.SetAutoFan)
+		route.GET("/autofan", mr.minerController.GetAutoFan)
+		// options
+		route.POST("/options", mr.minerController.SetOptions)
+		route.GET("/options", mr.minerController.GetOptions)
 	}
 }

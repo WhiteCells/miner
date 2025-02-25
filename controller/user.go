@@ -117,14 +117,29 @@ func (c *UserController) GetPools(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "get pools success", pools)
 }
 
-// GetSofts 获取软件信息
-func (c *UserController) GetSofts(ctx *gin.Context) {
-	softs, err := c.userService.GetSofts(ctx)
+// AppSoft 应用 Custom miner soft
+func (c *UserController) ApplySoft(ctx *gin.Context) {
+	var req dto.ApplySoftReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
+		return
+	}
+	if err := c.userService.ApplySoft(ctx, req.FsID, &req.Soft); err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
+		return
+	}
+	rsp.Success(ctx, http.StatusOK, "apply soft success", nil)
+}
+
+// GetSoft 获取 Custom miner soft 信息
+func (c *UserController) GetSoft(ctx *gin.Context) {
+	fsID := ctx.Query("fs_id")
+	softs, err := c.userService.GetSoft(ctx, fsID)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
-	rsp.Success(ctx, http.StatusOK, "get softs success", softs)
+	rsp.Success(ctx, http.StatusOK, "get soft success", softs)
 }
 
 // GenerateCaptcha

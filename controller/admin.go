@@ -310,7 +310,7 @@ func (c *AdminController) DelBscApiKey(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "del bsc apikey success", "")
 }
 
-// coin
+// AddCoin 添加 coin
 func (c *AdminController) AddCoin(ctx *gin.Context) {
 	var req dto.AdminAddCoinReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -324,6 +324,7 @@ func (c *AdminController) AddCoin(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "add coin success", "")
 }
 
+// DelCoin 删除 coin
 func (c *AdminController) DelCoin(ctx *gin.Context) {
 	var req dto.AdminDelCoinReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -337,6 +338,7 @@ func (c *AdminController) DelCoin(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "del coin success", "")
 }
 
+// GetCoin 获取 coin
 func (c *AdminController) GetCoin(ctx *gin.Context) {
 	coinName := ctx.Query("name")
 	pool, err := c.adminService.GetCoin(ctx, coinName)
@@ -347,6 +349,7 @@ func (c *AdminController) GetCoin(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "get coin success", pool)
 }
 
+// GetAllCoin 获取所有 coin
 func (c *AdminController) GetAllCoin(ctx *gin.Context) {
 	coins, err := c.adminService.GetAllCoin(ctx)
 	if err != nil {
@@ -356,7 +359,7 @@ func (c *AdminController) GetAllCoin(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "get all coin success", coins)
 }
 
-// pool
+// AddPool 添加 pool
 func (c *AdminController) AddPool(ctx *gin.Context) {
 	var req dto.AdminAddPoolReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -370,6 +373,7 @@ func (c *AdminController) AddPool(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "add pool success", "")
 }
 
+// DelPool 删除 pool
 func (c *AdminController) DelPool(ctx *gin.Context) {
 	var req dto.AdminDelPoolReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -383,6 +387,7 @@ func (c *AdminController) DelPool(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "del pool success", "")
 }
 
+// GetPool 获取 pool
 func (c *AdminController) GetPool(ctx *gin.Context) {
 	coinName := ctx.Query("coin")
 	poolName := ctx.Query("name")
@@ -394,6 +399,7 @@ func (c *AdminController) GetPool(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "get pool success", pool)
 }
 
+// GetAllPool 获取所有 pool
 func (c *AdminController) GetAllPool(ctx *gin.Context) {
 	coinName := ctx.Query("coin")
 	pools, err := c.adminService.GetAllPool(ctx, coinName)
@@ -404,52 +410,7 @@ func (c *AdminController) GetAllPool(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "get all pool success", pools)
 }
 
-// soft
-func (c *AdminController) AddSoft(ctx *gin.Context) {
-	var req dto.AdminAddSoftReq
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		rsp.Error(ctx, http.StatusBadRequest, "invalid request", err.Error())
-		return
-	}
-	if err := c.adminService.AddSoft(ctx, &req.Soft); err != nil {
-		rsp.Error(ctx, http.StatusInternalServerError, "failed to add soft", err.Error())
-		return
-	}
-	rsp.Success(ctx, http.StatusOK, "add soft success", "")
-}
-
-func (c *AdminController) DelSoft(ctx *gin.Context) {
-	var req dto.AdminDelSoftReq
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		rsp.Error(ctx, http.StatusBadRequest, "invalid request", err.Error())
-		return
-	}
-	if err := c.adminService.DelSoft(ctx, req.Name); err != nil {
-		rsp.Error(ctx, http.StatusInternalServerError, "failed to del soft", err.Error())
-		return
-	}
-	rsp.Success(ctx, http.StatusOK, "del soft success", "")
-}
-
-func (c *AdminController) GetSoftByName(ctx *gin.Context) {
-	softName := ctx.Query("name")
-	soft, err := c.adminService.GetSoftByName(ctx, softName)
-	if err != nil {
-		rsp.Error(ctx, http.StatusInternalServerError, "failed to get soft", err.Error())
-		return
-	}
-	rsp.Success(ctx, http.StatusOK, "get soft success", soft)
-}
-
-func (c *AdminController) GetAllSoft(ctx *gin.Context) {
-	softs, err := c.adminService.GetAllSoft(ctx)
-	if err != nil {
-		rsp.Error(ctx, http.StatusInternalServerError, "failed to get all soft", err.Error())
-		return
-	}
-	rsp.Success(ctx, http.StatusOK, "get all soft success", softs)
-}
-
+// SetFreeGpuNum 设置免费 gpu 数量
 func (c *AdminController) SetFreeGpuNum(ctx *gin.Context) {
 	var req dto.AdminSetFreeGpuNumReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {

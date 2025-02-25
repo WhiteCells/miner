@@ -299,11 +299,17 @@ func (s *UserService) GetPools(ctx context.Context, coinName string) (*[]info.Po
 	return s.poolRDB.GetAll(ctx, coinName)
 }
 
-func (s *UserService) GetSofts(ctx context.Context) (*[]info.Soft, error) {
-	return s.softRDB.GetAll(ctx)
+// ApplySoft 应用 custom miner soft
+func (s *UserService) ApplySoft(ctx context.Context, fsID string, soft *info.Soft) error {
+	return s.softRDB.Set(ctx, fsID, soft)
 }
 
-// 调用 bsc api
+// GetSoft 获取 custom miner soft 信息
+func (s *UserService) GetSoft(ctx context.Context, fsID string) (*info.Soft, error) {
+	return s.softRDB.Get(ctx, fsID)
+}
+
+// requestBscApi 调用 bsc api
 func (s *UserService) requestBscApi(address string, apikey string) (string, error) {
 	url := fmt.Sprintf(utils.Config.Bsc.Api, address, apikey)
 	go func() {

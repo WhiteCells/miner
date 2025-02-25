@@ -10,11 +10,11 @@ type AdminSwitchRegisterReq struct {
 }
 
 type AdminSetGlobalFsReq struct {
-	Name     string `json:"name" binding:"required,min=3,max=20"`
-	Coin     string `json:"coin" binding:"required,min=3,max=20"`
-	WalletID string `json:"wallet_id" binding:"required"`
-	Pool     string `json:"pool" binding:"required,min=2,max=20"`
-	Soft     string `json:"soft" binding:"required,min=2,max=20"`
+	Name     string    `json:"name" binding:"required,min=1,max=20"`
+	Coin     info.Coin `json:"coin" binding:"required"`
+	WalletID string    `json:"wallet_id" binding:"required"`
+	Pool     info.Pool `json:"pool" binding:"required"`
+	Soft     info.Soft `json:"soft" binding:"required"`
 }
 
 type AdminSetInviteRewardReq struct {
@@ -47,20 +47,6 @@ type AdminDelBscApiKeyReq struct {
 	Apikey string `json:"apikey" binding:"required"`
 }
 
-// test
-type AdminIncrBscApiKeyReq struct {
-	Apikey string  `json:"apikey" binding:"required"`
-	Score  float64 `json:"score" binding:"required"`
-}
-
-// coin
-/*
-{
-	"coin": {
-		"name": ""
-	}
-}
-*/
 type AdminAddCoinReq struct {
 	CoinName info.Coin `json:"coin_name" binding:"required"`
 }
@@ -80,7 +66,7 @@ type AdminDelPoolReq struct {
 }
 
 type AdminAddSoftReq struct {
-	Soft info.Soft `json:"soft" binding:"required,min=2,max=20"`
+	Soft info.Soft `json:"soft" binding:"required"`
 }
 
 type AdminDelSoftReq struct {

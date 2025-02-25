@@ -1,5 +1,7 @@
 package dto
 
+import "miner/model/info"
+
 type LoginReq struct {
 	Email    string `json:"email" binding:"required,min=3,max=32"`
 	Password string `json:"password" binding:"required,min=6,max=32"`
@@ -29,4 +31,9 @@ type VerifyCaptchaReq struct {
 type UpdatePasswdReq struct {
 	OldPasswd string `json:"old_passwd" binding:"required,min=6,max=32"`
 	NewPasswd string `json:"new_passwd" binding:"required,min=6,max=32"`
+}
+
+type ApplySoftReq struct {
+	FsID string    `json:"fs_id" binding:"required"`
+	Soft info.Soft `json:"soft" binding:"required"`
 }

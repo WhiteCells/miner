@@ -11,6 +11,7 @@ import (
 	"miner/model/info"
 	"miner/utils"
 	"os"
+	"slices"
 	"strings"
 )
 
@@ -257,6 +258,63 @@ func (s *MinerService) GetRigConf(ctx context.Context, farmID string, minerID st
 	return temp, nil
 }
 
+// SetWatchdog 设置 watchdog 选项
+func (s *MinerService) SetWatchdog(ctx context.Context, req *dto.SetWatchdogReq) error {
+	miner, err := s.minerRDB.GetByID(ctx, req.FarmID, req.MinerID)
+	if err != nil {
+		return err
+	}
+	miner.HiveOsConfig.Watchdog = req.Watchdog
+	return s.minerRDB.Set(ctx, req.FarmID, miner)
+}
+
+// GetWatchdog 获取 watchdog 选项
+func (s *MinerService) GetWatchdog(ctx context.Context, farmID string, minerID string) (*utils.Watchdog, error) {
+	miner, err := s.minerRDB.GetByID(ctx, farmID, minerID)
+	if err != nil {
+		return nil, err
+	}
+	return &miner.HiveOsConfig.Watchdog, nil
+}
+
+// SetAutoFan 设置 fan 选项
+func (s *MinerService) SetAutoFan(ctx context.Context, req *dto.SetAutoFanReq) error {
+	miner, err := s.minerRDB.GetByID(ctx, req.FarmID, req.MinerID)
+	if err != nil {
+		return err
+	}
+	miner.HiveOsAutoFan = req.AutoFan
+	return s.minerRDB.Set(ctx, req.FarmID, miner)
+}
+
+// GetAutoFan 获取 fan 选项
+func (s *MinerService) GetAutoFan(ctx context.Context, farmID string, minerID string) (*utils.HiveOsAutoFan, error) {
+	miner, err := s.minerRDB.GetByID(ctx, farmID, minerID)
+	if err != nil {
+		return nil, err
+	}
+	return &miner.HiveOsAutoFan, nil
+}
+
+// SetOptions 设置 worker 选项
+func (s *MinerService) SetOptions(ctx context.Context, req *dto.SetOptionsReq) error {
+	miner, err := s.minerRDB.GetByID(ctx, req.FarmID, req.MinerID)
+	if err != nil {
+		return err
+	}
+	miner.HiveOsConfig.Options = req.Options
+	return s.minerRDB.Set(ctx, req.FarmID, miner)
+}
+
+// GetOptions 获取 worker 选项
+func (s *MinerService) GetOptions(ctx context.Context, farmID, minerID string) (*utils.Options, error) {
+	miner, err := s.minerRDB.GetByID(ctx, farmID, minerID)
+	if err != nil {
+		return nil, err
+	}
+	return &miner.HiveOsConfig.Options, nil
+}
+
 // 转移矿机到其他矿场
 // func (s *MinerService) TransferMiner(ctx context.Context, userID, minerID, fromFarmID, toFarmID int) error {
 // 	// 检查源矿场权限
@@ -289,14 +347,7 @@ func (s *MinerService) validPerm(ctx context.Context, farmID string, minerID str
 	if err != nil {
 		return false
 	}
-
-	for _, p := range allowedPerms {
-		if farm.Perm == p {
-			return true
-		}
-	}
-
-	return false
+	return slices.Contains(allowedPerms, farm.Perm)
 }
 
 func (s *MinerService) validFarmPerm(ctx context.Context, userID string, farmID string, allowedPerms []perm.FarmPerm) bool {
@@ -304,14 +355,7 @@ func (s *MinerService) validFarmPerm(ctx context.Context, userID string, farmID 
 	if err != nil {
 		return false
 	}
-
-	for _, p := range allowedPerms {
-		if farm.Perm == p {
-			return true
-		}
-	}
-
-	return false
+	return slices.Contains(allowedPerms, farm.Perm)
 }
 
 func (s *MinerService) generateRigID(ctx context.Context, length int) (string, error) {

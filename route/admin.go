@@ -56,11 +56,5 @@ func (ar *AdminRoute) InitAdminRoute(r *gin.Engine) {
 		route.DELETE("/pool", ar.adminController.DelPool)
 		route.GET("/pool", ar.adminController.GetPool)
 		route.GET("/all_pool", ar.adminController.GetAllPool)
-		// soft
-		route.POST("/soft", ar.adminController.AddSoft)
-		route.PUT("/soft", ar.adminController.AddSoft)
-		route.DELETE("/soft", ar.adminController.DelSoft)
-		route.GET("/soft", ar.adminController.GetSoftByName)
-		route.GET("/all_soft", ar.adminController.GetAllSoft)
 	}
 }

@@ -46,6 +46,7 @@ var FreeGpuNumField = "free_gpu_num"
 var CoinField = "coin"
 var PoolField = "pool"
 var SoftField = "soft"
+var CustomField = "custom"
 
 func MakeKey(str ...string) string {
 	b := false

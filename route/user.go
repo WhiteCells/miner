@@ -43,8 +43,11 @@ func (ur *UserRoute) InitUserRoute(r *gin.Engine) {
 		route.GET("/oper_logs", ur.operLogController.GetOperLogs)
 		route.GET("/points_records", ur.pointsRecordController.GetPointsRecords)
 		route.GET("/address", ur.userController.GetUserAddress)
+		// coin
 		route.GET("/coins", ur.userController.GetCoins)
 		route.GET("/pools", ur.userController.GetPools)
-		route.GET("/softs", ur.userController.GetSofts)
+		// soft
+		route.POST("/apply_soft", ur.userController.ApplySoft)
+		route.GET("/soft", ur.userController.GetSoft)
 	}
 }

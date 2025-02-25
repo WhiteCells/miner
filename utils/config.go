@@ -92,6 +92,35 @@ type HiveOsConfig struct {
 	// Rig timezone
 	TimeZone string `json:"time_zone"`
 	// Watchdog
+	Watchdog Watchdog `json:"watchdog"`
+	// WdEnable        string `json:"wd_enable"`
+	// WdMiner         string `json:"wd_miner"`
+	// WdReboot        string `json:"wd_reboot"`
+	// WdMaxLA         string `json:"wd_max_la"`
+	// WdASR           string `json:"wd_asr"`
+	// WdPowerEnabled  string `json:"wd_power_enabled"`
+	// WdPowerMin      string `json:"wd_power_min"`
+	// WdPowerMax      string `json:"wd_power_max"`
+	// WdPowerAction   string `json:"wd_power_action"`
+	// WdCheckConn     string `json:"wd_check_conn"`
+	// WdShareTime     string `json:"wd_share_time"`
+	// WdMinhashes     string `json:"wd_minhashes"`
+	// WdMinhashesAlgo string `json:"wd_minhashes_algo"`
+	// WdType          string `json:"wd_type"`
+	// Options
+	Options Options `json:"options"`
+	// XDisabled         string `json:"x_disabled"`
+	// PushInterval      string `json:"push_interval"`
+	// Amintenance       string `json:"amintenance"`
+	// MinerDelay        string `json:"miner_delay"`
+	// DohEnable         string `json:"doh_enable"`
+	// PowerRecycle      string `json:"power_recycle"`
+	// ShellinaboxEnable string `json:"shellinabox_enable"`
+	// SshEnable         string `json:"ssh_enable"`
+	// SshPasswordEnable string `json:"ssh_password_enable"`
+}
+
+type Watchdog struct {
 	WdEnable        string `json:"wd_enable"`
 	WdMiner         string `json:"wd_miner"`
 	WdReboot        string `json:"wd_reboot"`
@@ -106,7 +135,9 @@ type HiveOsConfig struct {
 	WdMinhashes     string `json:"wd_minhashes"`
 	WdMinhashesAlgo string `json:"wd_minhashes_algo"`
 	WdType          string `json:"wd_type"`
-	// Options
+}
+
+type Options struct {
 	XDisabled         string `json:"x_disabled"`
 	PushInterval      string `json:"push_interval"`
 	Amintenance       string `json:"amintenance"`
@@ -119,6 +150,7 @@ type HiveOsConfig struct {
 }
 
 type HiveOsWallet struct {
+	// Custom miner soft
 	CustomMiner      string `json:"custom_miner"`
 	CustomInstallURL string `json:"custom_install_url"`
 	CustomAlgo       string `json:"custom_algo"`
@@ -127,27 +159,28 @@ type HiveOsWallet struct {
 	CustomPass       string `json:"custom_pass"`
 	CustomUserConfig string `json:"custom_user_config"`
 	CustomTLS        string `json:"custom_tls"`
-	FsID             string `json:"fs_id"`
-	Coin             string `json:"coin"`
-	// Meta             struct {
-	// 	FsID   string `json:"fs_id"`
-	// 	Custom struct {
-	// 		Coin string `json:"coin"`
-	// 	} `json:"custom"`
-	// }
+	// fs coin
+	FsID string `json:"fs_id"`
+	Coin string `json:"coin"`
 }
 
 type HiveOsAutoFan struct {
-	CriticalTemp       string `json:"critical_temp"`
-	CriticalTempAction string `json:"critical_temp_action"`
-	Enable             string `json:"enable"`
-	TargetTemp         string `json:"target_temp"`
-	MinFan             string `json:"min_fan"`
-	MaxFan             string `json:"max_fan"`
-	NoAMD              string `json:"no_amd"`
-	TargetMemTemp      string `json:"target_mem_temp"`
-	RebootOnError      string `json:"reboot_on_error"`
-	SmartMode          string `json:"smart_mode"`
+	Enable              string `json:"enable"`
+	TargetTemp          string `json:"target_temp"`
+	TargetMemTemp       string `json:"target_mem_temp"`
+	MinFan              string `json:"min_fan"`
+	MaxFan              string `json:"max_fan"`
+	CriticalTemp        string `json:"critical_temp"`
+	CriticalTempAction  string `json:"critical_temp_action"`
+	NoAMD               string `json:"no_amd"`
+	RebootOnError       string `json:"reboot_on_error"`
+	SmartMode           string `json:"smart_mode"`
+	CustomMode          string `json:"custom_mode"`
+	CustomTargetTemp    string `json:"custom_target_temp"`
+	CustomTargetMemTemp string `json:"custom_target_mem_temp"`
+	CustomMinFan        string `json:"custom_min_fan"`
+	CustomMaxFan        string `json:"custom_max_fan"`
+	CustomCriticalTemp  string `json:"custom_critical_temp"`
 }
 
 // 生成字符串会被写入 /hive-config/rig.conf
@@ -223,30 +256,30 @@ SSH_PASSWORD_ENABLE=%s
 		// Rig timezone
 		data.TimeZone,
 		// watchdog
-		data.WdEnable,
-		data.WdMiner,
-		data.WdReboot,
-		data.WdMaxLA,
-		data.WdASR,
-		data.WdPowerEnabled,
-		data.WdPowerMin,
-		data.WdPowerMax,
-		data.WdPowerAction,
-		data.WdCheckConn,
-		data.WdShareTime,
-		data.WdMinhashes,
-		data.WdMinhashesAlgo,
-		data.WdType,
+		data.Watchdog.WdEnable,
+		data.Watchdog.WdMiner,
+		data.Watchdog.WdReboot,
+		data.Watchdog.WdMaxLA,
+		data.Watchdog.WdASR,
+		data.Watchdog.WdPowerEnabled,
+		data.Watchdog.WdPowerMin,
+		data.Watchdog.WdPowerMax,
+		data.Watchdog.WdPowerAction,
+		data.Watchdog.WdCheckConn,
+		data.Watchdog.WdShareTime,
+		data.Watchdog.WdMinhashes,
+		data.Watchdog.WdMinhashesAlgo,
+		data.Watchdog.WdType,
 		// options
-		data.XDisabled,
-		data.PushInterval,
-		data.Amintenance,
-		data.MinerDelay,
-		data.DohEnable,
-		data.PowerRecycle,
-		data.ShellinaboxEnable,
-		data.SshEnable,
-		data.SshPasswordEnable,
+		data.Options.XDisabled,
+		data.Options.PushInterval,
+		data.Options.Amintenance,
+		data.Options.MinerDelay,
+		data.Options.DohEnable,
+		data.Options.PowerRecycle,
+		data.Options.ShellinaboxEnable,
+		data.Options.SshEnable,
+		data.Options.SshPasswordEnable,
 	)
 }
 
@@ -272,30 +305,55 @@ META='{
 }'
 `
 	return fmt.Sprintf(template,
-		data.CustomMiner, data.CustomInstallURL, data.CustomAlgo,
-		data.CustomTemplate, data.CustomUrl, data.CustomPass,
-		data.CustomUserConfig, data.FsID, data.Coin,
+		data.CustomMiner,
+		data.CustomInstallURL,
+		data.CustomAlgo,
+		data.CustomTemplate,
+		data.CustomUrl,
+		data.CustomPass,
+		data.CustomUserConfig,
+		data.FsID,
+		data.Coin,
 	)
 }
 
 // 生成字符串会被写入 /hive-config/autofan.conf
 func GenerateHiveOsAutofan(data *HiveOsAutoFan) string {
-	template := `\
-CRITICAL_TEMP=%s
-CRITICAL_TEMP_ACTION="%s"
+	template := `
 ENABLED=%s
 TARGET_TEMP=%s
+TARGET_MEM_TEMP=%s
 MIN_FAN=%s
 MAX_FAN=%s
+CRITICAL_TEMP=%s
+CRITICAL_TEMP_ACTION="%s"
 NO_AMD=%s
-TARGET_MEM_TEMP=%s
 REBOOT_ON_ERROR=%s
 SMART_MODE=%s
+CUSTOM_MODE="%s"
+CUSTOM_TARGET_TEMP="%s"
+CUSTOM_TARGET_MEM_TEMP="%s"
+CUSTOM_MIN_FAN="%s"
+CUSTOM_MAX_FAN="%s"
+CUSTOM_CRITICAL_TEMP="%s"
 `
 	return fmt.Sprintf(template,
-		data.CriticalTemp, data.CriticalTempAction, data.Enable,
-		data.TargetTemp, data.MinFan, data.MaxFan, data.NoAMD,
-		data.TargetMemTemp, data.RebootOnError, data.SmartMode,
+		data.Enable,
+		data.TargetTemp,
+		data.TargetMemTemp,
+		data.MinFan,
+		data.MaxFan,
+		data.CriticalTemp,
+		data.CriticalTempAction,
+		data.NoAMD,
+		data.RebootOnError,
+		data.SmartMode,
+		data.CustomMode,
+		data.CustomTargetTemp,
+		data.CustomTargetMemTemp,
+		data.CustomMinFan,
+		data.CustomMaxFan,
+		data.CustomCriticalTemp,
 	)
 }
 

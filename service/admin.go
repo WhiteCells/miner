@@ -71,13 +71,14 @@ func (s *AdminService) SetSwitchRegister(ctx context.Context, req *dto.AdminSwit
 
 // SetGlobalFlightsheet 设置全局飞行表
 func (s *AdminService) SetGlobalFs(ctx context.Context, req *dto.AdminSetGlobalFsReq) error {
-	fs := &info.Fs{
-		Name: req.Name,
-		Coin: req.Coin,
-		Pool: req.Pool,
-		Soft: req.Soft,
-	}
-	return s.adminRDB.SetGlobalFs(ctx, fs)
+	// fs := &info.Fs{
+	// 	Name: req.Name,
+	// 	Coin: req.Coin,
+	// 	Pool: req.Pool,
+	// 	Soft: req.Soft,
+	// }
+	// return s.adminRDB.SetGlobalFs(ctx, fs)
+	return nil
 }
 
 // SetInviteReward 设置邀请积分奖励
@@ -175,24 +176,9 @@ func (s *AdminService) GetAllPool(ctx context.Context, coinName string) (*[]info
 	return s.poolRDB.GetAll(ctx, coinName)
 }
 
-// AddSoft
-func (s *AdminService) AddSoft(ctx context.Context, soft *info.Soft) error {
-	return s.softRDB.Set(ctx, soft)
-}
-
-// DelSoft
-func (s *AdminService) DelSoft(ctx context.Context, name string) error {
-	return s.softRDB.Del(ctx, name)
-}
-
-// GetSoftByName
-func (s *AdminService) GetSoftByName(ctx context.Context, name string) (*info.Soft, error) {
-	return s.softRDB.GetByName(ctx, name)
-}
-
-// GetAllSoft
-func (s *AdminService) GetAllSoft(ctx context.Context) (*[]info.Soft, error) {
-	return s.softRDB.GetAll(ctx)
+// ApplySoft 应用 custom miner soft
+func (s *AdminService) ApplySoft(ctx context.Context, fsID string, soft *info.Soft) error {
+	return s.softRDB.Set(ctx, fsID, soft)
 }
 
 // 设置卡数上限
