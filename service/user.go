@@ -91,7 +91,7 @@ func (s *UserService) Register(ctx *gin.Context, req *dto.RegisterReq) (string, 
 
 	// 如果有邀请码，处理邀请关系
 	if req.InviteCode != "" {
-		user.InviteBy = uid
+		user.InviteBy = req.InviteCode
 		// 给邀请人增加积分
 		if err = s.addInvitePoints(ctx, uid, req.InviteCode); err != nil {
 			return "", err
