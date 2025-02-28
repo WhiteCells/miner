@@ -65,6 +65,66 @@ func (c *MinerController) UpdateMiner(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "update miner success", nil)
 }
 
+// UpdateMinerWatchdog
+func (c *MinerController) UpdateMinerWatchdog(ctx *gin.Context) {
+	var req dto.UpdateMinerWatchdogReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
+		return
+	}
+	if err := c.minerService.UpdateMinerWatchdog(ctx, &req); err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
+		return
+	}
+
+	rsp.Success(ctx, http.StatusOK, "update miner watchdog success", nil)
+}
+
+// UpdateMinerOptions
+func (c *MinerController) UpdateMinerOptions(ctx *gin.Context) {
+	var req dto.UpdateMinerOptionsReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
+		return
+	}
+	if err := c.minerService.UpdateMinerOptions(ctx, &req); err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
+		return
+	}
+
+	rsp.Success(ctx, http.StatusOK, "update miner options success", nil)
+}
+
+// UpdateMinerAutofan
+func (c *MinerController) UpdateMinerAutofan(ctx *gin.Context) {
+	var req dto.UpdateMinerAutofanReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
+		return
+	}
+	if err := c.minerService.UpdateMinerAutofan(ctx, &req); err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
+		return
+	}
+
+	rsp.Success(ctx, http.StatusOK, "update miner autofan success", nil)
+}
+
+// UpdateMinerWallet
+func (c *MinerController) UpdateMinerWallet(ctx *gin.Context) {
+	var req dto.UpdateMinerWalletReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
+		return
+	}
+	if err := c.minerService.UpdateMinerWallet(ctx, &req); err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
+		return
+	}
+
+	rsp.Success(ctx, http.StatusOK, "update miner wallet success", nil)
+}
+
 // GetMiner 获取用户矿机
 func (c *MinerController) GetFarmAllMiner(ctx *gin.Context) {
 	farmID := ctx.Query("farm_id")

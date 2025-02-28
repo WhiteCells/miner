@@ -158,10 +158,6 @@ func (s *MinerService) DeleteMiner(ctx context.Context, req *dto.DeleteMinerReq)
 
 // UpdateMiner 更新矿机信息
 func (s *MinerService) UpdateMiner(ctx context.Context, req *dto.UpdateMinerReq) error {
-	_, exists := ctx.Value("user_id").(string)
-	if !exists {
-		return errors.New("invalid user_id in context")
-	}
 	if !s.validPerm(ctx, req.FarmID, req.MinerID, []perm.MinerPerm{perm.MinerOwner, perm.MinerManager}) {
 		return errors.New("permission denied")
 	}
@@ -175,6 +171,86 @@ func (s *MinerService) UpdateMiner(ctx context.Context, req *dto.UpdateMinerReq)
 	utils.UpdateStructObjFromMap(miner, req.UpdateInfo)
 
 	// 保存更新
+	if err := s.minerRDB.Set(ctx, req.FarmID, miner); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// UpdateMinerWatchdog
+func (s *MinerService) UpdateMinerWatchdog(ctx context.Context, req *dto.UpdateMinerWatchdogReq) error {
+	if !s.validPerm(ctx, req.FarmID, req.MinerID, []perm.MinerPerm{perm.MinerOwner, perm.MinerManager}) {
+		return errors.New("permission denied")
+	}
+
+	miner, err := s.minerRDB.GetByID(ctx, req.FarmID, req.MinerID)
+	if err != nil {
+		return errors.New("miner not found")
+	}
+
+	utils.UpdateStructObjFromMap(&miner.HiveOsConfig.Watchdog, req.Watchdog)
+
+	if err := s.minerRDB.Set(ctx, req.FarmID, miner); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// UpdateMinerOptions
+func (s *MinerService) UpdateMinerOptions(ctx context.Context, req *dto.UpdateMinerOptionsReq) error {
+	if !s.validPerm(ctx, req.FarmID, req.MinerID, []perm.MinerPerm{perm.MinerOwner, perm.MinerManager}) {
+		return errors.New("permission denied")
+	}
+
+	miner, err := s.minerRDB.GetByID(ctx, req.FarmID, req.MinerID)
+	if err != nil {
+		return errors.New("miner not found")
+	}
+
+	utils.UpdateStructObjFromMap(&miner.HiveOsConfig.Options, req.Options)
+
+	if err := s.minerRDB.Set(ctx, req.FarmID, miner); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// UpdateMinerAutofan
+func (s *MinerService) UpdateMinerAutofan(ctx context.Context, req *dto.UpdateMinerAutofanReq) error {
+	if !s.validPerm(ctx, req.FarmID, req.MinerID, []perm.MinerPerm{perm.MinerOwner, perm.MinerManager}) {
+		return errors.New("permission denied")
+	}
+
+	miner, err := s.minerRDB.GetByID(ctx, req.FarmID, req.MinerID)
+	if err != nil {
+		return errors.New("miner not found")
+	}
+
+	utils.UpdateStructObjFromMap(&miner.HiveOsAutoFan, req.Autofan)
+
+	if err := s.minerRDB.Set(ctx, req.FarmID, miner); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// UpdateMinerWallet
+func (s *MinerService) UpdateMinerWallet(ctx context.Context, req *dto.UpdateMinerWalletReq) error {
+	if !s.validPerm(ctx, req.FarmID, req.MinerID, []perm.MinerPerm{perm.MinerOwner, perm.MinerManager}) {
+		return errors.New("permission denied")
+	}
+
+	miner, err := s.minerRDB.GetByID(ctx, req.FarmID, req.MinerID)
+	if err != nil {
+		return errors.New("miner not found")
+	}
+
+	utils.UpdateStructObjFromMap(&miner.HiveOsWallet, req.Wallet)
+
 	if err := s.minerRDB.Set(ctx, req.FarmID, miner); err != nil {
 		return err
 	}
