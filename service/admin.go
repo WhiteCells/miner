@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"miner/common/dto"
+	"miner/common/status"
 	"miner/dao/mysql"
 	"miner/dao/redis"
 	"miner/model"
@@ -81,14 +82,29 @@ func (s *AdminService) SetGlobalFs(ctx context.Context, req *dto.AdminSetGlobalF
 	return nil
 }
 
+// GetInviteReward 设置邀请奖励
+func (s *AdminService) GetInviteReward(ctx context.Context) (float32, error) {
+	return s.adminRDB.GetInviteReward(ctx)
+}
+
 // SetInviteReward 设置邀请积分奖励
 func (s *AdminService) SetInviteReward(ctx context.Context, req *dto.AdminSetInviteRewardReq) error {
 	return s.adminRDB.SetInviteReward(ctx, req.Reward)
 }
 
+// GetRechargeRatio 获取充值获取积分比率
+func (s *AdminService) GetRechargeRatio(ctx context.Context) (float64, error) {
+	return s.adminRDB.GetRechargeRatio(ctx)
+}
+
 // SetRechargeReward 设置充值获取积分比率
 func (s *AdminService) SetRechargeRatio(ctx context.Context, req *dto.AdminSetRechargeRewardReq) error {
 	return s.adminRDB.SetRechargeRatio(ctx, req.Ratio)
+}
+
+// GetUserStatus 获取用户状态
+func (s *AdminService) GetUserStatus(ctx context.Context, userID string) (status.UserStatus, error) {
+	return s.adminRDB.GetUserStatus(ctx, userID)
 }
 
 // SetUserStatus 设置用户状态

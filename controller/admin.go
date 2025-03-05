@@ -164,6 +164,17 @@ func (c *AdminController) SetGlobalFs(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "admin set global flightsheet success", nil)
 }
 
+// GetInviteReward 设置邀请积分奖励
+func (c *AdminController) GetInviteReward(ctx *gin.Context) {
+	reward, err := c.adminService.GetInviteReward(ctx)
+	if err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, "admin get invite reward failed", nil)
+		return
+	}
+
+	rsp.QuerySuccess(ctx, http.StatusOK, "admin get invite reward success", reward)
+}
+
 // SetInviteReward 设置邀请积分奖励
 func (c *AdminController) SetInviteReward(ctx *gin.Context) {
 	var req dto.AdminSetInviteRewardReq
@@ -178,6 +189,17 @@ func (c *AdminController) SetInviteReward(ctx *gin.Context) {
 	}
 
 	rsp.Success(ctx, http.StatusOK, "admin set invite reward success", nil)
+}
+
+// GetRechargeRatio
+func (c *AdminController) GetRechargeRatio(ctx *gin.Context) {
+	ratio, err := c.adminService.GetRechargeRatio(ctx)
+	if err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, "admin get recharge ratio failed", nil)
+		return
+	}
+
+	rsp.QuerySuccess(ctx, http.StatusOK, "admin get recharge ratiosuccess", ratio)
 }
 
 // SetRechargeReward 设置充值兑换积分比率
@@ -196,6 +218,12 @@ func (c *AdminController) SetRechargeRatio(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "admin set recharge reward success", nil)
 }
 
+// GetUserStatus
+func (c *AdminController) GetUserStatus(ctx *gin.Context) {
+	userID := ctx.Param("user_id")
+	c.adminService.GetUserStatus(ctx, userID)
+}
+
 // SetUserStatus 设置用户状态
 func (c *AdminController) SetUserStatus(ctx *gin.Context) {
 	var req dto.AdminSetUserStatusReq
@@ -212,21 +240,32 @@ func (c *AdminController) SetUserStatus(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "admin set user status success", nil)
 }
 
+// GetMinePoolCost 获取矿池费用
+// func (c *AdminController) GetMinePoolCost(ctx *gin.Context) {
+// 	cost, err := c.adminService.GetMinePoolCost(ctx)
+// 	if err != nil {
+// 		rsp.Error(ctx, http.StatusInternalServerError, "admin get miner poolCost failed", nil)
+// 		return
+// 	}
+
+// 	rsp.QuerySuccess(ctx, http.StatusOK, "admin get miner poolCost success", cost)
+// }
+
 // SetMinerPoolCost 设置矿池费用
-func (c *AdminController) SetMinePoolCost(ctx *gin.Context) {
-	var req dto.AdminSetMinePoolCostReq
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		rsp.Error(ctx, http.StatusBadRequest, "invalid request", nil)
-		return
-	}
+// func (c *AdminController) SetMinePoolCost(ctx *gin.Context) {
+// 	var req dto.AdminSetMinePoolCostReq
+// 	if err := ctx.ShouldBindJSON(&req); err != nil {
+// 		rsp.Error(ctx, http.StatusBadRequest, "invalid request", nil)
+// 		return
+// 	}
 
-	if err := c.adminService.SetMinepoolCost(ctx, &req); err != nil {
-		rsp.Error(ctx, http.StatusInternalServerError, "admin set miner poolCost faild", nil)
-		return
-	}
+// 	if err := c.adminService.SetMinepoolCost(ctx, &req); err != nil {
+// 		rsp.Error(ctx, http.StatusInternalServerError, "admin set miner poolCost faild", nil)
+// 		return
+// 	}
 
-	rsp.Success(ctx, http.StatusOK, "admin set miner poolCost success", nil)
-}
+// 	rsp.Success(ctx, http.StatusOK, "admin set miner poolCost success", nil)
+// }
 
 // SetMnemonic 设置助记词
 func (c *AdminController) SetMnemonic(ctx *gin.Context) {

@@ -33,13 +33,23 @@ func (ar *AdminRoute) InitAdminRoute(r *gin.Engine) {
 		route.POST("/switch_register", ar.adminController.SwitchRegister)
 		route.POST("/global_fs", ar.adminController.SetGlobalFs)
 		// route.GET("/global_fs", ar.adminController.GetGlobalFs)
+		// invite_reward
+		route.GET("/invite_reward", ar.adminController.GetInviteReward)
 		route.POST("/invite_reward", ar.adminController.SetInviteReward)
+		// recharge_ratio
+		route.GET("/recharge_ratio", ar.adminController.GetRechargeRatio)
 		route.POST("/recharge_ratio", ar.adminController.SetRechargeRatio)
+		// user_status
+		route.GET("/user_status", ar.adminController.GetUserStatus)
 		route.POST("/user_status", ar.adminController.SetUserStatus)
-		route.POST("/miner_pool_cost", ar.adminController.SetMinePoolCost)
+		// miner_pool_cost
+		// route.GET("/miner_pool_cost", ar.adminController.GetMinePoolCost)
+		// route.POST("/miner_pool_cost", ar.adminController.SetMinePoolCost)
+		// mnemonic
 		route.POST("/mnemonic", ar.adminController.SetMnemonic)
 		route.GET("/mnemonic", ar.adminController.GetMnemonic)
 		route.GET("/all_mnemonic", ar.adminController.GetAllMnemonic)
+		// bsc api
 		route.POST("/bsc_apikey", ar.adminController.AddBscApiKey)
 		route.GET("/bsc_apikey", ar.adminController.GetBscApiKey)
 		route.GET("/all_bsc_apikey", ar.adminController.GetAllBscApiKey)

@@ -139,6 +139,15 @@ func (c *AdminRDB) SetGlobalFs(ctx context.Context, fs *info.Fs) error {
 	return utils.RDB.HSet(ctx, key, fs.ID, string(fsJSON))
 }
 
+// SetUserStatus 获取用户状态
+func (c *AdminRDB) GetUserStatus(ctx context.Context, userID string) (status.UserStatus, error) {
+	user, err := c.userRDB.GetByID(ctx, userID)
+	if err != nil {
+		return status.UserStatus("-1"), err
+	}
+	return user.Status, nil
+}
+
 // 设置用户状态
 func (c *AdminRDB) SetUserStatus(ctx context.Context, userID string, s status.UserStatus) error {
 	user, err := c.userRDB.GetByID(ctx, userID)

@@ -45,6 +45,7 @@ func (ur *UserRoute) InitUserRoute(r *gin.Engine) {
 		route.GET("/address", ur.userController.GetUserAddress)
 		// coin
 		route.GET("/coins", ur.userController.GetCoins)
+		// pool
 		route.GET("/pools", ur.userController.GetPools)
 		// soft
 		route.POST("/apply_soft", ur.userController.ApplySoft)
