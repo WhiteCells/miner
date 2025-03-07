@@ -8,7 +8,7 @@ type LoginReq struct {
 	// CaptchaID    string `json:"captcha_id" binding:"required"`
 	// CaptchaValue string `json:"captcha_value" binding:"required"`
 	// google 验证码
-	// GoogleCode string `json:"google_code" binding:"required"`
+	//GoogleCode string `json:"google_code" binding:"required"`
 }
 
 type RegisterReq struct {

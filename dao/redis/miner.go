@@ -104,11 +104,10 @@ func (c *MinerRDB) Transfer(ctx context.Context, fromUserID, fromFarmID, MinerID
 // +---------------------+------------+
 // | key                 |    val     |
 // +---------------------+------------+
-// | miner_fs:<miner_id> |  <fs_id>   |
+// | miner:fs:<miner_id> |  <fs_id>   |
 // +---------------------+------------+
 func (c *MinerRDB) ApplyFs(ctx context.Context, farmID string, minerID string, fsID string) error {
 	pipe := utils.RDB.Client.TxPipeline()
-	// 更新 miner
 	// 获取 miner
 	field := MakeField(MinerField, farmID)
 	minerJSON, err := utils.RDB.Client.HGet(ctx, field, minerID).Result()
@@ -119,6 +118,7 @@ func (c *MinerRDB) ApplyFs(ctx context.Context, farmID string, minerID string, f
 	if err = json.Unmarshal([]byte(minerJSON), &miner); err != nil {
 		return err
 	}
+	// 更新 miner
 	miner.FS = fsID
 	miner.HiveOsWallet.FsID = fsID
 	minerByte, err := json.Marshal(miner)
@@ -126,7 +126,7 @@ func (c *MinerRDB) ApplyFs(ctx context.Context, farmID string, minerID string, f
 		return err
 	}
 	pipe.HSet(ctx, field, miner.ID, string(minerByte))
-
+	// 建立关联
 	key := MakeKey(MinerFsField, minerID)
 	pipe.Set(ctx, key, fsID, 0)
 

@@ -50,5 +50,7 @@ func (ur *UserRoute) InitUserRoute(r *gin.Engine) {
 		// soft
 		route.POST("/apply_soft", ur.userController.ApplySoft)
 		route.GET("/soft", ur.userController.GetSoft)
+		// Routers
+		route.GET("/get_routers", ur.userController.GetRouters)
 	}
 }

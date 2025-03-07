@@ -107,20 +107,20 @@ func (s *UserService) Register(ctx *gin.Context, req *dto.RegisterReq) (string, 
 }
 
 // Login 用户登录
-func (s *UserService) Login(ctx *gin.Context, req *dto.LoginReq) (string, *info.User, error) {
+func (s *UserService) Login(ctx *gin.Context, req *dto.LoginReq) ([]string, string, *info.User, error) {
 	user, err := s.userRDB.GetByEmail(ctx, req.Email)
 	if err != nil {
-		return "", nil, errors.New("user not found")
+		return []string{""}, "", nil, errors.New("user not found")
 	}
 
-	// 验证 Google 验证码
-	// if ret, err := utils.VerifyCodeMoment(user.Secret, req.GoogleCode); ret || err != nil {
-	// 	return "", nil, errors.New("invalid GoogleCode")
-	// }
+	//验证 Google 验证码
+	//if ret, err := utils.VerifyCodeMoment(user.Secret, req.GoogleCode); ret || err != nil {
+	//	return "", nil, errors.New("invalid GoogleCode")
+	//}
 
 	// 验证密码
 	if !s.validPassword(user, req.Password) {
-		return "", nil, errors.New("wrong password")
+		return []string{""}, "", nil, errors.New("wrong password")
 	}
 
 	// 验证 Captcha
@@ -130,12 +130,12 @@ func (s *UserService) Login(ctx *gin.Context, req *dto.LoginReq) (string, *info.
 
 	// 检查用户状态
 	if user.Status != status.UserOn {
-		return "", nil, errors.New("account is disabled")
+		return []string{""}, "", nil, errors.New("account is disabled")
 	}
 
 	// 检查积分是否欠费
 	if user.RechargePoints+user.InvitePoints < 0 {
-		return "", nil, errors.New("insufficient points")
+		return []string{""}, "", nil, errors.New("insufficient points")
 	}
 
 	// 检查IP是否变化
@@ -146,20 +146,24 @@ func (s *UserService) Login(ctx *gin.Context, req *dto.LoginReq) (string, *info.
 	// 生成 JWT token
 	token, err := utils.GenerateToken(user.ID, user.Name, 24)
 	if err != nil {
-		return "", nil, err
+		return []string{""}, "", nil, err
 	}
 
 	// 更新登录 IP 信息
 	user.LastLoginIP = ctx.ClientIP()
 	user.LastLoginAt = time.Now()
+	var permissions []string
+	if user.ID == "0" {
+		permissions = []string{"*:*:*"}
+	}
 
 	ctx.Set("user_id", user.ID)
 
 	if err := s.userRDB.Set(ctx, user); err != nil {
-		return "", nil, errors.New("failed to update")
+		return []string{""}, "", nil, errors.New("failed to update")
 	}
 
-	return token, user, nil
+	return permissions, token, user, nil
 }
 
 // Logout 用户注销

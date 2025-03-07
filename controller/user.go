@@ -1,13 +1,12 @@
 package controller
 
 import (
+	"github.com/gin-gonic/gin"
 	"miner/common/dto"
 	"miner/common/rsp"
 	"miner/service"
 	"miner/utils"
 	"net/http"
-
-	"github.com/gin-gonic/gin"
 )
 
 type UserController struct {
@@ -44,13 +43,13 @@ func (c *UserController) Login(ctx *gin.Context) {
 		return
 	}
 
-	token, user, err := c.userService.Login(ctx, &req)
+	permissions, token, user, err := c.userService.Login(ctx, &req)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
 
-	rsp.LoginSuccess(ctx, http.StatusOK, "login success", user, token)
+	rsp.LoginSuccess(ctx, http.StatusOK, "login success", user, token, permissions)
 }
 
 // Logout 用户登出
@@ -168,4 +167,12 @@ func (c *UserController) VerifyCaptcha(ctx *gin.Context) {
 		return
 	}
 	rsp.Success(ctx, http.StatusOK, "verify captcha success", nil)
+}
+
+func (c *UserController) GetRouters(ctx *gin.Context) {
+	data, err := utils.UtilsGetRouters()
+	if err != nil {
+		rsp.Error(ctx, http.StatusForbidden, "get routers error", nil)
+	}
+	rsp.Success(ctx, http.StatusOK, "get routers success", data)
 }
