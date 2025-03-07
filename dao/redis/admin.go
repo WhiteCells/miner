@@ -73,7 +73,7 @@ func (c *AdminRDB) GetUserMiners(ctx context.Context, farmID string) (*[]info.Mi
 // 修改注册开关
 func (c *AdminRDB) SetSwitchRegister(ctx context.Context, status status.RegisterStatus) error {
 	key := MakeKey(AdminField, AdminSwitchRegisterField)
-	return utils.RDB.Set(ctx, key, status)
+	return utils.RDB.Set(ctx, key, string(status))
 }
 
 // 获取注册开关

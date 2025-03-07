@@ -70,6 +70,11 @@ func (s *AdminService) SetSwitchRegister(ctx context.Context, req *dto.AdminSwit
 	return s.adminRDB.SetSwitchRegister(ctx, req.Status)
 }
 
+// GetSwitchRegister 用户注册开关
+func (s *AdminService) GetSwitchRegister(ctx context.Context) (string, error) {
+	return s.adminRDB.GetSwitchRegister(ctx)
+}
+
 // SetGlobalFlightsheet 设置全局飞行表
 func (s *AdminService) SetGlobalFs(ctx context.Context, req *dto.AdminSetGlobalFsReq) error {
 	// fs := &info.Fs{

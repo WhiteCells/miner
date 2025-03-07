@@ -133,19 +133,30 @@ func (c *AdminController) GetUserMiners(ctx *gin.Context) {
 }
 
 // SwitchRegister 用户注册开关
-func (c *AdminController) SwitchRegister(ctx *gin.Context) {
+func (c *AdminController) SetSwitchRegister(ctx *gin.Context) {
 	var req dto.AdminSwitchRegisterReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		rsp.Error(ctx, http.StatusBadRequest, "invalid request", nil)
+		rsp.Error(ctx, http.StatusBadRequest, "invalid request", err.Error())
 		return
 	}
 
 	if err := c.adminService.SetSwitchRegister(ctx, &req); err != nil {
-		rsp.Error(ctx, http.StatusInternalServerError, "admin switch register failed", nil)
+		rsp.Error(ctx, http.StatusInternalServerError, "admin switch register failed", err.Error())
 		return
 	}
 
 	rsp.Success(ctx, http.StatusOK, "admin switch register success", nil)
+}
+
+func (c *AdminController) GetSwitchRegister(ctx *gin.Context) {
+	switchRegister, err := c.adminService.GetSwitchRegister(ctx)
+	if err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, "admin get switch register failed", nil)
+		return
+	}
+
+	rsp.QuerySuccess(ctx, http.StatusOK, "admin get switch register success", switchRegister)
+
 }
 
 // SetGlobalFs 设置全局飞行表
@@ -220,23 +231,27 @@ func (c *AdminController) SetRechargeRatio(ctx *gin.Context) {
 
 // GetUserStatus
 func (c *AdminController) GetUserStatus(ctx *gin.Context) {
-	userID := ctx.Param("user_id")
-	c.adminService.GetUserStatus(ctx, userID)
+	userID := ctx.Query("user_id")
+	status, err := c.adminService.GetUserStatus(ctx, userID)
+	if err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, "admin get user status failed", nil)
+		return
+	}
+
+	rsp.QuerySuccess(ctx, http.StatusOK, "admin get user status success", status)
 }
 
-// SetUserStatus 设置用户状态
+// SetUserStatus
 func (c *AdminController) SetUserStatus(ctx *gin.Context) {
 	var req dto.AdminSetUserStatusReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		rsp.Error(ctx, http.StatusBadRequest, "invalid request", nil)
 		return
 	}
-
 	if err := c.adminService.SetUserStatus(ctx, &req); err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, "admin set user status faild", nil)
 		return
 	}
-
 	rsp.Success(ctx, http.StatusOK, "admin set user status success", nil)
 }
 
@@ -356,7 +371,7 @@ func (c *AdminController) AddCoin(ctx *gin.Context) {
 		rsp.Error(ctx, http.StatusBadRequest, "invalid request", err.Error())
 		return
 	}
-	if err := c.adminService.AddCoin(ctx, &req.CoinName); err != nil {
+	if err := c.adminService.AddCoin(ctx, &req.Coin); err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, "failed to add coin", err.Error())
 		return
 	}
@@ -379,13 +394,13 @@ func (c *AdminController) DelCoin(ctx *gin.Context) {
 
 // GetCoin 获取 coin
 func (c *AdminController) GetCoin(ctx *gin.Context) {
-	coinName := ctx.Query("name")
-	pool, err := c.adminService.GetCoin(ctx, coinName)
+	coinName := ctx.Query("coin_name")
+	coin, err := c.adminService.GetCoin(ctx, coinName)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, "failed to get coin", err.Error())
 		return
 	}
-	rsp.Success(ctx, http.StatusOK, "get coin success", pool)
+	rsp.Success(ctx, http.StatusOK, "get coin success", coin)
 }
 
 // GetAllCoin 获取所有 coin
@@ -428,8 +443,8 @@ func (c *AdminController) DelPool(ctx *gin.Context) {
 
 // GetPool 获取 pool
 func (c *AdminController) GetPool(ctx *gin.Context) {
-	coinName := ctx.Query("coin")
-	poolName := ctx.Query("name")
+	coinName := ctx.Query("coin_name")
+	poolName := ctx.Query("pool_name")
 	pool, err := c.adminService.GetPool(ctx, coinName, poolName)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, "failed to get pool", err.Error())

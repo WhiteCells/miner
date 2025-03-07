@@ -48,7 +48,7 @@ type AdminDelBscApiKeyReq struct {
 }
 
 type AdminAddCoinReq struct {
-	CoinName info.Coin `json:"coin_name" binding:"required"`
+	Coin info.Coin `json:"coin" binding:"required"`
 }
 
 type AdminDelCoinReq struct {

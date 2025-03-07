@@ -30,7 +30,8 @@ func (ar *AdminRoute) InitAdminRoute(r *gin.Engine) {
 		route.GET("/user_points_records", ar.adminController.GetUserPointsRecords)
 		route.GET("/user_farms", ar.adminController.GetUserFarms)
 		route.GET("/user_miners", ar.adminController.GetUserMiners)
-		route.POST("/switch_register", ar.adminController.SwitchRegister)
+		route.POST("/switch_register", ar.adminController.SetSwitchRegister)
+		route.GET("/switch_register", ar.adminController.GetSwitchRegister)
 		route.POST("/global_fs", ar.adminController.SetGlobalFs)
 		// route.GET("/global_fs", ar.adminController.GetGlobalFs)
 		// invite_reward
@@ -51,18 +52,18 @@ func (ar *AdminRoute) InitAdminRoute(r *gin.Engine) {
 		route.GET("/all_mnemonic", ar.adminController.GetAllMnemonic)
 		// bsc api
 		route.POST("/bsc_apikey", ar.adminController.AddBscApiKey)
+		route.DELETE("/bsc_apikey", ar.adminController.DelBscApiKey)
 		route.GET("/bsc_apikey", ar.adminController.GetBscApiKey)
 		route.GET("/all_bsc_apikey", ar.adminController.GetAllBscApiKey)
-		route.DELETE("/bsc_apikey", ar.adminController.DelBscApiKey)
 		// coin
 		route.POST("/coin", ar.adminController.AddCoin)
-		route.PUT("/coin", ar.adminController.AddCoin)
 		route.DELETE("/coin", ar.adminController.DelCoin)
+		// route.PUT("/coin", ar.adminController.UpdateCoin)
 		route.GET("/coin", ar.adminController.GetCoin)
 		route.GET("/all_coin", ar.adminController.GetAllCoin)
 		// pool
 		route.POST("/pool", ar.adminController.AddPool)
-		route.PUT("/pool", ar.adminController.AddPool)
+		// route.PUT("/pool", ar.adminController.UpdatePool)
 		route.DELETE("/pool", ar.adminController.DelPool)
 		route.GET("/pool", ar.adminController.GetPool)
 		route.GET("/all_pool", ar.adminController.GetAllPool)
