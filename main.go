@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"miner/dao/mysql"
 	"miner/dao/redis"
 	"miner/route"
@@ -35,14 +36,29 @@ func initialize() error {
 }
 
 func main() {
-	if err := initialize(); err != nil {
-		utils.Logger.Error(err.Error())
-		return
-	}
+	fmt.Println("哈哈哈哈哈哈哈")
+	fmt.Println("哈哈哈哈哈哈哈")
+	fmt.Println("哈哈哈哈哈哈哈")
+	fmt.Println("哈哈哈哈哈哈哈")
+	fmt.Println("哈哈哈哈哈哈哈")
+	fmt.Println("哈哈哈哈哈哈哈")
+	fmt.Println("哈哈哈哈哈哈哈")
+	fmt.Println("哈哈哈哈哈哈哈")
+	fmt.Println("哈哈哈哈哈哈哈")
+	fmt.Println("哈哈哈哈哈哈哈")
+	fmt.Println("哈哈哈哈哈哈哈")
+	fmt.Println("哈哈哈哈哈哈哈")
+	fmt.Println("哈哈哈哈哈哈哈")
+	fmt.Println("哈哈哈哈哈哈哈")
+	fmt.Println("哈哈哈哈哈哈哈")
+	// if err := initialize(); err != nil {
+	// utils.Logger.Error(err.Error())
+	// return
+	// }
 	gin.SetMode(utils.Config.Server.Mode)
 	ctx := gin.Default()
 	route.Init(ctx)
 	if err := ctx.Run(utils.GeneratePort()); err != nil {
-		utils.Logger.Error("" + err.Error())
+		// utils.Logger.Error("" + err.Error())
 	}
 }
