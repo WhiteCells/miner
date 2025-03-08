@@ -1,11 +1,11 @@
 package dto
 
 type CreateFsReq struct {
-	Name     string `json:"name" binding:"required,min=3,max=20"`
-	Coin     string `json:"coin" binding:"required,min=2,max=20"`
+	Name     string `json:"name" binding:"required,min=1,max=20"`
+	Coin     string `json:"coin" binding:"required,min=1,max=20"`
 	WalletID string `json:"wallet_id" binding:"required"`
-	Pool     string `json:"pool" binding:"required,min=2,max=20"`
-	Soft     string `json:"soft" binding:"required,min=2,max=20"`
+	Pool     string `json:"pool" binding:"required,min=1,max=20"`
+	Soft     string `json:"soft" binding:"required,min=1,max=20"`
 }
 
 type DeleteFsReq struct {

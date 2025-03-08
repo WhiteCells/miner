@@ -3,8 +3,8 @@ package dto
 import "miner/utils"
 
 type CreateMinerReq struct {
-	FarmID string `json:"farm_id" binding:"required,min=3,max=20"`
-	Name   string `json:"name" binding:"required,min=3,max=20"`
+	FarmID string `json:"farm_id" binding:"required,min=1,max=20"`
+	Name   string `json:"name" binding:"required,min=1,max=20"`
 }
 
 type DeleteMinerReq struct {
@@ -14,6 +14,7 @@ type DeleteMinerReq struct {
 
 /*
 update_info
+
 	ID          string         `json:"id"`
 	Name        string         `json:"name"`
 	RigID       string         `json:"rig_id"`
