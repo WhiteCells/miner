@@ -108,7 +108,7 @@ func UtilsGetRouters() ([]Route, error) {
         "name": "Keys",
         "path": "keys",
         "hidden": false,
-        "component": "admin/keys/index",
+        "component": "switch/keys/index",
         "meta": {
           "title": "管理员BSC_API密钥信息的",
           "icon": "#",
@@ -120,7 +120,7 @@ func UtilsGetRouters() ([]Route, error) {
         "name": "Fs",
         "path": "fs",
         "hidden": false,
-        "component": "admin/fs/index",
+        "component": "switch/fs/index",
         "meta": {
           "title": "管理全局飞行表配置",
           "icon": "#",
@@ -132,9 +132,21 @@ func UtilsGetRouters() ([]Route, error) {
         "name": "Mnemonic",
         "path": "mnemonic",
         "hidden": false,
-        "component": "admin/mnemonic/index",
+        "component": "switch/mnemonic/index",
         "meta": {
           "title": "助记词信息",
+          "icon": "#",
+          "noCache": false,
+          "link": null
+        }
+      },
+      {
+        "name": "Coins",
+        "path": "coins",
+        "hidden": false,
+        "component": "switch/coins/index",
+        "meta": {
+          "title": "币种信息的",
           "icon": "#",
           "noCache": false,
           "link": null
@@ -144,7 +156,7 @@ func UtilsGetRouters() ([]Route, error) {
         "name": "Fans",
         "path": "fans",
         "hidden": false,
-        "component": "admin/fans/index",
+        "component": "switch/fans/index",
         "meta": {
           "title": "矿机自动风扇配置信息的",
           "icon": "#",
@@ -156,7 +168,7 @@ func UtilsGetRouters() ([]Route, error) {
         "name": "Configs",
         "path": "configs",
         "hidden": false,
-        "component": "admin/configs/index",
+        "component": "switch/configs/index",
         "meta": {
           "title": "矿机配置信息的",
           "icon": "#",
@@ -168,7 +180,7 @@ func UtilsGetRouters() ([]Route, error) {
         "name": "Wallets",
         "path": "wallets",
         "hidden": false,
-        "component": "admin/wallets/index",
+        "component": "switch/wallets/index",
         "meta": {
           "title": "存储矿机钱包相关配置信息的",
           "icon": "#",
@@ -180,7 +192,7 @@ func UtilsGetRouters() ([]Route, error) {
         "name": "Urls",
         "path": "urls",
         "hidden": false,
-        "component": "admin/urls/index",
+        "component": "switch/urls/index",
         "meta": {
           "title": "存储矿池 URL 信息的",
           "icon": "#",
@@ -192,7 +204,7 @@ func UtilsGetRouters() ([]Route, error) {
         "name": "Softs",
         "path": "softs",
         "hidden": false,
-        "component": "admin/softs/index",
+        "component": "switch/softs/index",
         "meta": {
           "title": "存储软件相关信息的",
           "icon": "#",
@@ -204,7 +216,7 @@ func UtilsGetRouters() ([]Route, error) {
         "name": "Pools",
         "path": "pools",
         "hidden": false,
-        "component": "admin/pools/index",
+        "component": "switch/pools/index",
         "meta": {
           "title": "管理员添加的矿池信息的",
           "icon": "#",
