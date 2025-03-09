@@ -1,30 +1,3 @@
-package utils
-
-import (
-	"encoding/json"
-	"errors"
-)
-
-// Meta 定义元数据结构体
-type Meta struct {
-	Title   string  `json:"title"`
-	Icon    string  `json:"icon"`
-	NoCache bool    `json:"noCache"`
-	Link    *string `json:"link"`
-}
-
-// Route 定义路由结构体
-type Route struct {
-	Name      string  `json:"name"`
-	Path      string  `json:"path"`
-	Hidden    bool    `json:"hidden"`
-	Component string  `json:"component"`
-	Meta      Meta    `json:"meta"`
-	Children  []Route `json:"children"`
-}
-
-func UtilsGetRouters() ([]Route, error) {
-	routersContext := `
 [
   {
     "name": "Poop",
@@ -153,6 +126,66 @@ func UtilsGetRouters() ([]Route, error) {
         }
       },
       {
+        "name": "Fans",
+        "path": "fans",
+        "hidden": false,
+        "component": "switch/fans/index",
+        "meta": {
+          "title": "矿机风扇配置信息",
+          "icon": "#",
+          "noCache": false,
+          "link": null
+        }
+      },
+      {
+        "name": "Configs",
+        "path": "configs",
+        "hidden": false,
+        "component": "switch/configs/index",
+        "meta": {
+          "title": "矿机配置信息",
+          "icon": "#",
+          "noCache": false,
+          "link": null
+        }
+      },
+      {
+        "name": "Wallets",
+        "path": "wallets",
+        "hidden": false,
+        "component": "switch/wallets/index",
+        "meta": {
+          "title": "矿机钱包相关配置信息",
+          "icon": "#",
+          "noCache": false,
+          "link": null
+        }
+      },
+      {
+        "name": "Urls",
+        "path": "urls",
+        "hidden": false,
+        "component": "switch/urls/index",
+        "meta": {
+          "title": "矿池 URL 信息的",
+          "icon": "#",
+          "noCache": false,
+          "link": null
+        }
+      },
+      {
+        "name": "Softs",
+        "path": "softs",
+        "hidden": false,
+        "component": "switch/softs/index",
+        "meta": {
+          "title": "软件相关信息",
+          "icon": "#",
+          "noCache": false,
+          "link": null
+        }
+      },
+      {
         "name": "Pools",
         "path": "pools",
         "hidden": false,
@@ -207,12 +240,3 @@ func UtilsGetRouters() ([]Route, error) {
     ]
   }
 ]
-`
-	var routes []Route
-	// 将JSON字符串解析到Route切片中
-	err := json.Unmarshal([]byte(routersContext), &routes)
-	if err != nil {
-		return []Route{}, errors.New("router json unmarshal error")
-	}
-	return routes, err
-}

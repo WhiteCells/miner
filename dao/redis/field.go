@@ -45,6 +45,7 @@ var FreeGpuNumField = "free_gpu_num"
 
 var CoinField = "coin"
 var PoolField = "pool"
+var PoolsField = "pools"
 var SoftField = "soft"
 var CustomField = "custom"
 

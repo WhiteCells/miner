@@ -103,13 +103,13 @@ func (s *WalletService) GetAllWalletAllCoin(ctx context.Context) (*[]string, err
 	if err != nil {
 		return nil, err
 	}
-	contation := make(map[string]bool)
+	contagion := make(map[string]bool)
 	for wallet := range *wallets {
-		if contation[(*wallets)[wallet].Coin] {
+		if contagion[(*wallets)[wallet].Coin] {
 			continue
 		}
 		coins = append(coins, (*wallets)[wallet].Coin)
-		contation[(*wallets)[wallet].Coin] = true
+		contagion[(*wallets)[wallet].Coin] = true
 	}
 	return &coins, nil
 }

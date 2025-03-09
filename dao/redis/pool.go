@@ -23,7 +23,7 @@ func NewPoolRDB() *PoolRDB {
 // +-------------+---------+--------+
 
 func (c *PoolRDB) Set(ctx context.Context, coin string, info *info.Pool) error {
-	field := MakeField(coin, PoolField)
+	field := MakeField(PoolField, coin)
 	key := MakeKey(info.Name)
 	infoByte, err := json.Marshal(info)
 	if err != nil {
@@ -33,27 +33,27 @@ func (c *PoolRDB) Set(ctx context.Context, coin string, info *info.Pool) error {
 }
 
 func (c *PoolRDB) Del(ctx context.Context, coin string, name string) error {
-	field := MakeField(coin, PoolField)
+	field := MakeField(PoolField, coin)
 	key := MakeKey(name)
 	return utils.RDB.HDel(ctx, field, key)
 }
 
 func (c *PoolRDB) Get(ctx context.Context, coin string, name string) (*info.Pool, error) {
-	field := MakeField(coin, PoolField)
+	field := MakeField(PoolField, coin)
 	key := MakeKey(name)
 	infoStr, err := utils.RDB.HGet(ctx, field, key)
 	if err != nil {
 		return nil, err
 	}
-	var info info.Pool
-	if err := json.Unmarshal([]byte(infoStr), &info); err != nil {
+	var info_ info.Pool
+	if err := json.Unmarshal([]byte(infoStr), &info_); err != nil {
 		return nil, err
 	}
-	return &info, nil
+	return &info_, nil
 }
 
-func (c *PoolRDB) GetAll(ctx context.Context, coinName string) (*[]info.Pool, error) {
-	field := MakeField(PoolField)
+func (c *PoolRDB) GetAll(ctx context.Context, coin string) (*[]info.Pool, error) {
+	field := MakeField(PoolField, coin)
 
 	infos, err := utils.RDB.HGetAll(ctx, field)
 	if err != nil {
@@ -62,11 +62,11 @@ func (c *PoolRDB) GetAll(ctx context.Context, coinName string) (*[]info.Pool, er
 
 	var pools []info.Pool
 	for _, infoStr := range infos {
-		var info info.Pool
-		if err := json.Unmarshal([]byte(infoStr), &info); err != nil {
+		var info_ info.Pool
+		if err := json.Unmarshal([]byte(infoStr), &info_); err != nil {
 			return nil, err
 		}
-		pools = append(pools, info)
+		pools = append(pools, info_)
 	}
 
 	return &pools, nil

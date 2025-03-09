@@ -2,6 +2,7 @@ package info
 
 type Pool struct {
 	Name string `json:"name" binding:"required,min=1,max=20"`
+	Coin string `json:"coin" binding:"required,min=1,max=20"`
 	Urls []Url  `json:"urls" binding:"required"`
 }
 

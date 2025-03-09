@@ -12,7 +12,10 @@ import (
 )
 
 func initialize() error {
-	if err := utils.InitConfig("./config.dev.yml", "yml"); err != nil {
+	//if err := utils.InitConfig("./config.dev.yml", "yml"); err != nil {
+	//	return err
+	//}
+	if err := utils.InitConfig("./config.yml", "yml"); err != nil {
 		return err
 	}
 	utils.InitJWT()
@@ -37,28 +40,15 @@ func initialize() error {
 
 func main() {
 	fmt.Println("哈哈哈哈哈哈哈")
-	fmt.Println("哈哈哈哈哈哈哈")
-	fmt.Println("哈哈哈哈哈哈哈")
-	fmt.Println("哈哈哈哈哈哈哈")
-	fmt.Println("哈哈哈哈哈哈哈")
-	fmt.Println("哈哈哈哈哈哈哈")
-	fmt.Println("哈哈哈哈哈哈哈")
-	fmt.Println("哈哈哈哈哈哈哈")
-	fmt.Println("哈哈哈哈哈哈哈")
-	fmt.Println("哈哈哈哈哈哈哈")
-	fmt.Println("哈哈哈哈哈哈哈")
-	fmt.Println("哈哈哈哈哈哈哈")
-	fmt.Println("哈哈哈哈哈哈哈")
-	fmt.Println("哈哈哈哈哈哈哈")
-	fmt.Println("哈哈哈哈哈哈哈")
-	// if err := initialize(); err != nil {
-	// utils.Logger.Error(err.Error())
-	// return
-	// }
+
+	if err := initialize(); err != nil {
+		utils.Logger.Error(err.Error())
+		return
+	}
 	gin.SetMode(utils.Config.Server.Mode)
 	ctx := gin.Default()
 	route.Init(ctx)
 	if err := ctx.Run(utils.GeneratePort()); err != nil {
-		// utils.Logger.Error("" + err.Error())
+		utils.Logger.Error("" + err.Error())
 	}
 }

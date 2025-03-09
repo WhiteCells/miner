@@ -18,6 +18,7 @@ type AdminService struct {
 	coinRDB      *redis.CoinRDB
 	poolRDB      *redis.PoolRDB
 	softRDB      *redis.SoftRDB
+	poolsRDB     *redis.PoolsRDB
 }
 
 func NewAdminService() *AdminService {
@@ -28,6 +29,7 @@ func NewAdminService() *AdminService {
 		coinRDB:      redis.NewCoinRDB(),
 		poolRDB:      redis.NewPoolRDB(),
 		softRDB:      redis.NewSoftRDB(),
+		poolsRDB:     redis.NewPoolsRDB(),
 	}
 }
 
@@ -179,12 +181,28 @@ func (s *AdminService) GetAllCoin(ctx context.Context) (*[]info.Coin, error) {
 
 // AddPool 添加矿池
 func (s *AdminService) AddPool(ctx context.Context, CoinName string, pool *info.Pool) error {
-	return s.poolRDB.Set(ctx, CoinName, pool)
+	err := s.poolRDB.Set(ctx, CoinName, pool)
+	if err != nil {
+		return err
+	}
+	err = s.poolsRDB.Set(ctx, pool)
+	if err != nil {
+		return err
+	}
+	return err
 }
 
 // DelPool 删除矿池
 func (s *AdminService) DelPool(ctx context.Context, coinName string, poolName string) error {
-	return s.poolRDB.Del(ctx, coinName, poolName)
+	err := s.poolRDB.Del(ctx, coinName, poolName)
+	if err != nil {
+		return err
+	}
+	err = s.poolsRDB.Del(ctx, poolName)
+	if err != nil {
+		return err
+	}
+	return err
 }
 
 // GetPool 获取矿池
@@ -193,7 +211,12 @@ func (s *AdminService) GetPool(ctx context.Context, coinName string, name string
 }
 
 // GetAllPool 获取所有矿池
-func (s *AdminService) GetAllPool(ctx context.Context, coinName string) (*[]info.Pool, error) {
+func (s *AdminService) GetAllPool(ctx context.Context) (*[]info.Pool, error) {
+	return s.poolsRDB.GetAll(ctx)
+}
+
+// GetAllPoolByCoin 根据coin获取所有矿池
+func (s *AdminService) GetAllPoolByCoin(ctx context.Context, coinName string) (*[]info.Pool, error) {
 	return s.poolRDB.GetAll(ctx, coinName)
 }
 

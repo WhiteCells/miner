@@ -1,7 +1,10 @@
 server:
-  hive_os_url: https://hiveos.vip/hiveos
-  host: 172.16.20.232
-  # host: 172.16.20.240
+#  hive_os_url: https://hiveos.vip
+#  hive_os_url: https://49.0.230.80
+#  hive_os_url: http://172.16.20.240:9090
+  hive_os_url: http://192.168.3.170:9090
+#  host: 172.16.20.232
+  host: 172.16.20.240
   port: 9090
   mode: debug # debug/release
 
@@ -13,7 +16,7 @@ mysql:
   user: root
 #  password: "iRhPyszHSPC5LCXK"
 #  password: "3215"
-  password: "10101"
+  password: "123456"
   dbname: miner
   max_idle_conns: 10
   max_open_conns: 100

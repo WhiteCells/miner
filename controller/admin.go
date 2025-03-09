@@ -342,12 +342,12 @@ func (c *AdminController) GetBscApiKey(ctx *gin.Context) {
 
 // GetAllBscApiKey 获取所有 apikey
 func (c *AdminController) GetAllBscApiKey(ctx *gin.Context) {
-	apikeys, err := c.adminService.GetAllBscApiKey(ctx)
+	apiKeys, err := c.adminService.GetAllBscApiKey(ctx)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, "failed to get bsc apikey", err.Error())
 		return
 	}
-	rsp.Success(ctx, http.StatusOK, "get bsc apikey success", apikeys)
+	rsp.Success(ctx, http.StatusOK, "get bsc apikey success", apiKeys)
 }
 
 // DelBscApiKey 删除 apikey
@@ -456,12 +456,22 @@ func (c *AdminController) GetPool(ctx *gin.Context) {
 // GetAllPool 获取所有 pool
 func (c *AdminController) GetAllPool(ctx *gin.Context) {
 	coinName := ctx.Query("coin")
-	pools, err := c.adminService.GetAllPool(ctx, coinName)
-	if err != nil {
-		rsp.Error(ctx, http.StatusInternalServerError, "failed to get all pool", err.Error())
-		return
+	if coinName == "" {
+		pools, err := c.adminService.GetAllPool(ctx)
+		if err != nil {
+			rsp.Error(ctx, http.StatusInternalServerError, "failed to get all pool", err.Error())
+			return
+		}
+		rsp.Success(ctx, http.StatusOK, "get all pool success", pools)
+	} else {
+		pools, err := c.adminService.GetAllPoolByCoin(ctx, coinName)
+		if err != nil {
+			rsp.Error(ctx, http.StatusInternalServerError, "failed to get all pool", err.Error())
+			return
+		}
+		rsp.Success(ctx, http.StatusOK, "get all pool success", pools)
 	}
-	rsp.Success(ctx, http.StatusOK, "get all pool success", pools)
+
 }
 
 // SetFreeGpuNum 设置免费 gpu 数量
