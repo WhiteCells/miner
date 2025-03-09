@@ -189,8 +189,11 @@ func GenerateHiveOsConfig(data *HiveOsConfig) string {
 ### MINERS HIVE CONFIGS ###
 
 # URL
-HIVE_HOST_URL="%s"
-API_HOST_URLs="%s"
+# HIVE_HOST_URL="%s"
+# API_HOST_URLs="%s"
+
+HIVE_HOST_URL="192.168.182.153:9090"
+API_HOST_URLs="192.168.182.153:9090"
 
 # Id of the rig
 RIG_ID=%s

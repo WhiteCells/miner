@@ -221,7 +221,7 @@ func (s *HiveOsService) statsCase(ctx *gin.Context, rigID string) {
 	if err != nil {
 		// 没有任务则结束
 		log.Println("=============================================")
-		log.Println(err.Error())
+		log.Println(rigID, err.Error())
 		log.Println("=============================================")
 		return
 	}

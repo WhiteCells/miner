@@ -29,7 +29,7 @@ var OsField = "os"
 var OsInfoField = "os:info"
 var OsStatsField = "os:stats"
 var OsMinerField = "os:miner"
-var TaskIDField = "task:id"
+var TaskIDField = "task_id"
 var TaskInfoField = "task:info"
 var OsFarmHashField = "os:farm_hash"
 
