@@ -1,12 +1,13 @@
 package controller
 
 import (
-	"github.com/gin-gonic/gin"
 	"miner/common/dto"
 	"miner/common/rsp"
 	"miner/service"
 	"miner/utils"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 type UserController struct {
@@ -116,24 +117,52 @@ func (c *UserController) GetPools(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "get pools success", pools)
 }
 
-// AppSoft 应用 Custom miner soft
-func (c *UserController) ApplySoft(ctx *gin.Context) {
-	var req dto.ApplySoftReq
+// SetSoft 设置 Custon miner soft 信息
+func (c *UserController) SetSoft(ctx *gin.Context) {
+	var req dto.AddSoftReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
-	if err := c.userService.ApplySoft(ctx, req.FsID, &req.Soft); err != nil {
-		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
+	if err := c.userService.AddSoft(ctx, req.SoftName, &req.Soft); err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), err.Error())
 		return
 	}
-	rsp.Success(ctx, http.StatusOK, "apply soft success", nil)
+	rsp.Success(ctx, http.StatusOK, "add soft success", nil)
+}
+
+// DelSoft 删除 Custon miner soft 信息
+func (c *UserController) DelSoft(ctx *gin.Context) {
+	var req dto.DelSoftReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
+		return
+	}
+	if err := c.userService.DelSoft(ctx, req.SoftName); err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), err.Error())
+		return
+	}
+	rsp.Success(ctx, http.StatusOK, "add soft success", nil)
+}
+
+// UpdateSoft 修改 Custon miner soft 信息
+func (c *UserController) UpdateSoft(ctx *gin.Context) {
+	var req dto.UpdateSoftReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
+		return
+	}
+	if err := c.userService.AddSoft(ctx, req.SoftName, &req.Soft); err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), err.Error())
+		return
+	}
+	rsp.Success(ctx, http.StatusOK, "update soft success", nil)
 }
 
 // GetSoft 获取 Custom miner soft 信息
 func (c *UserController) GetSoft(ctx *gin.Context) {
-	fsID := ctx.Query("fs_id")
-	softs, err := c.userService.GetSoft(ctx, fsID)
+	soft_name := ctx.Query("soft_name")
+	softs, err := c.userService.GetSoft(ctx, soft_name)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return

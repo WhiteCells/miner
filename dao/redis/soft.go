@@ -19,24 +19,32 @@ func NewSoftRDB() *SoftRDB {
 // Custom 不做 curd
 // 每个 fs 都有自己的 Custom
 //
-// +----------------+--------+
-// | key            | val    |
-// +----------------+--------+
-// | custom:<fs_id> | <info> |
-// +----------------+--------+
+// +---------+---------+--------+
+// | fields  | key     | val    |
+// +---------+---------+--------+
+// | soft    | <name>  | <info> |
+// +---------+---------+--------+
 // info 存储 Custom 对象json序列化
-func (c *SoftRDB) Set(ctx context.Context, fsID string, info *info.Soft) error {
-	key := MakeField(CustomField, fsID)
+func (c *SoftRDB) Set(ctx context.Context, name string, info *info.Soft) error {
+	field := MakeField(SoftField)
+	key := MakeField(name)
 	infoByte, err := json.Marshal(info)
 	if err != nil {
 		return err
 	}
-	return utils.RDB.Set(ctx, key, string(infoByte))
+	return utils.RDB.HSet(ctx, field, key, string(infoByte))
 }
 
-func (c *SoftRDB) Get(ctx context.Context, fsID string) (*info.Soft, error) {
-	key := MakeField(CustomField, fsID)
-	softStr, err := utils.RDB.Get(ctx, key)
+func (c *SoftRDB) Del(ctx context.Context, name string) error {
+	field := MakeField(SoftField)
+	key := MakeField(name)
+	return utils.RDB.HDel(ctx, field, key)
+}
+
+func (c *SoftRDB) Get(ctx context.Context, name string) (*info.Soft, error) {
+	field := MakeField(SoftField)
+	key := MakeField(name)
+	softStr, err := utils.RDB.HGet(ctx, field, key)
 	if err != nil {
 		return nil, err
 	}

@@ -220,9 +220,9 @@ func (s *AdminService) GetAllPoolByCoin(ctx context.Context, coinName string) (*
 	return s.poolRDB.GetAll(ctx, coinName)
 }
 
-// ApplySoft 应用 custom miner soft
-func (s *AdminService) ApplySoft(ctx context.Context, fsID string, soft *info.Soft) error {
-	return s.softRDB.Set(ctx, fsID, soft)
+// AddSoft 应用 custom miner soft
+func (s *AdminService) AddSoft(ctx context.Context, name string, soft *info.Soft) error {
+	return s.softRDB.Set(ctx, name, soft)
 }
 
 // 设置卡数上限

@@ -303,9 +303,19 @@ func (s *UserService) GetPools(ctx context.Context, coinName string) (*[]info.Po
 	return s.poolRDB.GetAll(ctx, coinName)
 }
 
-// ApplySoft 应用 custom miner soft
-func (s *UserService) ApplySoft(ctx context.Context, fsID string, soft *info.Soft) error {
-	return s.softRDB.Set(ctx, fsID, soft)
+// AddSoft 应用 custom miner soft 信息
+func (s *UserService) AddSoft(ctx context.Context, name string, soft *info.Soft) error {
+	return s.softRDB.Set(ctx, name, soft)
+}
+
+// DelSoft 删除 custom miner soft 信息
+func (s *UserService) DelSoft(ctx context.Context, name string) error {
+	return s.softRDB.Del(ctx, name)
+}
+
+// Update 修改 custom miner soft 信息
+func (s *UserService) UpdateSoft(ctx context.Context, name string, soft *info.Soft) error {
+	return s.softRDB.Set(ctx, name, soft)
 }
 
 // GetSoft 获取 custom miner soft 信息

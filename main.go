@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"miner/dao/mysql"
 	"miner/dao/redis"
 	"miner/route"
@@ -12,12 +11,12 @@ import (
 )
 
 func initialize() error {
-	//if err := utils.InitConfig("./config.dev.yml", "yml"); err != nil {
-	//	return err
-	//}
-	if err := utils.InitConfig("./config.yml", "yml"); err != nil {
+	if err := utils.InitConfig("./config.dev.yml", "yml"); err != nil {
 		return err
 	}
+	// if err := utils.InitConfig("./config.yml", "yml"); err != nil {
+	// 	return err
+	// }
 	utils.InitJWT()
 	if err := utils.InitLogger(); err != nil {
 		return err
@@ -39,8 +38,6 @@ func initialize() error {
 }
 
 func main() {
-	fmt.Println("哈哈哈哈哈哈哈")
-
 	if err := initialize(); err != nil {
 		utils.Logger.Error(err.Error())
 		return

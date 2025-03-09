@@ -5,12 +5,6 @@ services:
       - "9090:9090"
     depends_on:
       - mysql
-      - redis-cluster-0
-      - redis-cluster-1
-      - redis-cluster-2
-      - redis-cluster-3
-      - redis-cluster-4
-      - redis-cluster-5
       - start-redis-cluster
     environment:
       - DB_HOST=mysql
@@ -32,86 +26,14 @@ services:
       - mysql_data:/var/lib/mysql
     networks:
       - backend
-  redis-cluster-0:
-    image: bitnami/redis-cluster:latest
-    environment:
-      - REDIS_PASSWORD=m3i2n1e0r
-      - REDIS_NODES=127.0.0.1:7000 127.0.0.1:7001 127.0.0.1:7002 127.0.0.1:7003 127.0.0.1:7004 127.0.0.1:7005
-    ports:
-      - "7000:7000"
+  redis-cluster-nodes:
+    build: ./redis-cluster
     volumes:
-      - ./redis-cluster/7000:/miner/redis-cluster/7000
-      - redis_data_0:/bitnami/redis/data
-    command: "redis-server /miner/redis-cluster/7000/redis.conf"
-    networks:
-      - backend
-  redis-cluster-1:
-    image: bitnami/redis-cluster:latest
-    environment:
-      - REDIS_PASSWORD=m3i2n1e0r
-      - REDIS_NODES=127.0.0.1:7000 127.0.0.1:7001 127.0.0.1:7002 127.0.0.1:7003 127.0.0.1:7004 127.0.0.1:7005
-    ports:
-      - "7001:7001"
-    volumes:
-      - ./redis-cluster/7001:/miner/redis-cluster/7001
-      - redis_data_1:/bitnami/redis/data
-    command: "redis-server /miner/redis-cluster/7001/redis.conf"
-    networks:
-      - backend
-  redis-cluster-2:
-    image: bitnami/redis-cluster:latest
-    environment:
-      - REDIS_PASSWORD=m3i2n1e0r
-      - REDIS_NODES=127.0.0.1:7000 127.0.0.1:7001 127.0.0.1:7002 127.0.0.1:7003 127.0.0.1:7004 127.0.0.1:7005
-    ports:
-      - "7002:7002"
-    volumes:
-      - ./redis-cluster/7002:/miner/redis-cluster/7002
-      - redis_data_2:/bitnami/redis/data
-    command: "redis-server /miner/redis-cluster/7002/redis.conf"
-    networks:
-      - backend
-  redis-cluster-3:
-    image: bitnami/redis-cluster:latest
-    environment:
-      - REDIS_PASSWORD=m3i2n1e0r
-      - REDIS_NODES=127.0.0.1:7000 127.0.0.1:7001 127.0.0.1:7002 127.0.0.1:7003 127.0.0.1:7004 127.0.0.1:7005
-    ports:
-      - "7003:7003"
-    volumes:
-      - ./redis-cluster/7003:/miner/redis-cluster/7003
-      - redis_data_3:/bitnami/redis/data
-    command: "redis-server /miner/redis-cluster/7003/redis.conf"
-    networks:
-      - backend
-  redis-cluster-4:
-    image: bitnami/redis-cluster:latest
-    environment:
-      - REDIS_PASSWORD=m3i2n1e0r
-      - REDIS_NODES=127.0.0.1:7000 127.0.0.1:7001 127.0.0.1:7002 127.0.0.1:7003 127.0.0.1:7004 127.0.0.1:7005
-    ports:
-      - "7004:7004"
-    volumes:
-      - ./redis-cluster/7004:/miner/redis-cluster/7004
-      - redis_data_4:/bitnami/redis/data
-    command: "redis-server /miner/redis-cluster/7004/redis.conf"
-    networks:
-      - backend
-  redis-cluster-5:
-    image: bitnami/redis-cluster:latest
-    environment:
-      - REDIS_PASSWORD=m3i2n1e0r
-      - REDIS_NODES=127.0.0.1:7000 127.0.0.1:7001 127.0.0.1:7002 127.0.0.1:7003 127.0.0.1:7004 127.0.0.1:7005
-    ports:
-      - "7005:7005"
-    volumes:
-      - ./redis-cluster/7005:/miner/redis-cluster/7005
-      - redis_data_5:/bitnami/redis/data
-    command: "redis-server /miner/redis-cluster/7005/redis.conf"
-    networks:
-      - backend
+      - ./redis-cluster:/redis-cluster
   start-redis-cluster:
     image: bitnami/redis-cluster:latest
+    volumes:
+      - ./redis-cluster:/redis-cluster
     command: >
       sh -c "
       redis-cli --cluster create \
@@ -125,22 +47,13 @@ services:
       -a m3i2n1e0r
       "
     depends_on:
-      - redis-cluster-0
-      - redis-cluster-1
-      - redis-cluster-2
-      - redis-cluster-3
-      - redis-cluster-4
-      - redis-cluster-5
+      - redis-cluster-nodes
     networks:
       - backend
+
 networks:
   backend:
     driver: bridge
+
 volumes:
   mysql_data:
-  redis_data_0:
-  redis_data_1:
-  redis_data_2:
-  redis_data_3:
-  redis_data_4:
-  redis_data_5:

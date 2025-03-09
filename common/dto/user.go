@@ -37,3 +37,17 @@ type ApplySoftReq struct {
 	FsID string    `json:"fs_id" binding:"required"`
 	Soft info.Soft `json:"soft" binding:"required"`
 }
+
+type AddSoftReq struct {
+	SoftName string    `json:"soft_name" binding:"required"`
+	Soft     info.Soft `json:"soft" binding:"required"`
+}
+
+type DelSoftReq struct {
+	SoftName string `json:"soft_name" binding:"required"`
+}
+
+type UpdateSoftReq struct {
+	SoftName string    `json:"soft_name" binding:"required"`
+	Soft     info.Soft `json:"soft" binding:"required"`
+}

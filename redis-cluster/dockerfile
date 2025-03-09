@@ -1,0 +1,19 @@
+FROM bitnami/redis-cluster:latest
+
+# 切换到 root
+USER root
+
+# 安装 Python3（如果需要）
+RUN apt-get update && apt-get install -y python3 && rm -rf /var/lib/apt/lists/*
+
+# 复制文件
+COPY gen_config.py /redis-cluster/gen_config.py
+COPY start_cluster.sh /redis-cluster/start_cluster.sh
+
+# 修改权限
+RUN chmod +x /redis-cluster/start_cluster.sh
+
+# 切换回默认的非 root 用户
+USER 1001
+
+ENTRYPOINT ["/bin/bash", "-c", "redis-server --daemonize yes && python3 /redis-cluster/gen_config.py && /redis-cluster/start_cluster.sh"]
