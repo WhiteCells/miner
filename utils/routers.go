@@ -163,6 +163,18 @@ func UtilsGetRouters() ([]Route, error) {
           "noCache": false,
           "link": null
         }
+      },
+      {
+        "name": "SoftAll",
+        "path": "SoftAll",
+        "hidden": false,
+        "component": "switch/soft_all/index",
+        "meta": {
+          "title": "挖矿软件",
+          "icon": "#",
+          "noCache": false,
+          "link": null
+        }
       }
     ]
   },

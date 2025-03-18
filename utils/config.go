@@ -135,12 +135,13 @@ type Watchdog struct {
 	WdMinhashes     string `json:"wd_minhashes"`
 	WdMinhashesAlgo string `json:"wd_minhashes_algo"`
 	WdType          string `json:"wd_type"`
+	WdCheckGpu      string `json:"wd_check_gpu"`
 }
 
 type Options struct {
 	XDisabled         string `json:"x_disabled"`
 	PushInterval      string `json:"push_interval"`
-	Amintenance       string `json:"amintenance"`
+	Maintenance       string `json:"maintenance"`
 	MinerDelay        string `json:"miner_delay"`
 	DohEnable         string `json:"doh_enable"`
 	PowerRecycle      string `json:"power_recycle"`
@@ -181,6 +182,7 @@ type HiveOsAutoFan struct {
 	CustomMinFan        string `json:"custom_min_fan"`
 	CustomMaxFan        string `json:"custom_max_fan"`
 	CustomCriticalTemp  string `json:"custom_critical_temp"`
+	CustomStaticFan     string `json:"custom_static_fan"`
 }
 
 // 生成字符串会被写入 /hive-config/rig.conf
@@ -189,11 +191,11 @@ func GenerateHiveOsConfig(data *HiveOsConfig) string {
 ### MINERS HIVE CONFIGS ###
 
 # URL
-# HIVE_HOST_URL="%s"
-# API_HOST_URLs="%s"
+HIVE_HOST_URL="%s"
+API_HOST_URLs="%s"
 
-HIVE_HOST_URL="192.168.182.153:9090"
-API_HOST_URLs="192.168.182.153:9090"
+# HIVE_HOST_URL="192.168.182.153:9090"
+# API_HOST_URLs="192.168.182.153:9090"
 
 # Id of the rig
 RIG_ID=%s
@@ -243,6 +245,8 @@ SSH_PASSWORD_ENABLE=%s
 `
 	return fmt.Sprintf(template,
 		// URL
+		//GenerateHiveOsUrl(),
+		//GenerateHiveOsUrl(),
 		data.HiveOsUrl,
 		data.ApiHiveOsUrls,
 		// Id of the rig
@@ -276,7 +280,7 @@ SSH_PASSWORD_ENABLE=%s
 		// options
 		data.Options.XDisabled,
 		data.Options.PushInterval,
-		data.Options.Amintenance,
+		data.Options.Maintenance,
 		data.Options.MinerDelay,
 		data.Options.DohEnable,
 		data.Options.PowerRecycle,

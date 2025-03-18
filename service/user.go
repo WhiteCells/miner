@@ -303,25 +303,25 @@ func (s *UserService) GetPools(ctx context.Context, coinName string) (*[]info.Po
 	return s.poolRDB.GetAll(ctx, coinName)
 }
 
-// AddSoft 应用 custom miner soft 信息
-func (s *UserService) AddSoft(ctx context.Context, name string, soft *info.Soft) error {
-	return s.softRDB.Set(ctx, name, soft)
-}
-
-// DelSoft 删除 custom miner soft 信息
-func (s *UserService) DelSoft(ctx context.Context, name string) error {
-	return s.softRDB.Del(ctx, name)
-}
-
-// Update 修改 custom miner soft 信息
-func (s *UserService) UpdateSoft(ctx context.Context, name string, soft *info.Soft) error {
-	return s.softRDB.Set(ctx, name, soft)
-}
-
-// GetSoft 获取 custom miner soft 信息
-func (s *UserService) GetSoft(ctx context.Context, fsID string) (*info.Soft, error) {
-	return s.softRDB.Get(ctx, fsID)
-}
+//// AddSoft 应用 custom miner soft 信息
+//func (s *UserService) AddSoft(ctx context.Context, name string, soft *info.Soft) error {
+//	return s.softRDB.Set(ctx, name, soft)
+//}
+//
+//// DelSoft 删除 custom miner soft 信息
+//func (s *UserService) DelSoft(ctx context.Context, name string) error {
+//	return s.softRDB.Del(ctx, name)
+//}
+//
+//// Update 修改 custom miner soft 信息
+//func (s *UserService) UpdateSoft(ctx context.Context, name string, soft *info.Soft) error {
+//	return s.softRDB.Set(ctx, name, soft)
+//}
+//
+//// GetSoft 获取 custom miner soft 信息
+//func (s *UserService) GetSoft(ctx context.Context, fsID string) (*info.Soft, error) {
+//	return s.softRDB.Get(ctx, fsID)
+//}
 
 // requestBscApi 调用 bsc api
 func (s *UserService) requestBscApi(address string, apikey string) (string, error) {
@@ -453,4 +453,8 @@ func (s *UserService) GenerateAddress(ctx *gin.Context, userID string) (string, 
 		return "", "", err
 	}
 	return account.Address.Hex(), privateKey, nil
+}
+
+func (s *UserService) GetSoftAll(ctx context.Context, coinName string) (*[]info.Soft, error) {
+	return s.softRDB.GetAll(ctx, coinName)
 }

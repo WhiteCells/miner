@@ -48,10 +48,11 @@ func (ur *UserRoute) InitUserRoute(r *gin.Engine) {
 		// pool
 		route.GET("/pools", ur.userController.GetPools)
 		// soft
-		route.POST("/soft", ur.userController.SetSoft)
-		route.DELETE("/soft", ur.userController.DelSoft)
-		route.PUT("/soft", ur.userController.UpdateSoft)
-		route.GET("/soft", ur.userController.GetSoft)
+		route.GET("/soft/list", ur.userController.GetSoftAll)
+		//route.POST("/soft", ur.userController.SetSoft)
+		//route.DELETE("/soft", ur.userController.DelSoft)
+		//route.PUT("/soft", ur.userController.UpdateSoft)
+		//route.GET("/soft", ur.userController.GetSoft)
 		// Routers
 		route.GET("/get_routers", ur.userController.GetRouters)
 	}

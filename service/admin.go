@@ -19,6 +19,7 @@ type AdminService struct {
 	poolRDB      *redis.PoolRDB
 	softRDB      *redis.SoftRDB
 	poolsRDB     *redis.PoolsRDB
+	softAllRDB   *redis.SoftAllRDB
 }
 
 func NewAdminService() *AdminService {
@@ -30,6 +31,7 @@ func NewAdminService() *AdminService {
 		poolRDB:      redis.NewPoolRDB(),
 		softRDB:      redis.NewSoftRDB(),
 		poolsRDB:     redis.NewPoolsRDB(),
+		softAllRDB:   redis.NewSoftAllRDB(),
 	}
 }
 
@@ -220,9 +222,50 @@ func (s *AdminService) GetAllPoolByCoin(ctx context.Context, coinName string) (*
 	return s.poolRDB.GetAll(ctx, coinName)
 }
 
-// AddSoft 应用 custom miner soft
-func (s *AdminService) AddSoft(ctx context.Context, name string, soft *info.Soft) error {
-	return s.softRDB.Set(ctx, name, soft)
+//// AddSoft 应用 custom miner soft
+//func (s *AdminService) AddSoft(ctx context.Context, coin string, name string, soft *info.Soft) error {
+//	return s.softRDB.Set(ctx, coin, name, soft)
+//}
+
+// AddSoft 添加矿池
+func (s *AdminService) AddSoft(ctx context.Context, coinName string, soft *info.Soft) error {
+	err := s.softRDB.Set(ctx, coinName, soft.MinerName, soft)
+	if err != nil {
+		return err
+	}
+	err = s.softAllRDB.Set(ctx, soft)
+	if err != nil {
+		return err
+	}
+	return err
+}
+
+// DelSoft 删除矿池
+func (s *AdminService) DelSoft(ctx context.Context, coinName string, softName string) error {
+	err := s.softRDB.Del(ctx, coinName, softName)
+	if err != nil {
+		return err
+	}
+	err = s.softAllRDB.Del(ctx, softName)
+	if err != nil {
+		return err
+	}
+	return err
+}
+
+// GetSoft 获取矿池
+func (s *AdminService) GetSoft(ctx context.Context, coinName string, name string) (*info.Soft, error) {
+	return s.softRDB.Get(ctx, coinName, name)
+}
+
+// GetAllSoft 获取所有矿池
+func (s *AdminService) GetAllSoft(ctx context.Context) (*[]info.Soft, error) {
+	return s.softAllRDB.GetAll(ctx)
+}
+
+// GetAllSoftByCoin 根据coin获取所有矿池
+func (s *AdminService) GetAllSoftByCoin(ctx context.Context, coinName string) (*[]info.Soft, error) {
+	return s.softRDB.GetAll(ctx, coinName)
 }
 
 // 设置卡数上限

@@ -47,6 +47,7 @@ var CoinField = "coin"
 var PoolField = "pool"
 var PoolsField = "pools"
 var SoftField = "soft"
+var SoftAllField = "soft_all"
 var CustomField = "custom"
 
 func MakeKey(str ...string) string {

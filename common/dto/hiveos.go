@@ -57,6 +57,7 @@ type HelloReq struct {
 		ShellinaboxEnable bool   `json:"shellinabox_enable"`
 		SshEnable         bool   `json:"ssh_enable"`
 		SshPasswordEnable bool   `json:"ssh_password_enable"`
+		WorkerName        string `json:"worker_name"`
 	} `json:"params"`
 }
 

@@ -117,58 +117,58 @@ func (c *UserController) GetPools(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "get pools success", pools)
 }
 
-// SetSoft 设置 Custon miner soft 信息
-func (c *UserController) SetSoft(ctx *gin.Context) {
-	var req dto.AddSoftReq
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
-		return
-	}
-	if err := c.userService.AddSoft(ctx, req.SoftName, &req.Soft); err != nil {
-		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), err.Error())
-		return
-	}
-	rsp.Success(ctx, http.StatusOK, "add soft success", nil)
-}
+//// SetSoft 设置 Custon miner soft 信息
+//func (c *UserController) SetSoft(ctx *gin.Context) {
+//	var req dto.AddSoftReq
+//	if err := ctx.ShouldBindJSON(&req); err != nil {
+//		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
+//		return
+//	}
+//	if err := c.userService.AddSoft(ctx, req.SoftName, &req.Soft); err != nil {
+//		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), err.Error())
+//		return
+//	}
+//	rsp.Success(ctx, http.StatusOK, "add soft success", nil)
+//}
+//
+//// DelSoft 删除 Custon miner soft 信息
+//func (c *UserController) DelSoft(ctx *gin.Context) {
+//	var req dto.DelSoftReq
+//	if err := ctx.ShouldBindJSON(&req); err != nil {
+//		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
+//		return
+//	}
+//	if err := c.userService.DelSoft(ctx, req.SoftName); err != nil {
+//		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), err.Error())
+//		return
+//	}
+//	rsp.Success(ctx, http.StatusOK, "add soft success", nil)
+//}
+//
+//// UpdateSoft 修改 Custon miner soft 信息
+//func (c *UserController) UpdateSoft(ctx *gin.Context) {
+//	var req dto.UpdateSoftReq
+//	if err := ctx.ShouldBindJSON(&req); err != nil {
+//		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
+//		return
+//	}
+//	if err := c.userService.AddSoft(ctx, req.SoftName, &req.Soft); err != nil {
+//		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), err.Error())
+//		return
+//	}
+//	rsp.Success(ctx, http.StatusOK, "update soft success", nil)
+//}
 
-// DelSoft 删除 Custon miner soft 信息
-func (c *UserController) DelSoft(ctx *gin.Context) {
-	var req dto.DelSoftReq
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
-		return
-	}
-	if err := c.userService.DelSoft(ctx, req.SoftName); err != nil {
-		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), err.Error())
-		return
-	}
-	rsp.Success(ctx, http.StatusOK, "add soft success", nil)
-}
-
-// UpdateSoft 修改 Custon miner soft 信息
-func (c *UserController) UpdateSoft(ctx *gin.Context) {
-	var req dto.UpdateSoftReq
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
-		return
-	}
-	if err := c.userService.AddSoft(ctx, req.SoftName, &req.Soft); err != nil {
-		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), err.Error())
-		return
-	}
-	rsp.Success(ctx, http.StatusOK, "update soft success", nil)
-}
-
-// GetSoft 获取 Custom miner soft 信息
-func (c *UserController) GetSoft(ctx *gin.Context) {
-	soft_name := ctx.Query("soft_name")
-	softs, err := c.userService.GetSoft(ctx, soft_name)
-	if err != nil {
-		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
-		return
-	}
-	rsp.Success(ctx, http.StatusOK, "get soft success", softs)
-}
+//// GetSoft 获取 Custom miner soft 信息
+//func (c *UserController) GetSoft(ctx *gin.Context) {
+//	soft_name := ctx.Query("soft_name")
+//	softs, err := c.userService.GetSoft(ctx, soft_name)
+//	if err != nil {
+//		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
+//		return
+//	}
+//	rsp.Success(ctx, http.StatusOK, "get soft success", softs)
+//}
 
 // GenerateCaptcha
 func (c *UserController) GenerateCaptcha(ctx *gin.Context) {
@@ -204,4 +204,15 @@ func (c *UserController) GetRouters(ctx *gin.Context) {
 		rsp.Error(ctx, http.StatusForbidden, "get routers error", nil)
 	}
 	rsp.Success(ctx, http.StatusOK, "get routers success", data)
+}
+
+// 获取全局挖矿软件
+func (c *UserController) GetSoftAll(ctx *gin.Context) {
+	coinName := ctx.Query("coin_name")
+	softList, err := c.userService.GetSoftAll(ctx, coinName)
+	if err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
+		return
+	}
+	rsp.Success(ctx, http.StatusOK, "get soft list success", softList)
 }

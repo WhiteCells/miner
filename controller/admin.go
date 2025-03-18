@@ -293,7 +293,7 @@ func (c *AdminController) SetMnemonic(ctx *gin.Context) {
 		rsp.Error(ctx, http.StatusInternalServerError, "set mnemonic", err.Error())
 		return
 	}
-	rsp.Success(ctx, http.StatusOK, "set mnemonict success", nil)
+	rsp.Success(ctx, http.StatusOK, "set mnemonics success", nil)
 }
 
 // GetMnemonic 获取活跃助记词
@@ -303,17 +303,21 @@ func (c *AdminController) GetMnemonic(ctx *gin.Context) {
 		rsp.Error(ctx, http.StatusInternalServerError, "no active mnemonic", err.Error())
 		return
 	}
-	rsp.Success(ctx, http.StatusOK, "get mnemonict success", mnemonic)
+	rsp.Success(ctx, http.StatusOK, "get mnemonics success", mnemonic)
 }
 
 // GetAllMnemonic 获取所有助记词
 func (c *AdminController) GetAllMnemonic(ctx *gin.Context) {
 	mnemonics, err := c.adminService.GetAllMnemonic(ctx)
 	if err != nil {
+		if err.Error() == "redis: nil" {
+			rsp.Success(ctx, http.StatusOK, "get mnemonics stats success", nil)
+			return
+		}
 		rsp.Error(ctx, http.StatusInternalServerError, "no mnemonic", err.Error())
 		return
 	}
-	rsp.Success(ctx, http.StatusOK, "get mnemonict success", mnemonics)
+	rsp.Success(ctx, http.StatusOK, "get mnemonics success", mnemonics)
 }
 
 // AddBscApiKey 添加 apikey
@@ -455,7 +459,7 @@ func (c *AdminController) GetPool(ctx *gin.Context) {
 
 // GetAllPool 获取所有 pool
 func (c *AdminController) GetAllPool(ctx *gin.Context) {
-	coinName := ctx.Query("coin")
+	coinName := ctx.Query("coinName")
 	if coinName == "" {
 		pools, err := c.adminService.GetAllPool(ctx)
 		if err != nil {
@@ -486,4 +490,65 @@ func (c *AdminController) SetFreeGpuNum(ctx *gin.Context) {
 		return
 	}
 	rsp.Success(ctx, http.StatusOK, "set free gpu num success", nil)
+}
+
+// AddSoft 添加 soft
+func (c *AdminController) AddSoft(ctx *gin.Context) {
+	var req dto.AdminAddSoftReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		rsp.Error(ctx, http.StatusBadRequest, "invalid request", err.Error())
+		return
+	}
+	if err := c.adminService.AddSoft(ctx, req.Soft.Coin, &req.Soft); err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, "failed to add soft", err.Error())
+		return
+	}
+	rsp.Success(ctx, http.StatusOK, "add pool success", "")
+}
+
+// DelSoft 删除 soft
+func (c *AdminController) DelSoft(ctx *gin.Context) {
+	var req dto.AdminDelSoftReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		rsp.Error(ctx, http.StatusBadRequest, "invalid request", err.Error())
+		return
+	}
+	if err := c.adminService.DelSoft(ctx, req.CoinName, req.Name); err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, "failed to del soft", err.Error())
+		return
+	}
+	rsp.Success(ctx, http.StatusOK, "del pool success", "")
+}
+
+// GetSoft 获取 soft
+func (c *AdminController) GetSoft(ctx *gin.Context) {
+	coinName := ctx.Query("coinName")
+	poolName := ctx.Query("poolName")
+	pool, err := c.adminService.GetPool(ctx, coinName, poolName)
+	if err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, "failed to get soft", err.Error())
+		return
+	}
+	rsp.Success(ctx, http.StatusOK, "get soft success", pool)
+}
+
+// GetAllSoft 获取所有 soft
+func (c *AdminController) GetAllSoft(ctx *gin.Context) {
+	coinName := ctx.Query("coinName")
+	if coinName == "" {
+		pools, err := c.adminService.GetAllSoft(ctx)
+		if err != nil {
+			rsp.Error(ctx, http.StatusInternalServerError, "failed to get all soft", err.Error())
+			return
+		}
+		rsp.Success(ctx, http.StatusOK, "get all soft success", pools)
+	} else {
+		pools, err := c.adminService.GetAllSoftByCoin(ctx, coinName)
+		if err != nil {
+			rsp.Error(ctx, http.StatusInternalServerError, "failed to get all soft", err.Error())
+			return
+		}
+		rsp.Success(ctx, http.StatusOK, "get all soft success", pools)
+	}
+
 }

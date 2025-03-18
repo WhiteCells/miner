@@ -66,11 +66,13 @@ type AdminDelPoolReq struct {
 }
 
 type AdminAddSoftReq struct {
-	Soft info.Soft `json:"soft" binding:"required"`
+	CoinName string    `json:"coinName" binding:"required"`
+	Soft     info.Soft `json:"soft" binding:"required"`
 }
 
 type AdminDelSoftReq struct {
-	Name string `json:"name" binding:"required"`
+	CoinName string `json:"coinName" binding:"required"`
+	Name     string `json:"name" binding:"required"`
 }
 
 type AdminSetFreeGpuNumReq struct {

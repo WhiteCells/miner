@@ -33,7 +33,7 @@ func (ar *AdminRoute) InitAdminRoute(r *gin.Engine) {
 		route.POST("/switch_register", ar.adminController.SetSwitchRegister)
 		route.GET("/switch_register", ar.adminController.GetSwitchRegister)
 		route.POST("/global_fs", ar.adminController.SetGlobalFs)
-		// route.GET("/global_fs", ar.adminController.GetGlobalFs)
+		//route.GET("/global_fs", ar.adminController.GetGlobalFs)
 		// invite_reward
 		route.GET("/invite_reward", ar.adminController.GetInviteReward)
 		route.POST("/invite_reward", ar.adminController.SetInviteReward)
@@ -67,5 +67,11 @@ func (ar *AdminRoute) InitAdminRoute(r *gin.Engine) {
 		route.DELETE("/pool", ar.adminController.DelPool)
 		route.GET("/pool", ar.adminController.GetPool)
 		route.GET("/all_pool", ar.adminController.GetAllPool)
+		// soft
+		route.POST("/soft", ar.adminController.AddSoft)
+		//route.PUT("/soft", ar.adminController.UpdateSoft)
+		route.DELETE("/soft", ar.adminController.DelSoft)
+		route.GET("/soft", ar.adminController.GetSoft)
+		route.GET("/soft/list", ar.adminController.GetAllSoft)
 	}
 }

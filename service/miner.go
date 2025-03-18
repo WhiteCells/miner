@@ -16,16 +16,18 @@ import (
 )
 
 type MinerService struct {
-	minerRDB  *redis.MinerRDB
-	farmRDB   *redis.FarmRDB
-	hiveosRDB *redis.HiveOsRDB
+	minerRDB   *redis.MinerRDB
+	farmRDB    *redis.FarmRDB
+	hiveosRDB  *redis.HiveOsRDB
+	softAllRDB *redis.SoftAllRDB
 }
 
 func NewMinerService() *MinerService {
 	return &MinerService{
-		minerRDB:  redis.NewMinerRDB(),
-		farmRDB:   redis.NewFarmRDB(),
-		hiveosRDB: redis.NewHiveOsRDB(),
+		minerRDB:   redis.NewMinerRDB(),
+		farmRDB:    redis.NewFarmRDB(),
+		hiveosRDB:  redis.NewHiveOsRDB(),
+		softAllRDB: redis.NewSoftAllRDB(),
 	}
 }
 
@@ -81,7 +83,12 @@ func (s *MinerService) CreateMiner(ctx context.Context, req *dto.CreateMinerReq)
 
 	// 建立 rigID->{userID:farmID:minerID} 映射
 	if err = s.hiveosRDB.SetRigMapping(ctx, userID, rigID, req.FarmID, miner.ID); err != nil {
-		defer s.minerRDB.Del(ctx, req.FarmID, miner.ID)
+		defer func(minerRDB *redis.MinerRDB, ctx context.Context, farmID string, minerID string) {
+			err := minerRDB.Del(ctx, farmID, minerID)
+			if err != nil {
+
+			}
+		}(s.minerRDB, ctx, req.FarmID, miner.ID)
 		return nil, err
 	}
 
@@ -415,7 +422,11 @@ func (s *MinerService) ApplyFs(ctx context.Context, req *dto.ApplyMinerFsReq) er
 	if !s.validPerm(ctx, req.FarmID, req.MinerID, []perm.MinerPerm{perm.MinerOwner, perm.MinerManager}) {
 		return errors.New("permission denied")
 	}
-	return s.minerRDB.ApplyFs(ctx, req.FarmID, req.MinerID, req.FsID)
+	softInfo, err := s.softAllRDB.Get(ctx, req.SoftName)
+	if err != nil {
+		return errors.New("get soft info err")
+	}
+	return s.minerRDB.ApplyFs(ctx, req.FarmID, req.MinerID, req.FsID, softInfo)
 }
 
 func (s *MinerService) validPerm(ctx context.Context, farmID string, minerID string, allowedPerms []perm.MinerPerm) bool {

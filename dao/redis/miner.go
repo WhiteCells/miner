@@ -106,7 +106,7 @@ func (c *MinerRDB) Transfer(ctx context.Context, fromUserID, fromFarmID, MinerID
 // +---------------------+------------+
 // | miner:fs:<miner_id> |  <fs_id>   |
 // +---------------------+------------+
-func (c *MinerRDB) ApplyFs(ctx context.Context, farmID string, minerID string, fsID string) error {
+func (c *MinerRDB) ApplyFs(ctx context.Context, farmID string, minerID string, fsID string, softInfo *info.Soft) error {
 	pipe := utils.RDB.Client.TxPipeline()
 	// 获取 miner
 	field := MakeField(MinerField, farmID)
@@ -121,6 +121,16 @@ func (c *MinerRDB) ApplyFs(ctx context.Context, farmID string, minerID string, f
 	// 更新 miner
 	miner.FS = fsID
 	miner.HiveOsWallet.FsID = fsID
+
+	miner.HiveOsWallet.CustomMiner = softInfo.MinerName
+	miner.HiveOsWallet.CustomUserConfig = softInfo.CustomUserConfig
+	miner.HiveOsWallet.CustomAlgo = softInfo.CustomAlgo
+	miner.HiveOsWallet.CustomInstallURL = softInfo.CustomInstallUrl
+	miner.HiveOsWallet.CustomPass = softInfo.CustomPass
+	miner.HiveOsWallet.CustomTemplate = softInfo.CustomTemplate
+	miner.HiveOsWallet.CustomUrl = softInfo.CustomUrl
+	miner.HiveOsWallet.CustomTLS = softInfo.CustomTls
+
 	minerByte, err := json.Marshal(miner)
 	if err != nil {
 		return err

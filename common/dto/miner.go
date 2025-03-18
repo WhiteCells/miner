@@ -104,9 +104,10 @@ type UpdateMinerAutofanReq struct {
 }
 
 type ApplyMinerFsReq struct {
-	FarmID  string `json:"farm_id" binding:"required"`
-	MinerID string `json:"miner_id" binding:"required"`
-	FsID    string `json:"fs_id" binding:"required"`
+	FarmID   string `json:"farm_id" binding:"required"`
+	MinerID  string `json:"miner_id" binding:"required"`
+	FsID     string `json:"fs_id" binding:"required"`
+	SoftName string `json:"soft_name" binding:"required"`
 }
 
 type TransferMinerReq struct {
