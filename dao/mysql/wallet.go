@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"miner/model"
+	"miner/model/relation"
 	"miner/utils"
 
 	"gorm.io/gorm"
@@ -20,7 +21,7 @@ func (dao *WalletDAO) CreateWallet(wallet *model.Wallet, userID int) error {
 			return err
 		}
 		// 建立 user-wallet 关联
-		userWallet := &model.UserWallet{
+		userWallet := &relation.UserWallet{
 			UserID:   userID,
 			WalletID: wallet.ID,
 		}
@@ -35,12 +36,12 @@ func (dao *WalletDAO) CreateWallet(wallet *model.Wallet, userID int) error {
 func (dao *WalletDAO) DeleteWallet(walletID int, userID int) error {
 	err := utils.DB.Transaction(func(tx *gorm.DB) error {
 		// 删除 user-wallet 关联
-		if err := tx.Where("user_id = ? AND wallet_id = ?", userID, walletID).Delete(&model.UserWallet{}).Error; err != nil {
+		if err := tx.Where("user_id = ? AND wallet_id = ?", userID, walletID).Delete(&relation.UserWallet{}).Error; err != nil {
 			return err
 		}
 
 		// 删除 flightsheet-wallet 关联
-		if err := tx.Where("wallet_id = ?", walletID).Delete(&model.FlightsheetWallet{}).Error; err != nil {
+		if err := tx.Where("wallet_id = ?", walletID).Delete(&relation.FsWallet{}).Error; err != nil {
 			return err
 		}
 		// 删除钱包
@@ -61,7 +62,7 @@ func (dao *WalletDAO) GetWallet(userID int, query map[string]interface{}) (*[]mo
 	var total int64
 
 	// 查询总数
-	if err := utils.DB.Model(model.UserWallet{}).Where("user_id = ?", userID).Count(&total).Error; err != nil {
+	if err := utils.DB.Model(relation.UserWallet{}).Where("user_id = ?", userID).Count(&total).Error; err != nil {
 		return nil, -1, err
 	}
 

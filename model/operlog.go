@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-type OperLog struct {
+type Operlog struct {
 	ID       int       `json:"id" gorm:"column:id;type:int;primaryKey;autoIncrement;comment:日志唯一标识"`
 	UserID   string    `json:"user_id" gorm:"column:user_id;type:varchar(255);comment:用户ID"`
 	UserName string    `json:"user_name" gorm:"column:user_name;type:varchar(255);comment:用户名"`
@@ -17,6 +17,6 @@ type OperLog struct {
 	Detail   string    `json:"detail" gorm:"column:detail;type:text;comment:请求回包"`
 }
 
-func (OperLog) TableName() string {
-	return "oper_log"
+func (Operlog) TableName() string {
+	return "operlog"
 }

@@ -3,6 +3,7 @@ package utils
 import (
 	"context"
 	"fmt"
+	"log"
 	"sync"
 	"time"
 
@@ -14,12 +15,11 @@ type RedisClient struct {
 }
 
 var (
-	RDB          *RedisClient
-	onceRDB      sync.Once
-	initRDBError error
+	RDB     *RedisClient
+	onceRDB sync.Once
 )
 
-func InitRDB() error {
+func InitRDB() {
 	onceRDB.Do(func() {
 		addrs := fmt.Sprintf("%s:%d", Config.Redis.Host, Config.Redis.Port)
 		client := redis.NewClusterClient(&redis.ClusterOptions{
@@ -42,16 +42,13 @@ func InitRDB() error {
 		defer cancel()
 
 		if _, err := client.Ping(ctx).Result(); err != nil {
-			fmt.Println("failed to connect redis")
-			initRDBError = err
-			return
+			log.Fatalf("failed to connect redis, %s", err.Error())
 		}
 
 		fmt.Println("redis connect successfully")
 
 		RDB = &RedisClient{Client: client}
 	})
-	return initRDBError
 }
 
 func (r *RedisClient) ZAdd(ctx context.Context, field string, key string) error {

@@ -57,7 +57,7 @@ func OperLog() gin.HandlerFunc {
 		}
 
 		// 创建操作日志
-		operLog := model.OperLog{
+		operLog := model.Operlog{
 			UserID:   userID,
 			UserName: userName,
 			Time:     time.Now(),

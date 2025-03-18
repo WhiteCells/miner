@@ -13,11 +13,11 @@ func NewOperLogDAO() *OperLogDAO {
 }
 
 // GetOperLogs 获取操作日志
-func (dao *OperLogDAO) GetOperLogs(query map[string]interface{}) (*[]model.OperLog, int64, error) {
-	var logs []model.OperLog
+func (dao *OperLogDAO) GetOperLogs(query map[string]interface{}) (*[]model.Operlog, int64, error) {
+	var logs []model.Operlog
 	var total int64
 
-	db := utils.DB.Model(&model.OperLog{})
+	db := utils.DB.Model(&model.Operlog{})
 
 	// 添加查询条件
 	if userIDStr, ok := query["user_id"].(string); ok {

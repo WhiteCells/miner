@@ -1,8 +1,8 @@
 package utils
 
 import (
-	"errors"
 	"fmt"
+	"log"
 	"strconv"
 
 	"github.com/spf13/viper"
@@ -57,21 +57,19 @@ type ServerConfig struct {
 
 var Config ServerConfig
 
-func InitConfig(configFile string, configType string) error {
+func InitConfig(configFile string, configType string) {
 	viper.SetConfigFile(configFile)
 	viper.SetConfigType(configType)
 
 	err := viper.ReadInConfig()
 	if err != nil {
-		return errors.New("Failed to read config " + err.Error())
+		log.Fatalf("failed to read config file: %s, %s", configFile, err.Error())
 	}
 
 	err = viper.Unmarshal(&Config)
 	if err != nil {
-		return errors.New("Failed to Unmarshal config " + err.Error())
+		log.Fatalf("failed to unmarshal config file: %s, %s", configFile, err.Error())
 	}
-
-	return nil
 }
 
 type HiveOsConfig struct {

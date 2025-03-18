@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-type PointsRecord struct {
+type Pointslog struct {
 	ID      string            `json:"id" gorm:"column:id;type:int;primaryKey;autoIncrement"`
 	UserID  string            `json:"user_id" gorm:"index;column:user_id;type:varchar(255);comment:用户ID"`
 	Type    points.PointsType `json:"type" gorm:"column:type;type:varchar(255);comment:积分类型"`
@@ -15,6 +15,6 @@ type PointsRecord struct {
 	Detail  string            `json:"detail" gorm:"column:detail;type:text;comment:详情"`
 }
 
-func (PointsRecord) TableName() string {
-	return "points_record"
+func (Pointslog) TableName() string {
+	return "pointslog"
 }

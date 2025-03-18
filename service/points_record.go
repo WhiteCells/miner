@@ -19,7 +19,7 @@ func NewPointRecordService() *PointsRecordService {
 }
 
 // GetPointsRecords 获取用户积分记录
-func (s *PointsRecordService) GetPointsRecords(ctx *gin.Context, query map[string]interface{}) (*[]model.PointsRecord, int64, error) {
+func (s *PointsRecordService) GetPointsRecords(ctx *gin.Context, query map[string]interface{}) (*[]model.Pointslog, int64, error) {
 	records, total, err := s.pointsRecordDAO.GetUserPointsRecords(query)
 	if err != nil {
 		return nil, -1, errors.New("get user points records failed")

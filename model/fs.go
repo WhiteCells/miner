@@ -2,7 +2,7 @@ package model
 
 import "miner/common/perm"
 
-type Flightsheet struct {
+type Fs struct {
 	ID       int       `json:"id" gorm:"column:id;type:int;primaryKey;autoIncrement;comment:飞行表ID"`
 	Name     string    `json:"name" gorm:"unqiue;column:name;type:varchar(255);comment:飞行表名"`
 	CoinType string    `json:"coin_type" gorm:"column:coin_type;type:varchar(255);comment:货币类型"`
@@ -11,6 +11,6 @@ type Flightsheet struct {
 	Perm     perm.Perm `json:"perm" gorm:"column:perm;type:varchar(255);comment:用户/管理员"`
 }
 
-func (Flightsheet) TableName() string {
-	return "flightsheet"
+func (Fs) TableName() string {
+	return "fs"
 }

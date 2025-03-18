@@ -1,8 +1,9 @@
 package main
 
 import (
-	"miner/dao/mysql"
+	"flag"
 	"miner/dao/redis"
+	model "miner/model/migrate"
 	"miner/route"
 	"miner/settlement"
 	"miner/utils"
@@ -10,38 +11,24 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func initialize() error {
-	//if err := utils.InitConfig("./config.dev.yml", "yml"); err != nil {
-	//	return err
-	//}
-	if err := utils.InitConfig("./config.yml", "yml"); err != nil {
-		return err
-	}
+var configPath string
+
+// go run main.go -f config.dev.yml
+func init() {
+	flag.StringVar(&configPath, "c", "./config.yml", "path to config file")
+	flag.Parse()
+
+	utils.InitConfig(configPath, "yml")
 	utils.InitJWT()
-	if err := utils.InitLogger(); err != nil {
-		return err
-	}
-	if err := utils.InitRDB(); err != nil {
-		return err
-	}
-	if err := redis.Init(); err != nil {
-		return err
-	}
-	if err := utils.InitDB(); err != nil {
-		return err
-	}
-	if err := mysql.Init(); err != nil {
-		return err
-	}
+	utils.InitLogger()
+	utils.InitRDB()
+	redis.Init()
+	utils.InitDB()
+	model.Migrate()
 	settlement.InitCronJob()
-	return nil
 }
 
 func main() {
-	if err := initialize(); err != nil {
-		utils.Logger.Error(err.Error())
-		return
-	}
 	gin.SetMode(utils.Config.Server.Mode)
 	ctx := gin.Default()
 	route.Init(ctx)

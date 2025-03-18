@@ -4,3 +4,4 @@ go.sum
 redis-cluster/*/log.txt
 redis-cluster/*/store/*
 !redis-cluster/*/store/.gitkeep
+config.dev.yml

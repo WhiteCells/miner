@@ -389,7 +389,7 @@ func (s *UserService) addInvitePoints(ctx *gin.Context, uid string, inviterID st
 	// 积分记录
 	detail := fmt.Sprintf("%s invite %s", inviterID, uid)
 	go func() {
-		record := &model.PointsRecord{
+		record := &model.Pointslog{
 			UserID:  inviterID,
 			Type:    points.PointInvite,
 			Amount:  invitePoints,

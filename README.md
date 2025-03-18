@@ -43,7 +43,7 @@
 
 ```sh
 go mod tidy
-go run ./main.go
+go run ./main.go -f config.dev.yml
 ```
 
 `redis-cluster` 目录为 持久化的分布式 redis

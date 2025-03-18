@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"log"
+
 	"github.com/natefinch/lumberjack"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -8,21 +10,18 @@ import (
 
 var Logger *zap.Logger
 
-func InitLogger() error {
+func InitLogger() {
 	writeSyncer := getLogWriter(Config.Log.Filename, Config.Log.MaxSize, Config.Log.MaxBackups, Config.Log.MaxAge)
 	encoder := getEncoder()
 
-	// 设置日志级别
 	var l zapcore.Level
 	err := l.UnmarshalText([]byte(Config.Log.Level))
 	if err != nil {
-		return err
+		log.Fatalf("failed to init logger, %s", err.Error())
 	}
 
 	core := zapcore.NewCore(encoder, writeSyncer, l)
 	Logger = zap.New(core, zap.AddCaller())
-
-	return nil
 }
 
 // 获取日志编码器

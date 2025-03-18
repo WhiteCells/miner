@@ -1,8 +1,8 @@
 package mysql
 
 import (
-	"miner/common/perm"
 	"miner/model"
+	"miner/model/relation"
 	"miner/utils"
 
 	"gorm.io/gorm"
@@ -23,10 +23,9 @@ func (dao *FarmDAO) CreateFarm(farm *model.Farm, userID int) error {
 			return err
 		}
 		// 创建 用户-矿场 关联
-		userFarm := &model.UserFarm{
+		userFarm := &relation.UserFarm{
 			UserID: userID,
 			FarmID: farm.ID,
-			Perm:   perm.FarmOwner,
 		}
 		if err := tx.Create(userFarm).Error; err != nil {
 			return err
@@ -39,12 +38,12 @@ func (dao *FarmDAO) CreateFarm(farm *model.Farm, userID int) error {
 func (dao *FarmDAO) DeleteFarmByID(farmID int, userID int) error {
 	return utils.DB.Transaction(func(tx *gorm.DB) error {
 		// 删除 用户-矿场 关联
-		if err := tx.Delete(&model.UserFarm{}, "user_id = ? AND farm_id = ?", userID, farmID).Error; err != nil {
+		if err := tx.Delete(&relation.UserFarm{}, "user_id = ? AND farm_id = ?", userID, farmID).Error; err != nil {
 			return err
 		}
 		// 删除 矿场-矿机 关联
 		// TODO 矿机如何处理
-		if err := tx.Delete(&model.FarmMiner{}, "farm_id = ?", farmID).Error; err != nil {
+		if err := tx.Delete(&relation.FarmMiner{}, "farm_id = ?", farmID).Error; err != nil {
 			return err
 		}
 		// 删除矿场
@@ -66,7 +65,7 @@ func (dao *FarmDAO) GetFarm(userID int, query map[string]interface{}) (*[]model.
 	var total int64
 
 	// 查询总数
-	if err := utils.DB.Model(model.UserFarm{}).Where("user_id = ?", userID).Count(&total).Error; err != nil {
+	if err := utils.DB.Model(relation.UserFarm{}).Where("user_id = ?", userID).Count(&total).Error; err != nil {
 		return nil, -1, err
 	}
 
@@ -95,13 +94,13 @@ func (dao *FarmDAO) GetFarmByID(farmID int) (*model.Farm, error) {
 func (dao *FarmDAO) ApplyFlightsheet(farmID int, fsID int) error {
 	return utils.DB.Transaction(func(tx *gorm.DB) error {
 		// 删除原有 farm-flightsheet 关联
-		if err := tx.Delete(&model.FarmFlightsheet{}, "farm_id = ?", farmID).Error; err != nil {
+		if err := tx.Delete(&relation.FarmFs{}, "farm_id = ?", farmID).Error; err != nil {
 			return err
 		}
 		// 建立新的 farm-flightsheet 关联
-		farmFlightsheet := &model.FarmFlightsheet{
-			FarmID:        farmID,
-			FlightsheetID: fsID,
+		farmFlightsheet := &relation.FarmFs{
+			FarmID: farmID,
+			FsID:   fsID,
 		}
 		if err := tx.Create(farmFlightsheet).Error; err != nil {
 			return err
@@ -115,14 +114,14 @@ func (dao *FarmDAO) ApplyFlightsheet(farmID int, fsID int) error {
 func (dao *FarmDAO) TransferFarm(farmID int, fromUserID int, toUserID int) error {
 	return utils.DB.Transaction(func(tx *gorm.DB) error {
 		// 更新 user-farm 关联
-		if err := tx.Model(&model.UserFarm{}).
+		if err := tx.Model(&relation.UserFarm{}).
 			Where("user_id = ?", fromUserID).
 			Update("user_id", toUserID).
 			Error; err != nil {
 			return err
 		}
 		// 更新 user-miner 关联
-		if err := tx.Model(&model.UserMiner{}).
+		if err := tx.Model(&relation.UserMiner{}).
 			Where("user_id = ?", fromUserID).
 			Updates(map[string]interface{}{"user_id": toUserID}).
 			Error; err != nil {

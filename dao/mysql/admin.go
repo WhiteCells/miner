@@ -3,6 +3,7 @@ package mysql
 import (
 	"miner/common/status"
 	"miner/model"
+	"miner/model/relation"
 	"miner/utils"
 )
 
@@ -40,11 +41,11 @@ func (dao *AdminDAO) GetAllUsers(query map[string]interface{}) (*[]model.User, i
 }
 
 // GetUserOperLogs 获取用户日志
-func (dao *AdminDAO) GetUserOperLogs(query map[string]interface{}) (*[]model.OperLog, int64, error) {
-	var logs []model.OperLog
+func (dao *AdminDAO) GetUserOperLogs(query map[string]interface{}) (*[]model.Operlog, int64, error) {
+	var logs []model.Operlog
 	var total int64
 
-	db := utils.DB.Model(&model.OperLog{})
+	db := utils.DB.Model(&model.Operlog{})
 
 	// query 的其他参数
 
@@ -93,8 +94,8 @@ func (dao *AdminDAO) GetUserLoginLogs(query map[string]interface{}) (*[]model.Lo
 }
 
 // GetUserPointsRecords 获取用户积分记录
-func (dao *AdminDAO) GetUserPointsRecords(query map[string]interface{}) (*[]model.PointsRecord, int64, error) {
-	var records []model.PointsRecord
+func (dao *AdminDAO) GetUserPointsRecords(query map[string]interface{}) (*[]model.Pointslog, int64, error) {
+	var records []model.Pointslog
 	var total int64
 
 	// query 的其他参数
@@ -104,7 +105,7 @@ func (dao *AdminDAO) GetUserPointsRecords(query map[string]interface{}) (*[]mode
 
 	// 查询总数
 	if err := utils.DB.
-		Where(model.PointsRecord{}).
+		Where(model.Pointslog{}).
 		Count(&total).Error; err != nil {
 		return nil, -1, err
 	}
@@ -133,7 +134,7 @@ func (dao *AdminDAO) GetUserFarms(query map[string]interface{}) (*[]model.Farm, 
 	// 获取用户拥有的矿场数量
 	// 后续可以细分为：用户拥有，用户管理，用户查看
 	if err := utils.DB.
-		Model(model.UserFarm{}).
+		Model(relation.UserFarm{}).
 		Where("user_id = ?", userID).
 		Count(&total).Error; err != nil {
 		return nil, -1, err
@@ -199,7 +200,7 @@ func (dao *AdminDAO) SwitchRegister(status status.RegisterStatus) error {
 }
 
 // SetGlobalFlightsheet 设置全局飞行表，所有用户都进行加载
-func (dao *AdminDAO) SetGlobalFlightsheet(fs *model.Flightsheet) error {
+func (dao *AdminDAO) SetGlobalFlightsheet(fs *model.Fs) error {
 	return nil
 }
 
@@ -250,7 +251,7 @@ func (dao *AdminDAO) SetUserStatus(userID int, status status.UserStatus) error {
 
 // SetMinerPoolCost 设置矿池消耗
 func (dao *AdminDAO) SetMinePoolCost(minePoolID int, cost float64) error {
-	var minePool model.MinePool
+	var minePool model.Pool
 	if err := utils.DB.First(&minePool, minePoolID).Error; err != nil {
 		return err
 	}

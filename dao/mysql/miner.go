@@ -1,8 +1,8 @@
 package mysql
 
 import (
-	"miner/common/perm"
 	"miner/model"
+	"miner/model/relation"
 	"miner/utils"
 
 	"gorm.io/gorm"
@@ -24,17 +24,17 @@ func (dao *MinerDAO) CreateMiner(miner *model.Miner, userID int, farmID int) err
 		}
 
 		// 建立 user-miner 关联
-		userMiner := &model.UserMiner{
+		userMiner := &relation.UserMiner{
 			UserID:  userID,
 			MinerID: miner.ID,
-			Perm:    perm.MinerOwner,
+			// Perm:    perm.MinerOwner,
 		}
 		if err := tx.Create(userMiner).Error; err != nil {
 			return err
 		}
 
 		// 建立 farm-miner 关联
-		farmMiner := &model.FarmMiner{
+		farmMiner := &relation.FarmMiner{
 			FarmID:  farmID,
 			MinerID: miner.ID,
 		}
@@ -69,19 +69,19 @@ func (dao *MinerDAO) DeleteMiner(minerID int, farmID int, userID int) error {
 		// 删除 user-miner 关联
 		if err := tx.
 			Where("user_id = ? AND miner_id = ?", userID, minerID).
-			Delete(&model.UserMiner{}).Error; err != nil {
+			Delete(&relation.UserMiner{}).Error; err != nil {
 			return err
 		}
 		// 删除 farm-miner 关联
 		if err := tx.
 			Where("miner_id = ?", minerID).
-			Delete(&model.FarmMiner{}).Error; err != nil {
+			Delete(&relation.FarmMiner{}).Error; err != nil {
 			return err
 		}
 		// 删除 miner-flightsheet 关联
 		if err := tx.
 			Where("miner_id = ?", minerID).
-			Delete(&model.MinerFlightsheet{}).Error; err != nil {
+			Delete(&relation.MinerFs{}).Error; err != nil {
 			return err
 		}
 		// 删除 miner
@@ -152,7 +152,7 @@ func (dao *MinerDAO) Transfer(minerID int, fromFarmID int, farmHash string) erro
 		}
 		// 更新 farm-miner 关联
 		if err := tx.
-			Model(&model.FarmMiner{}).
+			Model(&relation.FarmMiner{}).
 			Where("farm_id = ? AND miner_id = ?", fromFarmID, minerID).
 			Update("farm_id", farm.ID).Error; err != nil {
 			return err

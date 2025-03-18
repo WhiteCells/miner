@@ -137,7 +137,7 @@ func processUserPoints(ctx context.Context, user *info.User) {
 
 		detail := fmt.Sprintf("farm num:%d\ngpu num:%d\n", len(*farms), gpuNum)
 
-		pointsRecord := &model.PointsRecord{
+		pointsRecord := &model.Pointslog{
 			UserID:  user.ID,
 			Type:    points.PointSettlement,
 			Amount:  -cost,

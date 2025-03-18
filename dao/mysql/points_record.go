@@ -12,16 +12,16 @@ func NewPointRecordDAO() *PointsRecordDAO {
 }
 
 // CreatePointsRecord 创建积分记录
-func (dao *PointsRecordDAO) CreatePointsRecord(record *model.PointsRecord) error {
+func (dao *PointsRecordDAO) CreatePointsRecord(record *model.Pointslog) error {
 	return utils.DB.Create(record).Error
 }
 
 // GetUserPointsRecords 获取用户积分记录
-func (dao *PointsRecordDAO) GetUserPointsRecords(query map[string]interface{}) (*[]model.PointsRecord, int64, error) {
-	var records []model.PointsRecord
+func (dao *PointsRecordDAO) GetUserPointsRecords(query map[string]interface{}) (*[]model.Pointslog, int64, error) {
+	var records []model.Pointslog
 	var total int64
 
-	db := utils.DB.Model(&model.PointsRecord{})
+	db := utils.DB.Model(&model.Pointslog{})
 
 	// 添加查询条件
 	if userID, ok := query["user_id"].(int); ok {
