@@ -97,7 +97,7 @@ func LoginLog() gin.HandlerFunc {
 			return
 		}
 
-		loginLog := &model.LoginLog{
+		loginLog := &model.Loginlog{
 			UserID: userID,
 			Time:   time.Now(),
 			IP:     ctx.ClientIP(),

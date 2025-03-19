@@ -22,20 +22,34 @@ func NewAdminController() *AdminController {
 
 // AdminGetUser 获取所有用户
 func (c *AdminController) GetAllUser(ctx *gin.Context) {
-	users, err := c.adminService.GetAllUser(ctx)
+	pageNum, err := strconv.Atoi(ctx.Query("page_num"))
+	if err != nil {
+		rsp.Error(ctx, http.StatusBadRequest, "invalid page num", nil)
+		return
+	}
+	pageSize, err := strconv.Atoi(ctx.Query("page_size"))
+	if err != nil {
+		rsp.Error(ctx, http.StatusBadRequest, "invalid page size", nil)
+		return
+	}
+	query := map[string]any{
+		"page_num":  pageNum,
+		"page_size": pageSize,
+	}
+	users, total, err := c.adminService.GetAllUsers(ctx, query)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, "admin get all user failed", nil)
 		return
 	}
 
-	rsp.QuerySuccess(ctx, http.StatusOK, "admin get all user success", users)
+	rsp.DBQuerySuccess(ctx, http.StatusOK, "admin get all user success", users, total)
 }
 
 // AdminGetOperLog 获取所有用户操作日志
-func (c *AdminController) GetUserOperLogs(ctx *gin.Context) {
+func (c *AdminController) GetUserOperlogs(ctx *gin.Context) {
 	pageNum, err := strconv.Atoi(ctx.Query("page_num"))
 	if err != nil || pageNum <= 0 {
-		rsp.Error(ctx, http.StatusBadRequest, "invalid page_numt", nil)
+		rsp.Error(ctx, http.StatusBadRequest, "invalid page_num", nil)
 		return
 	}
 	pageSize, err := strconv.Atoi(ctx.Query("page_size"))
@@ -43,12 +57,12 @@ func (c *AdminController) GetUserOperLogs(ctx *gin.Context) {
 		rsp.Error(ctx, http.StatusBadRequest, "invalid page_size", nil)
 		return
 	}
-	query := map[string]interface{}{
+	query := map[string]any{
 		"page_num":  pageNum,
 		"page_size": pageSize,
 	}
 
-	users, total, err := c.adminService.GetUserOperLogs(ctx, query)
+	users, total, err := c.adminService.GetUserOperlogs(ctx, query)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, "admin get all user failed", nil)
 		return
@@ -58,7 +72,7 @@ func (c *AdminController) GetUserOperLogs(ctx *gin.Context) {
 }
 
 // GetUserLoginLogs 获取用户登陆日志
-func (c *AdminController) GetUserLoginLogs(ctx *gin.Context) {
+func (c *AdminController) GetUserLoginlogs(ctx *gin.Context) {
 	pageNum, err := strconv.Atoi(ctx.Query("page_num"))
 	if err != nil || pageNum <= 0 {
 		rsp.Error(ctx, http.StatusBadRequest, "invalid page_numt", nil)
@@ -74,7 +88,7 @@ func (c *AdminController) GetUserLoginLogs(ctx *gin.Context) {
 		"page_size": pageSize,
 	}
 
-	users, total, err := c.adminService.GetUserLoginLogs(ctx, query)
+	users, total, err := c.adminService.GetUserLoginlogs(ctx, query)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, "admin get user login logs failed", nil)
 		return
@@ -84,10 +98,10 @@ func (c *AdminController) GetUserLoginLogs(ctx *gin.Context) {
 }
 
 // GetUserPointsRecords 获取用户的积分记录
-func (c *AdminController) GetUserPointsRecords(ctx *gin.Context) {
+func (c *AdminController) GetUserPointslogs(ctx *gin.Context) {
 	pageNum, err := strconv.Atoi(ctx.Query("page_num"))
 	if err != nil || pageNum <= 0 {
-		rsp.Error(ctx, http.StatusBadRequest, "invalid page_numt", nil)
+		rsp.Error(ctx, http.StatusBadRequest, "invalid page_num", nil)
 		return
 	}
 	pageSize, err := strconv.Atoi(ctx.Query("page_size"))

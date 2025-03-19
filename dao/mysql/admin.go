@@ -14,7 +14,7 @@ func NewAdminDAO() *AdminDAO {
 }
 
 // GetAllUser 获取所有用户信息
-func (dao *AdminDAO) GetAllUsers(query map[string]interface{}) (*[]model.User, int64, error) {
+func (dao *AdminDAO) GetAllUsers(query map[string]any) (*[]model.User, int64, error) {
 	var users []model.User
 	var total int64
 
@@ -41,7 +41,7 @@ func (dao *AdminDAO) GetAllUsers(query map[string]interface{}) (*[]model.User, i
 }
 
 // GetUserOperLogs 获取用户日志
-func (dao *AdminDAO) GetUserOperLogs(query map[string]interface{}) (*[]model.Operlog, int64, error) {
+func (dao *AdminDAO) GetUserOperlogs(query map[string]any) (*[]model.Operlog, int64, error) {
 	var logs []model.Operlog
 	var total int64
 
@@ -67,11 +67,11 @@ func (dao *AdminDAO) GetUserOperLogs(query map[string]interface{}) (*[]model.Ope
 }
 
 // GetUserLoginLogs 获取用户登陆日志
-func (dao *AdminDAO) GetUserLoginLogs(query map[string]interface{}) (*[]model.LoginLog, int64, error) {
-	var logs []model.LoginLog
+func (dao *AdminDAO) GetUserLoginlogs(query map[string]any) (*[]model.Loginlog, int64, error) {
+	var logs []model.Loginlog
 	var total int64
 
-	db := utils.DB.Model(&model.LoginLog{})
+	db := utils.DB.Model(&model.Loginlog{})
 
 	// query 的其他参数
 
@@ -94,7 +94,7 @@ func (dao *AdminDAO) GetUserLoginLogs(query map[string]interface{}) (*[]model.Lo
 }
 
 // GetUserPointsRecords 获取用户积分记录
-func (dao *AdminDAO) GetUserPointsRecords(query map[string]interface{}) (*[]model.Pointslog, int64, error) {
+func (dao *AdminDAO) GetUserPointslogs(query map[string]any) (*[]model.Pointslog, int64, error) {
 	var records []model.Pointslog
 	var total int64
 

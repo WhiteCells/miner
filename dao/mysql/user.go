@@ -29,15 +29,34 @@ func (dao *UserDAO) GetUserByID(id int) (*model.User, error) {
 	return &user, err
 }
 
+func (dao *UserDAO) GetUserByEmail(email string) (*model.User, error) {
+	var user model.User
+	err := utils.DB.
+		Where("email=?", email).
+		First(&user).Error
+	return &user, err
+}
+
 func (dao *UserDAO) GetUserByName(name string) (*model.User, error) {
 	var user model.User
-	err := utils.DB.Where("name = ?", name).First(&user).Error
+	err := utils.DB.
+		Where("name = ?", name).
+		First(&user).Error
 	return &user, err
 }
 
 func (dao *UserDAO) GetUserByInviteCode(inviteCode string) (*model.User, error) {
 	var user model.User
-	err := utils.DB.Where("invite_code = ?", inviteCode).First(&user).Error
+	err := utils.DB.
+		Where("invite_code = ?", inviteCode).
+		First(&user).Error
+	return &user, err
+}
+
+func (dao *UserDAO) GetAllUsers() (*[]model.User, error) {
+	var user []model.User
+	err := utils.DB.
+		Find(&user).Error
 	return &user, err
 }
 

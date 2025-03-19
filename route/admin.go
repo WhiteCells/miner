@@ -25,9 +25,9 @@ func (ar *AdminRoute) InitAdminRoute(r *gin.Engine) {
 	route.Use(middleware.RoleAuth(role.Admin))
 	{
 		route.GET("/all_users", ar.adminController.GetAllUser)
-		route.GET("/user_oper_logs", ar.adminController.GetUserOperLogs)
-		route.GET("/user_login_logs", ar.adminController.GetUserLoginLogs)
-		route.GET("/user_points_records", ar.adminController.GetUserPointsRecords)
+		route.GET("/user_oper_logs", ar.adminController.GetUserOperlogs)
+		route.GET("/user_login_logs", ar.adminController.GetUserLoginlogs)
+		route.GET("/user_points_records", ar.adminController.GetUserPointslogs)
 		route.GET("/user_farms", ar.adminController.GetUserFarms)
 		route.GET("/user_miners", ar.adminController.GetUserMiners)
 		route.POST("/switch_register", ar.adminController.SetSwitchRegister)

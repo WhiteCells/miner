@@ -48,5 +48,5 @@ func (dao *PointsRecordDAO) GetUserPointsRecords(query map[string]interface{}) (
 func (dao *PointsRecordDAO) GetUserPointsBalance(userID int) (int, error) {
 	var user model.User
 	err := utils.DB.Select("points").First(&user, userID).Error
-	return user.Points, err
+	return 0, err
 }

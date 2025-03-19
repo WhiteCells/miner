@@ -10,7 +10,7 @@ func Migrate() error {
 	return utils.DB.AutoMigrate(
 		&model.Farm{},
 		&model.Fs{},
-		&model.LoginLog{},
+		&model.Loginlog{},
 		&model.Miner{},
 		&model.Operlog{},
 		&model.Pointslog{},
