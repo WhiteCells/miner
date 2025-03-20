@@ -3,7 +3,7 @@ package controller
 import (
 	"miner/common/dto"
 	"miner/common/rsp"
-	"miner/service"
+	"miner/services"
 	"miner/utils"
 	"net/http"
 
@@ -11,12 +11,12 @@ import (
 )
 
 type UserController struct {
-	userService *service.UserService
+	userService *services.UserService
 }
 
 func NewUserController() *UserController {
 	return &UserController{
-		userService: service.NewUserSerivce(),
+		userService: services.NewUserService(),
 	}
 }
 
@@ -63,22 +63,23 @@ func (c *UserController) Logout(ctx *gin.Context) {
 }
 
 // UpdatePasswd 修改密码
-func (c *UserController) UpdatePasswd(ctx *gin.Context) {
-	var req dto.UpdatePasswdReq
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
-		return
-	}
-	if err := c.userService.UpdatePasswd(ctx, &req); err != nil {
-		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
-		return
-	}
-	rsp.Success(ctx, http.StatusOK, "update passwd success", nil)
-}
+// func (c *UserController) UpdatePasswd(ctx *gin.Context) {
+// 	var req dto.UpdatePasswdReq
+// 	if err := ctx.ShouldBindJSON(&req); err != nil {
+// 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
+// 		return
+// 	}
+// 	if err := c.userService.UpdatePasswd(ctx, &req); err != nil {
+// 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
+// 		return
+// 	}
+// 	rsp.Success(ctx, http.StatusOK, "update passwd success", nil)
+// }
 
 // GetPointsBalance 获取积分余额
 func (c *UserController) GetPointsBalance(ctx *gin.Context) {
-	balance, err := c.userService.GetPointsBalance(ctx)
+	userID := ctx.GetInt("user_id")
+	balance, err := c.userService.GetUserPointsBalance(userID)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
@@ -87,8 +88,8 @@ func (c *UserController) GetPointsBalance(ctx *gin.Context) {
 }
 
 func (c *UserController) GetUserAddress(ctx *gin.Context) {
-	userID := ctx.GetString("user_id")
-	address, err := c.userService.GetUserAddress(ctx, userID)
+	userID := ctx.GetInt("user_id")
+	address, err := c.userService.GetUserAddress(userID)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
@@ -97,25 +98,25 @@ func (c *UserController) GetUserAddress(ctx *gin.Context) {
 }
 
 // GetCoins 获取币种信息
-func (c *UserController) GetCoins(ctx *gin.Context) {
-	coins, err := c.userService.GetCoins(ctx)
-	if err != nil {
-		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
-		return
-	}
-	rsp.Success(ctx, http.StatusOK, "get coins success", coins)
-}
+// func (c *UserController) GetCoins(ctx *gin.Context) {
+// 	coins, err := c.userService.GetCoins(ctx)
+// 	if err != nil {
+// 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
+// 		return
+// 	}
+// 	rsp.Success(ctx, http.StatusOK, "get coins success", coins)
+// }
 
 // GetPools 获取矿池信息
-func (c *UserController) GetPools(ctx *gin.Context) {
-	coinName := ctx.Query("coin_name")
-	pools, err := c.userService.GetPools(ctx, coinName)
-	if err != nil {
-		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
-		return
-	}
-	rsp.Success(ctx, http.StatusOK, "get pools success", pools)
-}
+// func (c *UserController) GetPools(ctx *gin.Context) {
+// 	coinName := ctx.Query("coin_name")
+// 	pools, err := c.userService.GetPools(ctx, coinName)
+// 	if err != nil {
+// 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
+// 		return
+// 	}
+// 	rsp.Success(ctx, http.StatusOK, "get pools success", pools)
+// }
 
 //// SetSoft 设置 Custon miner soft 信息
 //func (c *UserController) SetSoft(ctx *gin.Context) {
@@ -207,12 +208,12 @@ func (c *UserController) GetRouters(ctx *gin.Context) {
 }
 
 // 获取全局挖矿软件
-func (c *UserController) GetSoftAll(ctx *gin.Context) {
-	coinName := ctx.Query("coin_name")
-	softList, err := c.userService.GetSoftAll(ctx, coinName)
-	if err != nil {
-		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
-		return
-	}
-	rsp.Success(ctx, http.StatusOK, "get soft list success", softList)
-}
+// func (c *UserController) GetSoftAll(ctx *gin.Context) {
+// 	coinName := ctx.Query("coin_name")
+// 	softList, err := c.userService.GetSoftAll(ctx, coinName)
+// 	if err != nil {
+// 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
+// 		return
+// 	}
+// 	rsp.Success(ctx, http.StatusOK, "get soft list success", softList)
+// }

@@ -8,9 +8,9 @@ import (
 	"miner/common/points"
 	"miner/common/status"
 	"miner/dao/mysql"
+	"miner/dao/mysql/relationdao"
 	"miner/dao/redis"
 	"miner/model"
-	"miner/model/info"
 	"miner/utils"
 	"sync"
 	"time"
@@ -28,23 +28,25 @@ func InitCronJob() {
 }
 
 var (
-	adminRDB       *redis.AdminRDB        = redis.NewAdminRDB()
-	farmRDB        *redis.FarmRDB         = redis.NewFarmRDB()
-	userRDB        *redis.UserRDB         = redis.NewUserRDB()
-	pointsCordsDAO *mysql.PointsRecordDAO = mysql.NewPointRecordDAO()
+	adminDAO     *mysql.AdminDAO          = mysql.NewAdminDAO()
+	adminRDB     *redis.AdminRDB          = redis.NewAdminRDB()
+	farmDAO      *mysql.FarmDAO           = mysql.NewFarmDAO()
+	userFarmDAO  *relationdao.UserFarmDAO = relationdao.NewUserFarmDAO()
+	userDAO      *mysql.UserDAO           = mysql.NewUserDAO()
+	pointslogDAO *mysql.PointslogDAO      = mysql.NewPointRecordDAO()
 )
 
 func processPointsDeduct(ctx context.Context) {
-	users, err := adminRDB.GetAllUsers(ctx)
+	users, err := adminDAO.GetAllUsers()
 	if err != nil {
 		return
 	}
 
 	workerCnt := 10
-	userChan := make(chan info.User, len(*users))
+	userChan := make(chan model.User, len(*users))
 	var wg sync.WaitGroup
 
-	for i := 0; i < workerCnt; i++ {
+	for range workerCnt {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
@@ -64,7 +66,7 @@ func processPointsDeduct(ctx context.Context) {
 	wg.Wait()
 }
 
-func processUserPoints(ctx context.Context, user *info.User) {
+func processUserPoints(ctx context.Context, user *model.User) {
 	userLock := getUserLock(user.ID)
 	userLock.Lock()
 	defer userLock.Unlock()
@@ -84,18 +86,20 @@ func processUserPoints(ctx context.Context, user *info.User) {
 	if user.LastCheckAt.Before(now.Add(-24*time.Hour)) ||
 		user.LastCheckAt.Before(time.Date(now.Year(), now.Month(), now.Day(), 12, 0, 0, 0, now.Location())) {
 
-		// user 拥有的所有 farm
-		farms, err := farmRDB.GetAll(ctx, user.ID)
+		farms, err := farmDAO.GetUserAllFarms(user.ID)
 		if err != nil {
-			utils.Logger.Error(user.ID + " farm rdb get all error")
+			log := fmt.Sprintf("%d failed to get all farm", user.ID)
+			utils.Logger.Error(log)
 			return
 		}
 
-		// 计算所有 farm 的 GPU
 		gpuNum := 0
 		for _, farm := range *farms {
-			// 只计算所有者
-			if farm.Perm == perm.FarmOwner {
+			p, err := userFarmDAO.GetPerm(user.ID, farm.ID)
+			if err != nil {
+				continue
+			}
+			if p == perm.FarmOwner {
 				gpuNum += farm.GpuNum
 			}
 		}
@@ -106,7 +110,7 @@ func processUserPoints(ctx context.Context, user *info.User) {
 			return
 		}
 		if gpuNum <= freeGpuNum {
-			utils.Logger.Info(user.ID + " gpu num is less than free gpu num")
+			utils.Logger.Info("gpu num is less than free gpu num")
 			return
 		}
 
@@ -118,26 +122,24 @@ func processUserPoints(ctx context.Context, user *info.User) {
 		balance := user.InvitePoints + user.RechargePoints
 
 		// 更新积分
-		if err = userRDB.UpdatePoints(ctx, user.ID, -cost, points.PointSettlement); err != nil {
-			utils.Logger.Error(user.ID + " update points error")
+		if err = userDAO.UpdatePoints(user.ID, -cost, points.PointSettlement); err != nil {
+			utils.Logger.Error("update points error")
 			return
 		}
 
 		// 更新扣除积分时间
-		if err = userRDB.SetLastCheckAt(ctx, user.ID, now); err != nil {
-			utils.Logger.Error(user.ID + " set last check at error")
+		if err = userDAO.UpdateLastCheckAt(user.ID, now); err != nil {
+			utils.Logger.Error("set last check at error")
 			return
 		}
 
-		user, err = userRDB.GetByID(ctx, user.ID)
+		user, err = userDAO.GetUserByID(user.ID)
 		if err != nil {
-			utils.Logger.Error(user.ID + " get user error")
 			return
 		}
 
-		detail := fmt.Sprintf("farm num:%d\ngpu num:%d\n", len(*farms), gpuNum)
-
-		pointsRecord := &model.Pointslog{
+		detail := fmt.Sprintf("farm num:%d gpu num:%d", len(*farms), gpuNum)
+		pointslog := &model.Pointslog{
 			UserID:  user.ID,
 			Type:    points.PointSettlement,
 			Amount:  -cost,
@@ -145,8 +147,9 @@ func processUserPoints(ctx context.Context, user *info.User) {
 			Time:    now,
 			Detail:  detail,
 		}
-		if err := pointsCordsDAO.CreatePointsRecord(pointsRecord); err != nil {
-			utils.Logger.Error(user.ID + " create points record error")
+		if err := pointslogDAO.CreatePointslog(pointslog); err != nil {
+			log := fmt.Sprintf("%d failed to create points logs", user.ID)
+			utils.Logger.Error(log)
 		}
 	}
 }

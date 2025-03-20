@@ -83,7 +83,7 @@ func (c *AdminRDB) GetSwitchRegister(ctx context.Context) (string, error) {
 }
 
 // 修改邀请积分奖励数量
-func (c *AdminRDB) SetInviteReward(ctx context.Context, reward int) error {
+func (c *AdminRDB) SetInviteReward(ctx context.Context, reward float32) error {
 	key := MakeKey(AdminField, AdminInviteRewardField)
 	return utils.RDB.Set(ctx, key, reward)
 }
@@ -103,7 +103,7 @@ func (c *AdminRDB) GetInviteReward(ctx context.Context) (float32, error) {
 }
 
 // 修改充值积分奖励比例
-func (c *AdminRDB) SetRechargeRatio(ctx context.Context, ratio float64) error {
+func (c *AdminRDB) SetRechargeRatio(ctx context.Context, ratio float32) error {
 	key := MakeKey(AdminField, AdminRechargeRatioField)
 	return utils.RDB.Set(ctx, key, ratio)
 }
@@ -149,8 +149,8 @@ func (c *AdminRDB) GetUserStatus(ctx context.Context, userID string) (status.Use
 }
 
 // 设置用户状态
-func (c *AdminRDB) SetUserStatus(ctx context.Context, userID string, s status.UserStatus) error {
-	user, err := c.userRDB.GetByID(ctx, userID)
+func (c *AdminRDB) SetUserStatus(ctx context.Context, userID int, s status.UserStatus) error {
+	user, err := c.userRDB.GetByID(ctx, strconv.Itoa(userID))
 	if err != nil {
 		return err
 	}

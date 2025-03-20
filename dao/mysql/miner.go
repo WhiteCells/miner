@@ -107,7 +107,7 @@ func (dao *MinerDAO) UpdateMinerStatus(minerID int, status int) error {
 }
 
 // GetMiner 获取矿机
-func (dao *MinerDAO) GetMiner(userID int, query map[string]interface{}) (*[]model.Miner, int64, error) {
+func (dao *MinerDAO) GetMiner(userID int, query map[string]any) (*[]model.Miner, int64, error) {
 	var miners []model.Miner
 	var total int64
 

@@ -41,17 +41,17 @@ func (s *AdminService) GetAllUser(ctx context.Context) (*[]info.User, error) {
 }
 
 // GetUserOperLogs 获取用户操作日志
-func (s *AdminService) GetUserOperLogs(ctx context.Context, query map[string]interface{}) (*[]model.Operlog, int64, error) {
+func (s *AdminService) GetUserOperLogs(ctx context.Context, query map[string]any) (*[]model.Operlog, int64, error) {
 	return s.adminDAO.GetUserOperlogs(query)
 }
 
 // GetUserLoginLogs 获取用户登陆日志
-func (s *AdminService) GetUserLoginLogs(ctx context.Context, query map[string]interface{}) (*[]model.Loginlog, int64, error) {
+func (s *AdminService) GetUserLoginLogs(ctx context.Context, query map[string]any) (*[]model.Loginlog, int64, error) {
 	return s.adminDAO.GetUserLoginlogs(query)
 }
 
 // GetUserPointsRecords 获取用户积分记录
-func (s *AdminService) GetUserPointsRecords(ctx context.Context, query map[string]interface{}) (*[]model.Pointslog, int64, error) {
+func (s *AdminService) GetUserPointsRecords(ctx context.Context, query map[string]any) (*[]model.Pointslog, int64, error) {
 	return s.adminDAO.GetUserPointslogs(query)
 }
 

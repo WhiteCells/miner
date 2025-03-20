@@ -13,8 +13,8 @@ type DeleteFsReq struct {
 }
 
 type UpdateFsReq struct {
-	FsID       string                 `json:"fs_id" binding:"required"`
-	UpdateInfo map[string]interface{} `json:"update_info" binding:"required"`
+	FsID       string         `json:"fs_id" binding:"required"`
+	UpdateInfo map[string]any `json:"update_info" binding:"required"`
 }
 
 type ApplyWalletReq struct {

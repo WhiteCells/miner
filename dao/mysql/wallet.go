@@ -57,7 +57,7 @@ func (dao *WalletDAO) UpdateWallet(wallet *model.Wallet) error {
 	return utils.DB.Save(wallet).Error
 }
 
-func (dao *WalletDAO) GetWallet(userID int, query map[string]interface{}) (*[]model.Wallet, int64, error) {
+func (dao *WalletDAO) GetWallet(userID int, query map[string]any) (*[]model.Wallet, int64, error) {
 	var wallets []model.Wallet
 	var total int64
 

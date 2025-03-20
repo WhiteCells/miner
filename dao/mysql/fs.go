@@ -65,7 +65,7 @@ func (dao *FsDAO) UpdateFs(fs *model.Fs) error {
 }
 
 // GetUserAllFs 获取用户的所有飞行表
-func (dao *FsDAO) GetFs(userID int, query map[string]interface{}) (*[]model.Fs, int64, error) {
+func (dao *FsDAO) GetFs(userID int, query map[string]any) (*[]model.Fs, int64, error) {
 	var Fss []model.Fs
 	var total int64
 

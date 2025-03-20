@@ -73,7 +73,7 @@ func (c *UserRDB) Del(ctx context.Context, userID string) error {
 
 // 获取用户信息
 func (c *UserRDB) GetByID(ctx context.Context, userID string) (*info.User, error) {
-	userJSON, err := utils.RDB.HGet(ctx, UserField, userID)
+	userJSON, err := utils.RDB.HGet(ctx, UserField, string(userID))
 	if err != nil {
 		return nil, err
 	}

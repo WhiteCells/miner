@@ -19,7 +19,7 @@ func InitAdminRDB() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	keys := map[string]interface{}{}
+	keys := map[string]any{}
 	keys[MakeKey(AdminField, AdminInviteRewardField)] = 10
 	keys[MakeKey(AdminField, AdminRechargeRatioField)] = 1
 	keys[MakeKey(AdminField, AdminSwitchRegisterField)] = 1

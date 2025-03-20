@@ -5,6 +5,8 @@ type Farm struct {
 	Name     string `json:"name" gorm:"column:name;type:varchar(255);comment:矿场名"`
 	TimeZone string `json:"time_zone" gorm:"column:time_zone;type:varchar(255);comment:时区"`
 	Hash     string `json:"hash" gorm:"column:hash;type:varchar(255);comment:矿场Hash"`
+	GpuNum   int    `json:"gpu_num" gorm:"column:gpu_num;type:int"`
+	MinerNum int    `json:"miner_num" gorm:"column:miner_num;type:int"`
 }
 
 func (Farm) TableName() string {

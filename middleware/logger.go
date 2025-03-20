@@ -69,7 +69,7 @@ func OperLog() gin.HandlerFunc {
 		}
 
 		// 记录请求详情
-		detail := map[string]interface{}{
+		detail := map[string]any{
 			"request":  string(requestBody),
 			"response": blw.body.String(),
 		}

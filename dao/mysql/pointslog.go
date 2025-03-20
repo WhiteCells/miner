@@ -5,19 +5,19 @@ import (
 	"miner/utils"
 )
 
-type PointsRecordDAO struct{}
+type PointslogDAO struct{}
 
-func NewPointRecordDAO() *PointsRecordDAO {
-	return &PointsRecordDAO{}
+func NewPointRecordDAO() *PointslogDAO {
+	return &PointslogDAO{}
 }
 
-// CreatePointsRecord 创建积分记录
-func (dao *PointsRecordDAO) CreatePointsRecord(record *model.Pointslog) error {
+// 创建积分记录
+func (dao *PointslogDAO) CreatePointslog(record *model.Pointslog) error {
 	return utils.DB.Create(record).Error
 }
 
-// GetUserPointsRecords 获取用户积分记录
-func (dao *PointsRecordDAO) GetUserPointsRecords(query map[string]interface{}) (*[]model.Pointslog, int64, error) {
+// 获取用户积分记录
+func (dao *PointslogDAO) GetUserPointslog(query map[string]any) (*[]model.Pointslog, int64, error) {
 	var records []model.Pointslog
 	var total int64
 
@@ -45,7 +45,7 @@ func (dao *PointsRecordDAO) GetUserPointsRecords(query map[string]interface{}) (
 	return &records, total, err
 }
 
-func (dao *PointsRecordDAO) GetUserPointsBalance(userID int) (int, error) {
+func (dao *PointslogDAO) GetUserPointsBalance(userID int) (int, error) {
 	var user model.User
 	err := utils.DB.Select("points").First(&user, userID).Error
 	return 0, err

@@ -12,14 +12,16 @@ const (
 type UserStatus string
 
 const (
-	UserOn  UserStatus = "1"
-	UserOff UserStatus = "0"
+	UserOn   UserStatus = "1"
+	UserOff  UserStatus = "0"
+	UserNone UserStatus = "-1"
 )
 
 // 注册状态
 type RegisterStatus string
 
 const (
-	RegisterOn  RegisterStatus = "1"
-	RegisterOff RegisterStatus = "0"
+	RegisterOn   RegisterStatus = "1"
+	RegisterOff  RegisterStatus = "0"
+	RegisterNone RegisterStatus = "-1"
 )

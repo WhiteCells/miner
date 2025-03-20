@@ -11,8 +11,8 @@ type DeleteWalletReq struct {
 }
 
 type UpdateWalletReq struct {
-	WalletID   string                 `json:"wallet_id" binding:"required"`
-	UpdateInfo map[string]interface{} `json:"update_info" binding:"required"`
+	WalletID   string         `json:"wallet_id" binding:"required"`
+	UpdateInfo map[string]any `json:"update_info" binding:"required"`
 }
 
 type GetUserWalletByIDReq struct {

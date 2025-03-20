@@ -2,7 +2,7 @@ package rsp
 
 import "github.com/gin-gonic/gin"
 
-func LoginSuccess(ctx *gin.Context, statusCode int, msg string, data interface{}, token string, permissions []string) {
+func LoginSuccess(ctx *gin.Context, statusCode int, msg string, data any, token string, permissions []string) {
 	ctx.JSON(statusCode, gin.H{
 		"code":         statusCode,
 		"data":         data,
@@ -12,8 +12,8 @@ func LoginSuccess(ctx *gin.Context, statusCode int, msg string, data interface{}
 	})
 }
 
-// func QuerySuccess(ctx *gin.Context, statusCode int, msg string, data interface{}, total int64) {
-func QuerySuccess(ctx *gin.Context, statusCode int, msg string, data interface{}) {
+// func QuerySuccess(ctx *gin.Context, statusCode int, msg string, data any, total int64) {
+func QuerySuccess(ctx *gin.Context, statusCode int, msg string, data any) {
 	ctx.JSON(statusCode, gin.H{
 		"code": statusCode,
 		"data": data,
@@ -21,7 +21,7 @@ func QuerySuccess(ctx *gin.Context, statusCode int, msg string, data interface{}
 	})
 }
 
-func DBQuerySuccess(ctx *gin.Context, statusCode int, msg string, data interface{}, total int64) {
+func DBQuerySuccess(ctx *gin.Context, statusCode int, msg string, data any, total int64) {
 	ctx.JSON(statusCode, gin.H{
 		"code":  statusCode,
 		"data":  data,
@@ -30,7 +30,7 @@ func DBQuerySuccess(ctx *gin.Context, statusCode int, msg string, data interface
 	})
 }
 
-func Success(ctx *gin.Context, statusCode int, msg string, data interface{}) {
+func Success(ctx *gin.Context, statusCode int, msg string, data any) {
 	ctx.JSON(statusCode, gin.H{
 		"code": statusCode,
 		"data": data,
@@ -38,7 +38,7 @@ func Success(ctx *gin.Context, statusCode int, msg string, data interface{}) {
 	})
 }
 
-func Error(ctx *gin.Context, statusCode int, msg string, data interface{}) {
+func Error(ctx *gin.Context, statusCode int, msg string, data any) {
 	ctx.JSON(statusCode, gin.H{
 		"code": statusCode,
 		"data": data,

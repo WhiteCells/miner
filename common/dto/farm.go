@@ -10,8 +10,8 @@ type DeleteFarmReq struct {
 }
 
 type UpdateFarmReq struct {
-	FarmID     string                 `json:"farm_id" binding:"required,max=19"`
-	UpdateInfo map[string]interface{} `json:"update_info" binding:"required"`
+	FarmID     string         `json:"farm_id" binding:"required,max=19"`
+	UpdateInfo map[string]any `json:"update_info" binding:"required"`
 }
 
 type UpdateFarmHashReq struct {

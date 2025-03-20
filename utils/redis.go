@@ -125,7 +125,7 @@ func (r *RedisClient) HDel(ctx context.Context, field string, key string) error 
 	return r.Client.HDel(ctx, field, key).Err()
 }
 
-func (r *RedisClient) Set(ctx context.Context, key string, value interface{}, opts ...time.Duration) error {
+func (r *RedisClient) Set(ctx context.Context, key string, value any, opts ...time.Duration) error {
 	exp := time.Duration(0)
 	if len(opts) > 0 {
 		exp = opts[0]

@@ -60,7 +60,7 @@ func (dao *FarmDAO) UpdateFarm(farm *model.Farm) error {
 }
 
 // GetFarm 获取用户的矿场
-func (dao *FarmDAO) GetFarm(userID int, query map[string]interface{}) (*[]model.Farm, int64, error) {
+func (dao *FarmDAO) GetFarm(userID int, query map[string]any) (*[]model.Farm, int64, error) {
 	var farms []model.Farm
 	var total int64
 
@@ -83,21 +83,27 @@ func (dao *FarmDAO) GetFarm(userID int, query map[string]interface{}) (*[]model.
 	return &farms, total, err
 }
 
-// GetFarmByID 获取指定矿场
+func (m *FarmDAO) GetUserAllFarms(userID int) (*[]model.Farm, error) {
+	var farms []model.Farm
+	err := utils.DB.Find(&farms).Error
+	return &farms, err
+}
+
+// 获取矿场
 func (dao *FarmDAO) GetFarmByID(farmID int) (*model.Farm, error) {
 	var farm model.Farm
 	err := utils.DB.First(&farm, farmID).Error
 	return &farm, err
 }
 
-// ApplyFlightsheet 矿场应用飞行表
-func (dao *FarmDAO) ApplyFlightsheet(farmID int, fsID int) error {
+// 矿场应用飞行表
+func (dao *FarmDAO) ApplyFs(farmID int, fsID int) error {
 	return utils.DB.Transaction(func(tx *gorm.DB) error {
-		// 删除原有 farm-flightsheet 关联
+		// 删除原有 farm-fs 关联
 		if err := tx.Delete(&relation.FarmFs{}, "farm_id = ?", farmID).Error; err != nil {
 			return err
 		}
-		// 建立新的 farm-flightsheet 关联
+		// 建立新的 farm-fs 关联
 		farmFlightsheet := &relation.FarmFs{
 			FarmID: farmID,
 			FsID:   fsID,
@@ -110,7 +116,7 @@ func (dao *FarmDAO) ApplyFlightsheet(farmID int, fsID int) error {
 	})
 }
 
-// TransferFarm 转移矿场，矿场下的矿机也会转移
+// 转移矿场
 func (dao *FarmDAO) TransferFarm(farmID int, fromUserID int, toUserID int) error {
 	return utils.DB.Transaction(func(tx *gorm.DB) error {
 		// 更新 user-farm 关联
@@ -123,7 +129,7 @@ func (dao *FarmDAO) TransferFarm(farmID int, fromUserID int, toUserID int) error
 		// 更新 user-miner 关联
 		if err := tx.Model(&relation.UserMiner{}).
 			Where("user_id = ?", fromUserID).
-			Updates(map[string]interface{}{"user_id": toUserID}).
+			Updates(map[string]any{"user_id": toUserID}).
 			Error; err != nil {
 			return err
 		}

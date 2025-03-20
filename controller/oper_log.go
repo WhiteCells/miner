@@ -62,7 +62,7 @@ func (c *OperLogController) GetOperLogs(ctx *gin.Context) {
 		return
 	}
 
-	query := map[string]interface{}{
+	query := map[string]any{
 		"user_id": userID,
 		// "action":  action,
 		// "start_time": startTime,

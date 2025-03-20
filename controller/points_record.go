@@ -42,7 +42,7 @@ func (c *PointsRecordController) GetPointsRecords(ctx *gin.Context) {
 		return
 	}
 
-	query := map[string]interface{}{
+	query := map[string]any{
 		"user_id":   userID,
 		"page_num":  pageNum,
 		"page_size": pageSize,

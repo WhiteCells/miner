@@ -2,6 +2,7 @@ package dto
 
 import (
 	"miner/common/status"
+	"miner/model"
 	"miner/model/info"
 )
 
@@ -18,15 +19,15 @@ type AdminSetGlobalFsReq struct {
 }
 
 type AdminSetInviteRewardReq struct {
-	Reward int `json:"reward" binding:"required,gt=0"`
+	Reward float32 `json:"reward" binding:"required,gt=0"`
 }
 
 type AdminSetRechargeRewardReq struct {
-	Ratio float64 `json:"ratio" binding:"required"`
+	Ratio float32 `json:"ratio" binding:"required"`
 }
 
 type AdminSetUserStatusReq struct {
-	UserID string            `json:"user_id" binding:"required"`
+	UserID int               `json:"user_id" binding:"required"`
 	Status status.UserStatus `json:"status" binding:"required,oneof=1 0"`
 }
 
@@ -56,8 +57,8 @@ type AdminDelCoinReq struct {
 }
 
 type AdminAddPoolReq struct {
-	CoinName string    `json:"coin_name" binding:"required"`
-	Pool     info.Pool `json:"pool" binding:"required"`
+	CoinName string     `json:"coin_name" binding:"required"`
+	Pool     model.Pool `json:"pool" binding:"required"`
 }
 
 type AdminDelPoolReq struct {

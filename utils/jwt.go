@@ -8,7 +8,7 @@ import (
 )
 
 type Claims struct {
-	UserID   string `json:"user_id"`
+	UserID   int    `json:"user_id"`
 	Username string `json:"user_name"`
 	// Role     role.RoleType `json:"user_role"`
 	jwt.RegisteredClaims
@@ -21,7 +21,7 @@ func InitJWT() {
 }
 
 // 生成 JWT token
-func GenerateToken(userID string, username string, expireHours int) (string, error) {
+func GenerateToken(userID int, username string, expireHours int) (string, error) {
 	nowTime := time.Now()
 	expireTime := nowTime.Add(time.Duration(expireHours) * time.Hour)
 
@@ -44,7 +44,7 @@ func GenerateToken(userID string, username string, expireHours int) (string, err
 
 // 解析 JWT token
 func ParseToken(token string) (*Claims, error) {
-	tokenClaims, err := jwt.ParseWithClaims(token, &Claims{}, func(token *jwt.Token) (interface{}, error) {
+	tokenClaims, err := jwt.ParseWithClaims(token, &Claims{}, func(token *jwt.Token) (any, error) {
 		return jwtSecret, nil
 	})
 	if err != nil {

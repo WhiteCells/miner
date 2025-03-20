@@ -9,18 +9,18 @@ import (
 )
 
 type PointsRecordService struct {
-	pointsRecordDAO *mysql.PointsRecordDAO
+	pointslogDAO *mysql.PointslogDAO
 }
 
 func NewPointRecordService() *PointsRecordService {
 	return &PointsRecordService{
-		pointsRecordDAO: mysql.NewPointRecordDAO(),
+		pointslogDAO: mysql.NewPointRecordDAO(),
 	}
 }
 
-// GetPointsRecords 获取用户积分记录
-func (s *PointsRecordService) GetPointsRecords(ctx *gin.Context, query map[string]interface{}) (*[]model.Pointslog, int64, error) {
-	records, total, err := s.pointsRecordDAO.GetUserPointsRecords(query)
+// 获取用户积分记录
+func (s *PointsRecordService) GetPointsRecords(ctx *gin.Context, query map[string]any) (*[]model.Pointslog, int64, error) {
+	records, total, err := s.pointslogDAO.GetUserPointslog(query)
 	if err != nil {
 		return nil, -1, errors.New("get user points records failed")
 	}

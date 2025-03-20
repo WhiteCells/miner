@@ -6,11 +6,11 @@ import (
 )
 
 // 使用反射修改对象
-func UpdateStructObjFromMap(obj interface{}, updates map[string]interface{}) error {
+func UpdateStructObjFromMap(obj any, updates map[string]any) error {
 	// 递归更新字段的函数
-	var updateFields func(reflect.Value, map[string]interface{}) error
+	var updateFields func(reflect.Value, map[string]any) error
 
-	updateFields = func(val reflect.Value, updates map[string]interface{}) error {
+	updateFields = func(val reflect.Value, updates map[string]any) error {
 		typ := val.Type()
 		for key, value := range updates {
 			for i := 0; i < val.NumField(); i++ {
@@ -19,7 +19,7 @@ func UpdateStructObjFromMap(obj interface{}, updates map[string]interface{}) err
 					fieldValue := val.Field(i)
 					if fieldValue.Kind() == reflect.Struct {
 						// 如果字段是结构体，则递归更新
-						if subUpdates, ok := value.(map[string]interface{}); ok {
+						if subUpdates, ok := value.(map[string]any); ok {
 							err := updateFields(fieldValue, subUpdates)
 							if err != nil {
 								return err
@@ -45,6 +45,6 @@ func UpdateStructObjFromMap(obj interface{}, updates map[string]interface{}) err
 	return updateFields(reflect.ValueOf(obj).Elem(), updates)
 }
 
-// func UpdateStructObjFromStruct(obj interface{}, from interface{}) {
+// func UpdateStructObjFromStruct(obj any, from any) {
 
 // }

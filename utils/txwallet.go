@@ -16,11 +16,23 @@ func UpdateTxWallet(mnemonic string) error {
 	return err
 }
 
-func DerivationPath(userID string) accounts.DerivationPath {
-	return hdwallet.MustParseDerivationPath(fmt.Sprintf("%s/%s", Config.Mnemonic.Path, userID))
+func DerivationPath(userUID string) accounts.DerivationPath {
+	return hdwallet.MustParseDerivationPath(fmt.Sprintf("%s/%s", Config.Mnemonic.Path, userUID))
 }
 
 func ValidMnemonic(mnemonic string) bool {
 	_, err := hdwallet.NewFromMnemonic(mnemonic)
 	return err == nil
+}
+
+func GenerateAddress(mn string, userUID string) (string, string, error) {
+	account, err := TxWallet.Derive(DerivationPath(userUID), false)
+	if err != nil {
+		return "", "", err
+	}
+	privateKey, err := TxWallet.PrivateKeyHex(account)
+	if err != nil {
+		return "", "", err
+	}
+	return account.Address.Hex(), privateKey, nil
 }
