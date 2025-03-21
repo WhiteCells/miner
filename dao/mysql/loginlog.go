@@ -5,21 +5,22 @@ import (
 	"miner/utils"
 )
 
-type OperLogDAO struct{}
-
-func NewOperLogDAO() *OperLogDAO {
-	return &OperLogDAO{}
+type LoginlogDAO struct {
 }
 
-// 获取操作日志
-func (dao *OperLogDAO) GetOperLogs(query map[string]any) (*[]model.Operlog, int64, error) {
-	var logs []model.Operlog
+func NewLoginlogDAO() *LoginlogDAO {
+	return &LoginlogDAO{}
+}
+
+// 获取登录日志
+func (m *LoginlogDAO) GetLoginlogs(query map[string]any) (*[]model.Loginlog, int64, error) {
+	var logs []model.Loginlog
 	var total int64
 
-	db := utils.DB.Model(&model.Operlog{})
+	db := utils.DB.Where(&model.Loginlog{})
 
 	if userID, ok := query["user_id"].(int); ok {
-		db = db.Where("user_id = ?", userID)
+		db = db.Where("user_id=?", userID)
 	}
 
 	if err := db.Count(&total).Error; err != nil {
@@ -31,7 +32,6 @@ func (dao *OperLogDAO) GetOperLogs(query map[string]any) (*[]model.Operlog, int6
 
 	err := db.Offset((pageNum - 1) * pageSize).
 		Limit(pageSize).
-		Order("time desc").
 		Find(&logs).Error
 
 	return &logs, total, err

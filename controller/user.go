@@ -171,34 +171,6 @@ func (c *UserController) GetUserAddress(ctx *gin.Context) {
 //	rsp.Success(ctx, http.StatusOK, "get soft success", softs)
 //}
 
-// GenerateCaptcha
-func (c *UserController) GenerateCaptcha(ctx *gin.Context) {
-	id, b64s, err := utils.GenerateCaptcha(ctx)
-	if err != nil {
-		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
-		return
-	}
-	captcha := &dto.GenerateCaptchaRsp{
-		CaptchaID: id,
-		Base64:    b64s,
-	}
-	rsp.Success(ctx, http.StatusOK, "generate captcha success", captcha)
-}
-
-// VerifyCaptcha
-func (c *UserController) VerifyCaptcha(ctx *gin.Context) {
-	var req dto.VerifyCaptchaReq
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
-		return
-	}
-	if !utils.VerifyCaptcha(ctx, req.CaptchaID, req.Value) {
-		rsp.Error(ctx, http.StatusForbidden, "captcha error", nil)
-		return
-	}
-	rsp.Success(ctx, http.StatusOK, "verify captcha success", nil)
-}
-
 func (c *UserController) GetRouters(ctx *gin.Context) {
 	data, err := utils.UtilsGetRouters()
 	if err != nil {

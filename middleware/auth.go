@@ -11,6 +11,8 @@ import (
 	"miner/dao/redis"
 	"miner/utils"
 
+	"slices"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -49,7 +51,6 @@ func JWTAuth() gin.HandlerFunc {
 
 		// 保存用户信息到 ctx
 		ctx.Set("user_id", claims.UserID)
-		ctx.Set("user_name", claims.Username)
 
 		ctx.Next()
 	}
@@ -70,11 +71,9 @@ func RoleAuth(roles ...role.RoleType) gin.HandlerFunc {
 			ctx.Abort()
 			return
 		}
-		for _, role := range roles {
-			if role == user.Role {
-				ctx.Next()
-				return
-			}
+		if slices.Contains(roles, user.Role) {
+			ctx.Next()
+			return
 		}
 		rsp.Error(ctx, http.StatusForbidden, "permission denied", nil)
 		ctx.Abort()

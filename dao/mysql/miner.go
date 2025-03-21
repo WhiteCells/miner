@@ -14,7 +14,7 @@ func NewMinerDAO() *MinerDAO {
 	return &MinerDAO{}
 }
 
-// CreateMiner 创建矿机
+// 创建矿机
 func (dao *MinerDAO) CreateMiner(miner *model.Miner, userID int, farmID int) error {
 	// 创建矿机时就需要将用户与用户与矿机进行联系
 	err := utils.DB.Transaction(func(tx *gorm.DB) error {

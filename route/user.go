@@ -28,8 +28,6 @@ func (ur *UserRoute) InitUserRoute(r *gin.Engine) {
 	{
 		route.POST("/register", middleware.RegisterAuth(), ur.userController.Register)
 		route.POST("/login", ur.userController.Login, middleware.LoginLog())
-		route.GET("/gen_captcha", ur.userController.GenerateCaptcha)
-		route.POST("/verify_captcha", ur.userController.VerifyCaptcha)
 	}
 	route.Use(middleware.JWTAuth())
 	// route.Use(middleware.IPAuth()) // IP 验证要在 token 解析之后

@@ -154,7 +154,6 @@ func (m *UserService) Register(ctx *gin.Context, req *dto.RegisterReq) (string, 
 	return secret, nil
 }
 
-// 给邀请者增加积分
 func (s *UserService) addInvitePoints(ctx *gin.Context, userID int, inviteCode string) error {
 	invitePoints, err := s.adminDAO.GetInviteReward()
 	if err != nil {
@@ -180,12 +179,18 @@ func (s *UserService) addInvitePoints(ctx *gin.Context, userID int, inviteCode s
 	return s.userDAO.UpdateUser(user)
 }
 
-// 获取用户地址
 func (m *UserService) GetUserAddress(userID int) (string, error) {
 	return m.userDAO.GetUserAddress(userID)
 }
 
-// 获取用户积分余额
 func (m *UserService) GetUserPointsBalance(userID int) (float32, error) {
 	return m.userDAO.GetUserPointsBalance(userID)
+}
+
+func (m *UserService) GetUserOperlogs(userID int, query map[string]any) (*[]model.Operlog, error) {
+	return m.userDAO.GetUserOperlogs(userID, query)
+}
+
+func (m *UserService) GetUserPointslog(userID int, query map[string]any) (*[]model.Pointslog, error) {
+	return m.userDAO.GetUserPointslogs(userID, query)
 }

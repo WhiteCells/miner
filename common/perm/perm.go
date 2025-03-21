@@ -18,10 +18,10 @@ const (
 	MinerViewer  MinerPerm = "viewer"
 )
 
-type AdminPerm Perm
-type UserPerm Perm
+type FsPerm Perm
 
 const (
-	AdminFS AdminPerm = "admin"
-	UserFS  UserPerm  = "user"
+	FsOwner   FsPerm = "owner"
+	FsManager FsPerm = "manager"
+	FsViewer  FsPerm = "viewer"
 )

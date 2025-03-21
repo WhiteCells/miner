@@ -14,7 +14,7 @@ func NewWalletDAO() *WalletDAO {
 	return &WalletDAO{}
 }
 
-func (dao *WalletDAO) CreateWallet(wallet *model.Wallet, userID int) error {
+func (WalletDAO) CreateWallet(wallet *model.Wallet, userID int) error {
 	err := utils.DB.Transaction(func(tx *gorm.DB) error {
 		// 创建 wallet
 		if err := tx.Create(wallet).Error; err != nil {
@@ -33,7 +33,7 @@ func (dao *WalletDAO) CreateWallet(wallet *model.Wallet, userID int) error {
 	return err
 }
 
-func (dao *WalletDAO) DeleteWallet(walletID int, userID int) error {
+func (WalletDAO) DeleteWallet(walletID int, userID int) error {
 	err := utils.DB.Transaction(func(tx *gorm.DB) error {
 		// 删除 user-wallet 关联
 		if err := tx.Where("user_id = ? AND wallet_id = ?", userID, walletID).Delete(&relation.UserWallet{}).Error; err != nil {

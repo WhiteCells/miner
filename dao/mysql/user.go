@@ -79,8 +79,25 @@ func (UserDAO) GetUserAddress(userID int) (string, error) {
 
 func (UserDAO) GetUserPointsBalance(userID int) (float32, error) {
 	var user model.User
-	err := utils.DB.First(&user, userID).Error
+	err := utils.DB.
+		First(&user, userID).Error
 	return user.InvitePoints + user.RechargePoints, err
+}
+
+func (UserDAO) GetUserOperlogs(userID int, query map[string]any) (*[]model.Operlog, error) {
+	var operlogs []model.Operlog
+	err := utils.DB.
+		Where("user_id = ?", userID).
+		Find(&operlogs).Error
+	return &operlogs, err
+}
+
+func (UserDAO) GetUserPointslogs(userID int, query map[string]any) (*[]model.Pointslog, error) {
+	var pointslogs []model.Pointslog
+	err := utils.DB.
+		Where("user_id = ?", userID).
+		Find(&pointslogs).Error
+	return &pointslogs, err
 }
 
 func (UserDAO) UpdatePassword(userID int, newPassword string) error {
@@ -88,33 +105,34 @@ func (UserDAO) UpdatePassword(userID int, newPassword string) error {
 	if err != nil {
 		return err
 	}
-
 	return utils.DB.Model(&model.User{}).
 		Where("id = ?", userID).
 		Update("password", string(hashedPassword)).Error
 }
 
 func (UserDAO) UpdatePoints(userID int, num float32, t points.PointsType) error {
-	// return utils.DB.Model(&model.User{}).
-	// 	Where("id = ?", userID).
-	// 	Update("points", points).Error
-	// var err error
-	// switch t {
-	// case points.PointInvite:
-	// 	err = utils.DB.
-	// case points.PointRecharge:
-
-	// }
-
-	return nil
+	var err error
+	switch t {
+	case points.PointInvite:
+		err = utils.DB.Model(&model.User{}).
+			Where("id=?", userID).
+			Update("invite_points", num).Error
+	case points.PointRecharge:
+		err = utils.DB.Model(&model.User{}).
+			Where("id=?", userID).
+			Update("recharge_points", num).Error
+	}
+	return err
 }
 
 func (UserDAO) UpdateLastCheckAt(userID int, t time.Time) error {
 	var user model.User
-	if err := utils.DB.Where("id=?", userID).First(&user).Error; err != nil {
+	if err := utils.DB.Where("id=?", userID).
+		First(&user).Error; err != nil {
 		return err
 	}
-	return utils.DB.Model(&model.User{}).Update("check_at", t).Error
+	return utils.DB.Model(&model.User{}).
+		Update("check_at", t).Error
 }
 
 func (UserDAO) TransferPoints(fromUserID int, toUserID int, points float32) error {

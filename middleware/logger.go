@@ -45,27 +45,21 @@ func OperLog() gin.HandlerFunc {
 		ctx.Next()
 
 		// 业务处理完后
-		userID, exists := ctx.Value("user_id").(string)
+		userID, exists := ctx.Value("user_id").(int)
 		if !exists {
 			// ctx.
-			return
-		}
-		userName, exists := ctx.Value("user_name").(string)
-		if !exists {
-			//
 			return
 		}
 
 		// 创建操作日志
 		operLog := model.Operlog{
-			UserID:   userID,
-			UserName: userName,
-			Time:     time.Now(),
-			Action:   ctx.Request.Method,
-			Target:   ctx.FullPath(),
-			IP:       ctx.ClientIP(),
-			Agent:    ctx.Request.UserAgent(),
-			Status:   ctx.Writer.Status(),
+			UserID: userID,
+			Time:   time.Now(),
+			Action: ctx.Request.Method,
+			Target: ctx.FullPath(),
+			IP:     ctx.ClientIP(),
+			Agent:  ctx.Request.UserAgent(),
+			Status: ctx.Writer.Status(),
 		}
 
 		// 记录请求详情
@@ -92,7 +86,7 @@ func LoginLog() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		ctx.Next()
 
-		userID, exists := ctx.Value("user_id").(string)
+		userID, exists := ctx.Value("user_id").(int)
 		if !exists {
 			return
 		}
