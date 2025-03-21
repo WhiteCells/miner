@@ -6,11 +6,11 @@ type CreateFarmReq struct {
 }
 
 type DeleteFarmReq struct {
-	FarmID string `json:"farm_id" binding:"required,min=1,max=20"`
+	FarmID int `json:"farm_id" binding:"required,min=1,max=20"`
 }
 
 type UpdateFarmReq struct {
-	FarmID     string         `json:"farm_id" binding:"required,max=19"`
+	FarmID     int            `json:"farm_id" binding:"required"`
 	UpdateInfo map[string]any `json:"update_info" binding:"required"`
 }
 

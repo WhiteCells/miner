@@ -55,8 +55,8 @@ func (dao *FarmDAO) DeleteFarmByID(farmID int, userID int) error {
 }
 
 // UpdateFarm 更新矿场信息
-func (dao *FarmDAO) UpdateFarm(farm *model.Farm) error {
-	return utils.DB.Save(farm).Error
+func (dao *FarmDAO) UpdateFarm(farmID int, farm *model.Farm) error {
+	return utils.DB.Model(&model.Farm{}).Where("id=?", farmID).Save(farm).Error
 }
 
 // GetFarm 获取用户的矿场

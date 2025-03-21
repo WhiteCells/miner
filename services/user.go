@@ -194,3 +194,8 @@ func (m *UserService) GetUserOperlogs(userID int, query map[string]any) (*[]mode
 func (m *UserService) GetUserPointslog(userID int, query map[string]any) (*[]model.Pointslog, error) {
 	return m.userDAO.GetUserPointslogs(userID, query)
 }
+
+func (m *UserService) QuitFarm(userID int, farmID int) error {
+
+	return nil
+}
