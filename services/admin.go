@@ -22,19 +22,19 @@ func NewAdminService() *AdminService {
 }
 
 func (m *AdminService) GetUsers(ctx context.Context, query map[string]any) (*[]model.User, int64, error) {
-	return m.adminDAO.GetUsers(query)
+	return m.adminDAO.GetUsers(ctx, query)
 }
 
 func (m *AdminService) DelUser(ctx context.Context, userID int) error {
-	return m.adminDAO.DelUser(userID)
+	return m.adminDAO.DelUser(ctx, userID)
 }
 
 func (m *AdminService) GetUserStatus(ctx context.Context, userID int) (status.UserStatus, error) {
-	return m.adminDAO.GetUserStatus(userID)
+	return m.adminDAO.GetUserStatus(ctx, userID)
 }
 
 func (m *AdminService) SetUserStatus(ctx context.Context, userID int, s status.UserStatus) error {
-	return m.adminDAO.SetUserStatus(userID, s)
+	return m.adminDAO.SetUserStatus(ctx, userID, s)
 }
 
 func (m *AdminService) SetMnemonic(ctx context.Context, mn string) error {
@@ -86,31 +86,31 @@ func (m *AdminService) DelBscApiKey(ctx context.Context, apikey string) error {
 // }
 
 func (m *AdminService) SetFreeGpuNum(ctx context.Context, num int) error {
-	return m.adminDAO.SetFreeGpuNum(num)
+	return m.adminDAO.SetFreeGpuNum(ctx, num)
 }
 
 func (m *AdminService) GetFreeGpuNum(ctx context.Context) (int, error) {
-	return m.adminDAO.GetFreeGpuNum()
+	return m.adminDAO.GetFreeGpuNum(ctx)
 }
 
 func (m *AdminService) GetUserOperlogs(ctx context.Context, query map[string]any) (*[]model.Operlog, int64, error) {
-	return m.adminDAO.GetUserOperlogs(query)
+	return m.adminDAO.GetUserOperlogs(ctx, query)
 }
 
 func (m *AdminService) GetUserPointslogs(ctx context.Context, query map[string]any) (*[]model.Pointslog, int64, error) {
-	return m.adminDAO.GetUserPointslogs(query)
+	return m.adminDAO.GetUserPointslogs(ctx, query)
 }
 
 func (m *AdminService) GetUserLoginlogs(ctx context.Context, query map[string]any) (*[]model.Loginlog, int64, error) {
-	return m.adminDAO.GetUserLoginlogs(query)
+	return m.adminDAO.GetUserLoginlogs(ctx, query)
 }
 
-func (m *AdminService) GetUserFarms(ctx context.Context, query map[string]any) (*[]model.Farm, int64, error) {
-	return m.adminDAO.GetUserFarms(query)
+func (m *AdminService) GetUserFarms(ctx context.Context, userID int, query map[string]any) (*[]model.Farm, int64, error) {
+	return m.adminDAO.GetUserFarms(ctx, userID, query)
 }
 
-func (m *AdminService) GetUserMiners(ctx context.Context, query map[string]any) (*[]model.Miner, int64, error) {
-	return m.adminDAO.GetUserMiners(query)
+func (m *AdminService) GetUserMiners(ctx context.Context, userID, farmID int, query map[string]any) (*[]model.Miner, int64, error) {
+	return m.adminDAO.GetUserMiners(ctx, userID, farmID, query)
 }
 
 // func (m *AdminService) CreateGlobalFs(ctx context.Context, req *dto.CreateFsReq) error {
@@ -118,33 +118,33 @@ func (m *AdminService) GetUserMiners(ctx context.Context, query map[string]any) 
 // }
 
 func (m *AdminService) GetInviteReward(ctx context.Context) (float32, error) {
-	return m.adminDAO.GetInviteReward()
+	return m.adminDAO.GetInviteReward(ctx)
 }
 
 func (m *AdminService) SetInviteReward(ctx context.Context, reward float32) error {
-	return m.adminDAO.SetInviteReward(reward)
+	return m.adminDAO.SetInviteReward(ctx, reward)
 }
 
 func (m *AdminService) GetRechargeRatio(ctx context.Context) (float32, error) {
-	return m.adminDAO.GetRechargeRatio()
+	return m.adminDAO.GetRechargeRatio(ctx)
 }
 
 func (m *AdminService) SetRechargeRatio(ctx context.Context, ratio float32) error {
-	return m.adminDAO.SetRechargeRatio(ratio)
+	return m.adminDAO.SetRechargeRatio(ctx, ratio)
 }
 
 func (m *AdminService) GetRechargeReward(ctx context.Context) (float32, error) {
-	return m.adminDAO.GetRechargeReward()
+	return m.adminDAO.GetRechargeReward(ctx)
 }
 
 func (m *AdminService) SetRechargeReward(ctx context.Context, reward float32) error {
-	return m.adminDAO.SetRechargeReward(reward)
+	return m.adminDAO.SetRechargeReward(ctx, reward)
 }
 
 func (m *AdminService) GetSwitchRegister(ctx context.Context) (status.RegisterStatus, error) {
-	return m.adminDAO.GetSwitchRegister()
+	return m.adminDAO.GetSwitchRegister(ctx)
 }
 
 func (m *AdminService) SetSwitchRegister(ctx context.Context, s status.RegisterStatus) error {
-	return m.adminDAO.SetSwitchRegister(s)
+	return m.adminDAO.SetSwitchRegister(ctx, s)
 }

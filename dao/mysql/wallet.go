@@ -1,6 +1,7 @@
 package mysql
 
 import (
+	"context"
 	"miner/model"
 	"miner/model/relation"
 	"miner/utils"
@@ -14,8 +15,9 @@ func NewWalletDAO() *WalletDAO {
 	return &WalletDAO{}
 }
 
-func (WalletDAO) CreateWallet(wallet *model.Wallet, userID int) error {
-	err := utils.DB.Transaction(func(tx *gorm.DB) error {
+// 添加钱包
+func (WalletDAO) CreateWallet(ctx context.Context, userID int, wallet *model.Wallet) error {
+	err := utils.DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		// 创建 wallet
 		if err := tx.Create(wallet).Error; err != nil {
 			return err
@@ -33,8 +35,9 @@ func (WalletDAO) CreateWallet(wallet *model.Wallet, userID int) error {
 	return err
 }
 
-func (WalletDAO) DeleteWallet(walletID int, userID int) error {
-	err := utils.DB.Transaction(func(tx *gorm.DB) error {
+// 删除钱包
+func (WalletDAO) DelWallet(ctx context.Context, userID int, walletID int) error {
+	err := utils.DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		// 删除 user-wallet 关联
 		if err := tx.Where("user_id = ? AND wallet_id = ?", userID, walletID).Delete(&relation.UserWallet{}).Error; err != nil {
 			return err
@@ -53,41 +56,36 @@ func (WalletDAO) DeleteWallet(walletID int, userID int) error {
 	return err
 }
 
-func (dao *WalletDAO) UpdateWallet(wallet *model.Wallet) error {
-	return utils.DB.Save(wallet).Error
+// 更新钱包
+func (WalletDAO) UpdateWallet(ctx context.Context, wallet *model.Wallet) error {
+	return utils.DB.WithContext(ctx).Save(wallet).Error
 }
 
-func (dao *WalletDAO) GetWallet(userID int, query map[string]any) (*[]model.Wallet, int64, error) {
+// 获取指定钱包
+func (WalletDAO) GetWalletByID(ctx context.Context, walletID int) (*model.Wallet, error) {
+	var wallet model.Wallet
+	err := utils.DB.WithContext(ctx).First(&wallet, walletID).Error
+	return &wallet, err
+}
+
+// 获取用户所有钱包
+func (WalletDAO) GetWallets(ctx context.Context, userID int, query map[string]any) (*[]model.Wallet, int64, error) {
 	var wallets []model.Wallet
 	var total int64
-
-	// 查询总数
-	if err := utils.DB.Model(relation.UserWallet{}).Where("user_id = ?", userID).Count(&total).Error; err != nil {
-		return nil, -1, err
-	}
 
 	pageNum := query["page_num"].(int)
 	pageSize := query["page_size"].(int)
 
-	// 分页查询
-	err := utils.DB.
-		Joins("JOIN user_wallet ON wallet.id = user_wallet.wallet_id").
-		Where("user_wallet.user_id = ?", userID).
+	// 查询总数
+	if err := utils.DB.WithContext(ctx).Model(relation.UserWallet{}).Where("user_id = ?", userID).Count(&total).Error; err != nil {
+		return nil, -1, err
+	}
+	err := utils.DB.WithContext(ctx).
+		Joins("JOIN user_wallet ON user_wallet.wallet_id=wallet.id").
+		Where("user.id=?", userID).
 		Offset((pageNum - 1) * pageSize).
 		Limit(pageSize).
-		Find(&wallets).Error
-
+		Find(&wallets).
+		Error
 	return &wallets, total, err
-}
-
-func (dao *WalletDAO) GetWalletByID(walletID int) (*model.Wallet, error) {
-	var wallet model.Wallet
-	err := utils.DB.First(&wallet, walletID).Error
-	return &wallet, err
-}
-
-func (dao *WalletDAO) GetWalletByAddress(address string) (*model.Wallet, error) {
-	var wallet model.Wallet
-	err := utils.DB.Where("address = ?", address).First(&wallet).Error
-	return &wallet, err
 }

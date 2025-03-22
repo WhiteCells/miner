@@ -42,17 +42,17 @@ func (s *AdminService) GetAllUser(ctx context.Context) (*[]info.User, error) {
 
 // GetUserOperLogs 获取用户操作日志
 func (s *AdminService) GetUserOperLogs(ctx context.Context, query map[string]any) (*[]model.Operlog, int64, error) {
-	return s.adminDAO.GetUserOperlogs(query)
+	return s.adminDAO.GetUserOperlogs(ctx, query)
 }
 
 // GetUserLoginLogs 获取用户登陆日志
 func (s *AdminService) GetUserLoginLogs(ctx context.Context, query map[string]any) (*[]model.Loginlog, int64, error) {
-	return s.adminDAO.GetUserLoginlogs(query)
+	return s.adminDAO.GetUserLoginlogs(ctx, query)
 }
 
 // GetUserPointsRecords 获取用户积分记录
 func (s *AdminService) GetUserPointsRecords(ctx context.Context, query map[string]any) (*[]model.Pointslog, int64, error) {
-	return s.adminDAO.GetUserPointslogs(query)
+	return s.adminDAO.GetUserPointslogs(ctx, query)
 }
 
 // GetUserFarms 获取用户的矿场

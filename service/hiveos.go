@@ -301,7 +301,7 @@ func (s *HiveOsService) messageCase(ctx *gin.Context, rigID string) {
 	// 查找命令
 	// 根绝请求生成新的任务，更新任务中的 result
 	taskID := req.Params.ID
-	task, err := s.taskDAO.GetTask(taskID)
+	task, err := s.taskDAO.GetTask(ctx, taskID)
 	if err != nil {
 		log.Println(taskID)
 		log.Println("taskRDB.Get")
@@ -312,7 +312,7 @@ func (s *HiveOsService) messageCase(ctx *gin.Context, rigID string) {
 	task.Result = req.Params.Payload
 	task.Status = info.Done
 
-	if err := s.taskDAO.UpdateTask(task); err != nil {
+	if err := s.taskDAO.UpdateTask(ctx, task); err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), "update result failed")
 		return
 	}
@@ -430,7 +430,7 @@ func (s *HiveOsService) PostTask(ctx context.Context, req *dto.PostTaskReq) (str
 }
 
 func (s *HiveOsService) GetTaskRes(ctx context.Context, taskID string) (*model.Task, error) {
-	return s.taskDAO.GetTask(taskID)
+	return s.taskDAO.GetTask(ctx, taskID)
 }
 
 func (s *HiveOsService) GetTaskStats(ctx context.Context, taskID string) (info.TaskStatus, error) {

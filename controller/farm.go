@@ -3,64 +3,66 @@ package controller
 import (
 	"miner/common/dto"
 	"miner/common/rsp"
-	"miner/service"
+	"miner/services"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
 type FarmController struct {
-	farmService *service.FarmService
+	farmService *services.FarmService
 }
 
 func NewFarmController() *FarmController {
 	return &FarmController{
-		farmService: service.NewFarmService(),
+		farmService: services.NewFarmService(),
 	}
 }
 
-// CreateFarm 创建矿场
-func (c *FarmController) CreateFarm(ctx *gin.Context) {
+// 创建矿场
+func (m *FarmController) CreateFarm(ctx *gin.Context) {
 	var req dto.CreateFarmReq
 	err := ctx.ShouldBindJSON(&req)
 	if err != nil {
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
+	userID := ctx.GetInt("user_id")
 
-	farm, err := c.farmService.CreateFarm(ctx, &req)
-	if err != nil {
+	if err := m.farmService.CreateFarm(ctx, userID, &req); err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
-
-	rsp.Success(ctx, http.StatusOK, "create farm success", farm)
+	rsp.Success(ctx, http.StatusOK, "create farm success", nil)
 }
 
-// DeleteFarm 删除矿场
-func (c *FarmController) DeleteFarm(ctx *gin.Context) {
+// 删除矿场
+func (c *FarmController) DelFarm(ctx *gin.Context) {
 	var req dto.DeleteFarmReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
+	userID := ctx.GetInt("user_id")
 
-	if err := c.farmService.DeleteFarm(ctx, &req); err != nil {
+	if err := c.farmService.DelFarm(ctx, userID, req.FarmID); err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
 	rsp.Success(ctx, http.StatusOK, "delete farm success", nil)
 }
 
-// UpdateFarm 更新矿场
+// 更新矿场
 func (c *FarmController) UpdateFarm(ctx *gin.Context) {
 	var req dto.UpdateFarmReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
+	userID := ctx.GetInt("user_id")
 
-	if err := c.farmService.UpdateFarm(ctx, &req); err != nil {
+	if err := c.farmService.UpdateFarm(ctx, userID, req.FarmID, req.UpdateInfo); err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
@@ -69,33 +71,49 @@ func (c *FarmController) UpdateFarm(ctx *gin.Context) {
 }
 
 // UpdateFarmHash 更新矿场hash
-func (c *FarmController) UpdateFarmHash(ctx *gin.Context) {
-	var req dto.UpdateFarmHashReq
-	if err := ctx.ShouldBindJSON(&req); err != nil {
-		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
+// func (c *FarmController) UpdateFarmHash(ctx *gin.Context) {
+// 	var req dto.UpdateFarmHashReq
+// 	if err := ctx.ShouldBindJSON(&req); err != nil {
+// 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
+// 		return
+// 	}
+
+// 	if err := c.farmService.UpdateFarmHash(ctx, &req); err != nil {
+// 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
+// 		return
+// 	}
+
+// 	rsp.Success(ctx, http.StatusOK, "update farm hash success", nil)
+// }
+
+// 获取用户所有的矿场
+func (c *FarmController) GetFarms(ctx *gin.Context) {
+	pageNum, err := strconv.Atoi(ctx.Query("page_num"))
+	if err != nil || pageNum <= 0 {
+		rsp.Error(ctx, http.StatusBadRequest, "invalid parmas", nil)
 		return
 	}
-
-	if err := c.farmService.UpdateFarmHash(ctx, &req); err != nil {
-		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
+	pageSize, err := strconv.Atoi(ctx.Query("page_size"))
+	if err != nil || pageSize <= 0 {
+		rsp.Error(ctx, http.StatusBadRequest, "invalid params", nil)
 		return
 	}
+	query := map[string]any{
+		"page_num":  pageNum,
+		"page_size": pageSize,
+	}
+	userID := ctx.GetInt("user_id")
 
-	rsp.Success(ctx, http.StatusOK, "update farm hash success", nil)
-}
-
-// GetFarm 获取用户所有的矿场
-func (c *FarmController) GetAllFarm(ctx *gin.Context) {
-	farms, err := c.farmService.GetAllFarm(ctx)
+	farms, total, err := c.farmService.GetFarms(ctx, userID, query)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
 
-	rsp.QuerySuccess(ctx, http.StatusOK, "get farm success", farms)
+	rsp.DBQuerySuccess(ctx, http.StatusOK, "get farm success", farms, total)
 }
 
-// GetFarmByID
+// 获取指定矿场
 func (c *FarmController) GetFarmByID(ctx *gin.Context) {
 	farmID := ctx.Param("farm_id")
 	farm, err := c.farmService.GetFarmByID(ctx, farmID)
@@ -107,7 +125,7 @@ func (c *FarmController) GetFarmByID(ctx *gin.Context) {
 	rsp.QuerySuccess(ctx, http.StatusOK, "get farm success", farm)
 }
 
-// ApplyFs 矿场应用飞行表
+// 应用飞行表
 func (c *FarmController) ApplyFs(ctx *gin.Context) {
 	var req dto.ApplyFarmFsReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -122,15 +140,16 @@ func (c *FarmController) ApplyFs(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "get user all farm", nil)
 }
 
-// Transfer 转移矿场
+// 转移矿场
 func (c *FarmController) Transfer(ctx *gin.Context) {
 	var req dto.TransferFarmReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
+	userID := ctx.GetInt("user_id")
 
-	if err := c.farmService.Transfer(ctx, &req); err != nil {
+	if err := c.farmService.Transfer(ctx, userID, req.ToUserID, req.FarmID); err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}

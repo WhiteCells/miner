@@ -2,25 +2,25 @@ package controller
 
 import (
 	"miner/common/rsp"
-	"miner/service"
+	"miner/services"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
-type OperLogController struct {
-	operLogService *service.OperLogService
+type OperlogController struct {
+	operlogService *services.OperlogService
 }
 
-func NewOperLogController() *OperLogController {
-	return &OperLogController{
-		operLogService: service.NewOperLogService(),
+func NewOperLogController() *OperlogController {
+	return &OperlogController{
+		operlogService: services.NewOperlogService(),
 	}
 }
 
 // GetOperLogs 获取用户日志
-func (c *OperLogController) GetOperLogs(ctx *gin.Context) {
+func (m *OperlogController) GetOperLogs(ctx *gin.Context) {
 	userID, exists := ctx.Value("user_id").(string)
 	if !exists {
 		rsp.Error(ctx, http.StatusBadRequest, "invalid user_id in context", nil)
@@ -71,7 +71,7 @@ func (c *OperLogController) GetOperLogs(ctx *gin.Context) {
 		"page_size": pageSize,
 	}
 
-	logs, total, err := c.operLogService.GetOperLogs(ctx, query)
+	logs, total, err := m.operlogService.GetOperlogs(ctx, query)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return

@@ -1,6 +1,7 @@
 package mysql
 
 import (
+	"context"
 	"miner/model"
 	"miner/model/relation"
 	"miner/utils"
@@ -14,15 +15,24 @@ func NewFarmDAO() *FarmDAO {
 	return &FarmDAO{}
 }
 
-// CreateFarm 创建矿场
-func (dao *FarmDAO) CreateFarm(farm *model.Farm, userID int) error {
-	// 创建矿场时就需要将用户与矿场关联
-	return utils.DB.Transaction(func(tx *gorm.DB) error {
-		// 创建矿场
+var allowChangeField = map[string]bool{
+	"name":      true,
+	"time_zone": true,
+	"hash":      true,
+}
+
+func (FarmDAO) AllowChangeField() map[string]bool {
+	return allowChangeField
+}
+
+// 创建矿场
+func (FarmDAO) CreateFarm(ctx context.Context, farm *model.Farm, userID int) error {
+	return utils.DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		// farm
 		if err := tx.Create(farm).Error; err != nil {
 			return err
 		}
-		// 创建 用户-矿场 关联
+		// user-farm
 		userFarm := &relation.UserFarm{
 			UserID: userID,
 			FarmID: farm.ID,
@@ -34,19 +44,18 @@ func (dao *FarmDAO) CreateFarm(farm *model.Farm, userID int) error {
 	})
 }
 
-// DeleteFarmByID 删除矿场
-func (dao *FarmDAO) DeleteFarmByID(farmID int, userID int) error {
-	return utils.DB.Transaction(func(tx *gorm.DB) error {
-		// 删除 用户-矿场 关联
+// 删除矿场
+func (FarmDAO) DelFarmByID(ctx context.Context, userID, farmID int) error {
+	return utils.DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		// user-farm
 		if err := tx.Delete(&relation.UserFarm{}, "user_id = ? AND farm_id = ?", userID, farmID).Error; err != nil {
 			return err
 		}
-		// 删除 矿场-矿机 关联
-		// TODO 矿机如何处理
+		// farm-miner
 		if err := tx.Delete(&relation.FarmMiner{}, "farm_id = ?", farmID).Error; err != nil {
 			return err
 		}
-		// 删除矿场
+		// farm
 		if err := tx.Delete(&model.Farm{}, farmID).Error; err != nil {
 			return err
 		}
@@ -54,26 +63,29 @@ func (dao *FarmDAO) DeleteFarmByID(farmID int, userID int) error {
 	})
 }
 
-// UpdateFarm 更新矿场信息
-func (dao *FarmDAO) UpdateFarm(farmID int, farm *model.Farm) error {
-	return utils.DB.Model(&model.Farm{}).Where("id=?", farmID).Save(farm).Error
+// 更新矿场信息
+func (FarmDAO) UpdateFarm(ctx context.Context, userID, farmID int, updateInfo map[string]any) error {
+	return utils.DB.WithContext(ctx).
+		Model(&model.Farm{}).
+		Where("id=?", farmID).
+		Updates(updateInfo).Error
 }
 
-// GetFarm 获取用户的矿场
-func (dao *FarmDAO) GetFarm(userID int, query map[string]any) (*[]model.Farm, int64, error) {
+// 获取用户的矿场
+func (FarmDAO) GetFarms(ctx context.Context, userID int, query map[string]any) (*[]model.Farm, int64, error) {
 	var farms []model.Farm
 	var total int64
-
-	// 查询总数
-	if err := utils.DB.Model(relation.UserFarm{}).Where("user_id = ?", userID).Count(&total).Error; err != nil {
-		return nil, -1, err
-	}
 
 	pageNum := query["page_num"].(int)
 	pageSize := query["page_size"].(int)
 
+	// 查询总数
+	if err := utils.DB.WithContext(ctx).Model(relation.UserFarm{}).Where("user_id = ?", userID).Count(&total).Error; err != nil {
+		return nil, -1, err
+	}
+
 	// 分页查询
-	err := utils.DB.
+	err := utils.DB.WithContext(ctx).
 		Joins("JOIN user_farm ON farm.id = user_farm.farm_id").
 		Where("user_farm.user_id = ?", userID).
 		Offset((pageNum - 1) * pageSize).
@@ -83,22 +95,21 @@ func (dao *FarmDAO) GetFarm(userID int, query map[string]any) (*[]model.Farm, in
 	return &farms, total, err
 }
 
-func (m *FarmDAO) GetUserAllFarms(userID int) (*[]model.Farm, error) {
-	var farms []model.Farm
-	err := utils.DB.Find(&farms).Error
-	return &farms, err
-}
-
-// 获取矿场
-func (dao *FarmDAO) GetFarmByID(farmID int) (*model.Farm, error) {
+// 获取指定矿场
+func (FarmDAO) GetFarmByID(ctx context.Context, farmID int) (*model.Farm, error) {
 	var farm model.Farm
-	err := utils.DB.First(&farm, farmID).Error
+	err := utils.DB.WithContext(ctx).First(&farm, farmID).Error
 	return &farm, err
 }
 
+// 获取所有矿场
+func (FarmDAO) GetAllFarmsByUserID(ctx context.Context, userID int) (*[]model.Farm, error) {
+	return nil, nil
+}
+
 // 矿场应用飞行表
-func (dao *FarmDAO) ApplyFs(farmID int, fsID int) error {
-	return utils.DB.Transaction(func(tx *gorm.DB) error {
+func (FarmDAO) ApplyFs(ctx context.Context, userID, farmID, fsID int) error {
+	return utils.DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		// 删除原有 farm-fs 关联
 		if err := tx.Delete(&relation.FarmFs{}, "farm_id = ?", farmID).Error; err != nil {
 			return err
@@ -116,23 +127,32 @@ func (dao *FarmDAO) ApplyFs(farmID int, fsID int) error {
 	})
 }
 
-// 转移矿场
-func (dao *FarmDAO) TransferFarm(farmID int, fromUserID int, toUserID int) error {
-	return utils.DB.Transaction(func(tx *gorm.DB) error {
+// 转移
+func (dao *FarmDAO) Transfer(ctx context.Context, userID, toUserID, farmID int) error {
+	return utils.DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		// 更新 user-farm 关联
 		if err := tx.Model(&relation.UserFarm{}).
-			Where("user_id = ?", fromUserID).
+			Where("user_id = ?", userID).
 			Update("user_id", toUserID).
 			Error; err != nil {
 			return err
 		}
 		// 更新 user-miner 关联
 		if err := tx.Model(&relation.UserMiner{}).
-			Where("user_id = ?", fromUserID).
+			Where("user_id = ?", userID).
 			Updates(map[string]any{"user_id": toUserID}).
 			Error; err != nil {
 			return err
 		}
 		return nil
 	})
+}
+
+// 退出矿场
+func (FarmDAO) QuitFarm(ctx context.Context, farmID int, userID int) error {
+	// user-farm 关联
+	// todo farm 有多个管理者
+	return utils.DB.WithContext(ctx).
+		Where("farm_id=? AND userID=?", farmID, userID).
+		Delete(&relation.UserFarm{}).Error
 }

@@ -20,7 +20,7 @@ func NewAdminController() *AdminController {
 	}
 }
 
-// GetAllUser 获取所有用户
+// 获取所有用户
 func (c *AdminController) GetUsers(ctx *gin.Context) {
 	pageNum, err := strconv.Atoi(ctx.Query("page_num"))
 	if err != nil || pageNum <= 0 {
@@ -45,7 +45,7 @@ func (c *AdminController) GetUsers(ctx *gin.Context) {
 	rsp.DBQuerySuccess(ctx, http.StatusOK, "admin get all user success", users, total)
 }
 
-// GetUserOperlogs 获取所有用户操作日志
+// 获取所有用户操作日志
 func (c *AdminController) GetUserOperlogs(ctx *gin.Context) {
 	pageNum, err := strconv.Atoi(ctx.Query("page_num"))
 	if err != nil || pageNum <= 0 {
@@ -71,7 +71,7 @@ func (c *AdminController) GetUserOperlogs(ctx *gin.Context) {
 	rsp.DBQuerySuccess(ctx, http.StatusOK, "admin get all user success", users, total)
 }
 
-// GetUserLoginlogs 获取用户登陆日志
+// 获取用户登陆日志
 func (c *AdminController) GetUserLoginlogs(ctx *gin.Context) {
 	pageNum, err := strconv.Atoi(ctx.Query("page_num"))
 	if err != nil || pageNum <= 0 {
@@ -97,7 +97,7 @@ func (c *AdminController) GetUserLoginlogs(ctx *gin.Context) {
 	rsp.DBQuerySuccess(ctx, http.StatusOK, "admin get user login logs success", users, total)
 }
 
-// GetUserPointslogs 获取用户的积分记录
+// 获取用户的积分记录
 func (c *AdminController) GetUserPointslogs(ctx *gin.Context) {
 	pageNum, err := strconv.Atoi(ctx.Query("page_num"))
 	if err != nil || pageNum <= 0 {
@@ -123,7 +123,7 @@ func (c *AdminController) GetUserPointslogs(ctx *gin.Context) {
 	rsp.DBQuerySuccess(ctx, http.StatusOK, "admin get user points records success", users, total)
 }
 
-// GetUserFarms 获取用户的所有矿场
+// 获取用户的所有矿场
 func (c *AdminController) GetUserFarms(ctx *gin.Context) {
 	pageNum, err := strconv.Atoi(ctx.Query("page_num"))
 	if err != nil || pageNum <= 0 {
@@ -140,7 +140,8 @@ func (c *AdminController) GetUserFarms(ctx *gin.Context) {
 		"page_size": pageSize,
 	}
 
-	farms, total, err := c.adminService.GetUserFarms(ctx, query)
+	userID := ctx.GetInt("user_id")
+	farms, total, err := c.adminService.GetUserFarms(ctx, userID, query)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
@@ -149,7 +150,7 @@ func (c *AdminController) GetUserFarms(ctx *gin.Context) {
 	rsp.DBQuerySuccess(ctx, http.StatusOK, "admin get user farms success", farms, total)
 }
 
-// GetUserMiners 获取用户的所有矿机
+// 获取用户的所有矿机
 func (c *AdminController) GetUserMiners(ctx *gin.Context) {
 	pageNum, err := strconv.Atoi(ctx.Query("page_num"))
 	if err != nil || pageNum <= 0 {
@@ -199,7 +200,6 @@ func (c *AdminController) GetSwitchRegister(ctx *gin.Context) {
 	}
 
 	rsp.QuerySuccess(ctx, http.StatusOK, "admin get switch register success", switchRegister)
-
 }
 
 // SetGlobalFs 设置全局飞行表

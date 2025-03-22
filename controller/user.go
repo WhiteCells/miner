@@ -44,11 +44,15 @@ func (c *UserController) Login(ctx *gin.Context) {
 		return
 	}
 
-	permissions, token, user, err := c.userService.Login(ctx, &req)
+	clientIP := ctx.ClientIP()
+
+	permissions, token, user, err := c.userService.Login(ctx, clientIP, &req)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
+
+	ctx.Set("user_id", user.ID)
 
 	rsp.LoginSuccess(ctx, http.StatusOK, "login success", user, token, permissions)
 }
@@ -79,7 +83,7 @@ func (c *UserController) Logout(ctx *gin.Context) {
 // GetPointsBalance 获取积分余额
 func (c *UserController) GetPointsBalance(ctx *gin.Context) {
 	userID := ctx.GetInt("user_id")
-	balance, err := c.userService.GetUserPointsBalance(userID)
+	balance, err := c.userService.GetUserPointsBalance(ctx, userID)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
@@ -89,7 +93,7 @@ func (c *UserController) GetPointsBalance(ctx *gin.Context) {
 
 func (c *UserController) GetUserAddress(ctx *gin.Context) {
 	userID := ctx.GetInt("user_id")
-	address, err := c.userService.GetUserAddress(userID)
+	address, err := c.userService.GetUserAddress(ctx, userID)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return

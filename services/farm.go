@@ -1,12 +1,11 @@
 package services
 
 import (
+	"context"
+	"errors"
 	"miner/common/dto"
 	"miner/dao/mysql"
 	"miner/model"
-	"miner/utils"
-
-	"github.com/gin-gonic/gin"
 )
 
 type FarmService struct {
@@ -19,31 +18,49 @@ func NewFarmService() *FarmService {
 	}
 }
 
-func (m *FarmService) CreateFarm(ctx *gin.Context, userID int, req *dto.CreateFarmReq) error {
+func (m *FarmService) CreateFarm(ctx context.Context, userID int, req *dto.CreateFarmReq) error {
 	farm := &model.Farm{
 		Name:     req.Name,
 		TimeZone: req.TimeZone,
 	}
-	return m.farmDAO.CreateFarm(farm, userID)
+	return m.farmDAO.CreateFarm(ctx, farm, userID)
 }
 
-func (m *FarmService) DelFarm(ctx *gin.Context, userID int, req *dto.DeleteFarmReq) error {
-	return m.farmDAO.DeleteFarmByID(req.FarmID, userID)
+func (m *FarmService) DelFarm(ctx context.Context, userID, farmID int) error {
+	return m.farmDAO.DelFarmByID(ctx, userID, farmID)
 }
 
-func (m *FarmService) UpdateFarm(ctx *gin.Context, req *dto.UpdateFarmReq) error {
-	farm := &model.Farm{}
-	if name, ok := req.UpdateInfo["name"].(string); ok {
-		farm.Name = name
+func (m *FarmService) UpdateFarm(ctx context.Context, userID, farmID int, updateInfo map[string]any) error {
+	var allowChangeField = map[string]bool{
+		"name":      true,
+		"coin_type": true,
+		"mine_pool": true,
+		"hash":      true,
 	}
-	if timezone, ok := req.UpdateInfo["time_zone"].(string); ok {
-		farm.TimeZone = timezone
+	updates := make(map[string]any)
+	for key, value := range updateInfo {
+		if allowChangeField[key] {
+			updates[key] = value
+		}
 	}
-	return m.farmDAO.UpdateFarm(req.FarmID, farm)
+	if len(updates) == 0 {
+		return errors.New("没有可更新的字段")
+	}
+	return m.farmDAO.UpdateFarm(ctx, userID, farmID, updates)
 }
 
-func (m *FarmService) GetFarm(ctx *gin.Context, farmID int) (*model.Farm, error) {
-	farm := &model.Farm{}
-	err := utils.DB.Where("id=?", farmID).First(farm).Error
-	return farm, err
+func (m *FarmService) GetFarmByID(ctx context.Context, farmID int) (*model.Farm, error) {
+	return m.farmDAO.GetFarmByID(ctx, farmID)
+}
+
+func (m *FarmService) GetFarms(ctx context.Context, userID int, query map[string]any) (*[]model.Farm, int64, error) {
+	return m.farmDAO.GetFarms(ctx, userID, query)
+}
+
+func (m *FarmService) ApplyFs(ctx context.Context, userID int, farmID int, fsID int) error {
+	return m.farmDAO.ApplyFs(ctx, userID, farmID, fsID)
+}
+
+func (m *FarmService) Transfer(ctx context.Context, userID, toUserID int, farmID int) error {
+	return m.farmDAO.Transfer(ctx, userID, toUserID, farmID)
 }

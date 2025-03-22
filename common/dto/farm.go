@@ -25,6 +25,6 @@ type ApplyFarmFsReq struct {
 }
 
 type TransferFarmReq struct {
-	FarmID   string `json:"farm_id" binding:"required"`
-	ToUserID string `json:"to_user_id" binding:"required"`
+	FarmID   int `json:"farm_id" binding:"required"`
+	ToUserID int `json:"to_user_id" binding:"required"`
 }

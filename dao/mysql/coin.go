@@ -1,6 +1,7 @@
 package mysql
 
 import (
+	"context"
 	"miner/model"
 	"miner/utils"
 )
@@ -12,26 +13,40 @@ func NewCoinDAO() *CoinDAO {
 	return &CoinDAO{}
 }
 
-func (CoinDAO) CreateCoin(coin *model.Coin) error {
-	return utils.DB.Create(coin).Error
+func (CoinDAO) CreateCoin(ctx context.Context, coin *model.Coin) error {
+	return utils.DB.WithContext(ctx).Create(coin).Error
 }
 
-func (CoinDAO) DelCoin(coinID int) error {
-	return utils.DB.Delete(&model.Coin{}, coinID).Error
+func (CoinDAO) DelCoin(ctx context.Context, coinID int) error {
+	return utils.DB.WithContext(ctx).Delete(&model.Coin{}, coinID).Error
 }
 
-func (CoinDAO) UpdateCoin(coinID int, coin *model.Coin) error {
-	return utils.DB.Save(coin).Error
+func (CoinDAO) UpdateCoin(ctx context.Context, coinID int, coin *model.Coin) error {
+	return utils.DB.WithContext(ctx).Save(coin).Error
 }
 
-func (CoinDAO) GetCoin(coinID int) (*model.Coin, error) {
+func (CoinDAO) GetCoin(ctx context.Context, coinID int) (*model.Coin, error) {
 	var coin model.Coin
-	err := utils.DB.First(&coin, coinID).Error
+	err := utils.DB.WithContext(ctx).First(&coin, coinID).Error
 	return &coin, err
 }
 
-func (CoinDAO) GetAllCoin() (*[]model.Coin, error) {
+func (CoinDAO) GetCoins(ctx context.Context, query map[string]any) (*[]model.Coin, int64, error) {
 	var coin []model.Coin
-	err := utils.DB.Find(&coin).Error
-	return &coin, err
+	var total int64
+
+	pageNum := query["page_num"].(int)
+	pageSize := query["page_size"].(int)
+
+	if err := utils.DB.WithContext(ctx).
+		Model(&model.Coin{}).Count(&total).Error; err != nil {
+		return nil, -1, err
+	}
+
+	err := utils.DB.WithContext(ctx).
+		Offset((pageNum - 1) * pageSize).
+		Limit(pageSize).
+		Find(&coin).
+		Error
+	return &coin, total, err
 }

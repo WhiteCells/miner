@@ -37,7 +37,7 @@ var (
 )
 
 func processPointsDeduct(ctx context.Context) {
-	users, err := adminDAO.GetAllUsers()
+	users, err := adminDAO.GetAllUsers(ctx)
 	if err != nil {
 		return
 	}
@@ -86,7 +86,7 @@ func processUserPoints(ctx context.Context, user *model.User) {
 	if user.LastCheckAt.Before(now.Add(-24*time.Hour)) ||
 		user.LastCheckAt.Before(time.Date(now.Year(), now.Month(), now.Day(), 12, 0, 0, 0, now.Location())) {
 
-		farms, err := farmDAO.GetUserAllFarms(user.ID)
+		farms, err := farmDAO.GetFarms(ctx, user.ID)
 		if err != nil {
 			log := fmt.Sprintf("%d failed to get all farm", user.ID)
 			utils.Logger.Error(log)
@@ -122,18 +122,18 @@ func processUserPoints(ctx context.Context, user *model.User) {
 		balance := user.InvitePoints + user.RechargePoints
 
 		// 更新积分
-		if err = userDAO.UpdatePoints(user.ID, -cost, points.PointSettlement); err != nil {
+		if err = userDAO.UpdatePoints(ctx, user.ID, -cost, points.PointSettlement); err != nil {
 			utils.Logger.Error("update points error")
 			return
 		}
 
 		// 更新扣除积分时间
-		if err = userDAO.UpdateLastCheckAt(user.ID, now); err != nil {
+		if err = userDAO.UpdateLastCheckAt(ctx, user.ID, now); err != nil {
 			utils.Logger.Error("set last check at error")
 			return
 		}
 
-		user, err = userDAO.GetUserByID(user.ID)
+		user, err = userDAO.GetUserByID(ctx, user.ID)
 		if err != nil {
 			return
 		}
@@ -147,7 +147,7 @@ func processUserPoints(ctx context.Context, user *model.User) {
 			Time:    now,
 			Detail:  detail,
 		}
-		if err := pointslogDAO.CreatePointslog(pointslog); err != nil {
+		if err := pointslogDAO.CreatePointslog(ctx, pointslog); err != nil {
 			log := fmt.Sprintf("%d failed to create points logs", user.ID)
 			utils.Logger.Error(log)
 		}

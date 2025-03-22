@@ -1,6 +1,7 @@
 package mysql
 
 import (
+	"context"
 	"miner/model"
 	"miner/utils"
 )
@@ -11,27 +12,23 @@ func NewPointRecordDAO() *PointslogDAO {
 	return &PointslogDAO{}
 }
 
-func (dao *PointslogDAO) CreatePointslog(log *model.Pointslog) error {
-	return utils.DB.Create(log).Error
+func (dao *PointslogDAO) CreatePointslog(ctx context.Context, log *model.Pointslog) error {
+	return utils.DB.WithContext(ctx).Create(log).Error
 }
 
-// 获取积分日志
-func (dao *PointslogDAO) GetUserPointslog(query map[string]any) (*[]model.Pointslog, int64, error) {
+// 获取指定用户积分日志
+func (dao *PointslogDAO) GetPointslogByID(ctx context.Context, userID int, query map[string]any) (*[]model.Pointslog, int64, error) {
 	var logs []model.Pointslog
 	var total int64
 
-	db := utils.DB.Model(&model.Pointslog{})
+	pageNum := query["page_num"].(int)
+	pageSize := query["page_size"].(int)
 
-	if userID, ok := query["user_id"].(int); ok {
-		db = db.Where("user_id = ?", userID)
-	}
+	db := utils.DB.WithContext(ctx).Model(&model.Pointslog{}).Where("user_id = ?", userID)
 
 	if err := db.Count(&total).Error; err != nil {
 		return nil, -1, err
 	}
-
-	pageNum := query["page_num"].(int)
-	pageSize := query["page_size"].(int)
 
 	err := db.Offset((pageNum - 1) * pageSize).
 		Limit(pageSize).
@@ -40,8 +37,29 @@ func (dao *PointslogDAO) GetUserPointslog(query map[string]any) (*[]model.Points
 	return &logs, total, err
 }
 
-func (dao *PointslogDAO) GetUserPointsBalance(userID int) (int, error) {
+// 获取积分日志
+func (PointslogDAO) GetPointslogs(ctx context.Context, query map[string]any) (*[]model.Pointslog, int64, error) {
+	var logs []model.Pointslog
+	var total int64
+
+	pageNum := query["page_num"].(int)
+	pageSize := query["page_size"].(int)
+
+	db := utils.DB.WithContext(ctx).Model(&model.Pointslog{})
+
+	if err := db.Count(&total).Error; err != nil {
+		return nil, -1, err
+	}
+
+	err := db.Offset((pageNum - 1) * pageSize).
+		Limit(pageSize).
+		Find(&logs).Error
+
+	return &logs, total, err
+}
+
+func (dao *PointslogDAO) GetUserPointsBalance(ctx context.Context, userID int) (int, error) {
 	var user model.User
-	err := utils.DB.Select("points").First(&user, userID).Error
+	err := utils.DB.WithContext(ctx).Select("points").First(&user, userID).Error
 	return 0, err
 }

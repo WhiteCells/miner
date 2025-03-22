@@ -2,25 +2,25 @@ package controller
 
 import (
 	"miner/common/rsp"
-	"miner/service"
+	"miner/services"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
-type PointsRecordController struct {
-	pointsRecordService *service.PointsRecordService
+type PointslogController struct {
+	pointsRecordService *services.PointslogService
 }
 
-func NewPointsRecordController() *PointsRecordController {
-	return &PointsRecordController{
-		pointsRecordService: service.NewPointRecordService(),
+func NewPointsRecordController() *PointslogController {
+	return &PointslogController{
+		pointsRecordService: services.NewPointlogService(),
 	}
 }
 
 // GetPointsRecords 获取用户积分记录
-func (c *PointsRecordController) GetPointsRecords(ctx *gin.Context) {
+func (c *PointslogController) GetPointsRecords(ctx *gin.Context) {
 	userIDStr, exists := ctx.Value("user_id").(string)
 	if !exists {
 		rsp.Error(ctx, http.StatusInternalServerError, "invalid user_id in context", nil)
@@ -48,7 +48,7 @@ func (c *PointsRecordController) GetPointsRecords(ctx *gin.Context) {
 		"page_size": pageSize,
 	}
 
-	records, total, err := c.pointsRecordService.GetPointsRecords(ctx, query)
+	records, total, err := c.pointsRecordService.GetPointslogs(ctx, query)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return

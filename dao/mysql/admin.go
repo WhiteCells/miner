@@ -1,6 +1,7 @@
 package mysql
 
 import (
+	"context"
 	"miner/common/status"
 	"miner/model"
 	"miner/model/relation"
@@ -14,16 +15,16 @@ func NewAdminDAO() *AdminDAO {
 }
 
 // 删除用户
-func (dao *AdminDAO) DelUser(userID int) error {
-	return utils.DB.Delete(&model.User{}, userID).Error
+func (dao *AdminDAO) DelUser(ctx context.Context, userID int) error {
+	return utils.DB.WithContext(ctx).Delete(&model.User{}, userID).Error
 }
 
 // 获取用户
-func (dao *AdminDAO) GetUsers(query map[string]any) (*[]model.User, int64, error) {
+func (dao *AdminDAO) GetUsers(ctx context.Context, query map[string]any) (*[]model.User, int64, error) {
 	var users []model.User
 	var total int64
 
-	db := utils.DB.Model(&model.User{})
+	db := utils.DB.WithContext(ctx).Model(&model.User{})
 
 	// query 的其他参数
 
@@ -46,36 +47,37 @@ func (dao *AdminDAO) GetUsers(query map[string]any) (*[]model.User, int64, error
 }
 
 // 获取所有用户
-func (dao *AdminDAO) GetAllUsers() (*[]model.User, error) {
+func (dao *AdminDAO) GetAllUsers(ctx context.Context) (*[]model.User, error) {
 	var users []model.User
-	err := utils.DB.Find(&users).Error
+	err := utils.DB.WithContext(ctx).Find(&users).Error
 	return &users, err
 }
 
 // 获取用户状态
-func (m *AdminDAO) GetUserStatus(userID int) (status.UserStatus, error) {
+func (m *AdminDAO) GetUserStatus(ctx context.Context, userID int) (status.UserStatus, error) {
 	var user model.User
-	err := utils.DB.
+	err := utils.DB.WithContext(ctx).
 		Where("id=?", userID).
 		Error
 	return user.Status, err
 }
 
 // 设置免费 GPU 数量
-func (m *AdminDAO) SetFreeGpuNum(num int) error {
+func (m *AdminDAO) SetFreeGpuNum(ctx context.Context, num int) error {
 	var system model.System
-	err := utils.DB.Find(&system).Error
+	err := utils.DB.WithContext(ctx).
+		Find(&system).Error
 	if err != nil {
 		return err
 	}
 	system.FreeGpuNum = num
-	return utils.DB.Save(&system).Error
+	return utils.DB.WithContext(ctx).Save(&system).Error
 }
 
 // 获取免费 GPU 数量
-func (m *AdminDAO) GetFreeGpuNum() (int, error) {
+func (m *AdminDAO) GetFreeGpuNum(ctx context.Context) (int, error) {
 	var system model.System
-	err := utils.DB.Find(&system).Error
+	err := utils.DB.WithContext(ctx).Find(&system).Error
 	if err != nil {
 		return -1, err
 	}
@@ -83,11 +85,11 @@ func (m *AdminDAO) GetFreeGpuNum() (int, error) {
 }
 
 // 获取用户日志
-func (dao *AdminDAO) GetUserOperlogs(query map[string]any) (*[]model.Operlog, int64, error) {
+func (dao *AdminDAO) GetUserOperlogs(ctx context.Context, query map[string]any) (*[]model.Operlog, int64, error) {
 	var logs []model.Operlog
 	var total int64
 
-	db := utils.DB.Model(&model.Operlog{})
+	db := utils.DB.WithContext(ctx).Model(&model.Operlog{})
 
 	// query 的其他参数
 
@@ -109,11 +111,11 @@ func (dao *AdminDAO) GetUserOperlogs(query map[string]any) (*[]model.Operlog, in
 }
 
 // 获取用户登陆日志
-func (dao *AdminDAO) GetUserLoginlogs(query map[string]any) (*[]model.Loginlog, int64, error) {
+func (dao *AdminDAO) GetUserLoginlogs(ctx context.Context, query map[string]any) (*[]model.Loginlog, int64, error) {
 	var logs []model.Loginlog
 	var total int64
 
-	db := utils.DB.Model(&model.Loginlog{})
+	db := utils.DB.WithContext(ctx).Model(&model.Loginlog{})
 
 	// query 的其他参数
 
@@ -136,7 +138,7 @@ func (dao *AdminDAO) GetUserLoginlogs(query map[string]any) (*[]model.Loginlog, 
 }
 
 // GetUserPointsRecords 获取用户积分记录
-func (dao *AdminDAO) GetUserPointslogs(query map[string]any) (*[]model.Pointslog, int64, error) {
+func (dao *AdminDAO) GetUserPointslogs(ctx context.Context, query map[string]any) (*[]model.Pointslog, int64, error) {
 	var records []model.Pointslog
 	var total int64
 
@@ -146,14 +148,14 @@ func (dao *AdminDAO) GetUserPointslogs(query map[string]any) (*[]model.Pointslog
 	pageSize := query["page_size"].(int)
 
 	// 查询总数
-	if err := utils.DB.
+	if err := utils.DB.WithContext(ctx).
 		Where(model.Pointslog{}).
 		Count(&total).Error; err != nil {
 		return nil, -1, err
 	}
 
 	// 分页查询
-	err := utils.DB.
+	err := utils.DB.WithContext(ctx).
 		Offset((pageNum - 1) * pageSize).
 		Limit(pageSize).
 		Order("time"). // 目前用 time，后续有需求在修改
@@ -163,19 +165,16 @@ func (dao *AdminDAO) GetUserPointslogs(query map[string]any) (*[]model.Pointslog
 }
 
 // GetUserFarms 获取用户的矿场
-func (dao *AdminDAO) GetUserFarms(query map[string]any) (*[]model.Farm, int64, error) {
+func (dao *AdminDAO) GetUserFarms(ctx context.Context, userID int, query map[string]any) (*[]model.Farm, int64, error) {
 	var farms []model.Farm
 	var total int64
 
-	// query 的其他参数
-
-	userID := query["user_id"].(int)
 	pageNum := query["page_num"].(int)
 	pageSize := query["page_size"].(int)
 
 	// 获取用户拥有的矿场数量
 	// 后续可以细分为：用户拥有，用户管理，用户查看
-	if err := utils.DB.
+	if err := utils.DB.WithContext(ctx).
 		Model(relation.UserFarm{}).
 		Where("user_id = ?", userID).
 		Count(&total).Error; err != nil {
@@ -183,7 +182,7 @@ func (dao *AdminDAO) GetUserFarms(query map[string]any) (*[]model.Farm, int64, e
 	}
 
 	// 查询矿场详情
-	err := utils.DB.
+	err := utils.DB.WithContext(ctx).
 		Joins("JOIN user_farm ON user_farm.farm_id = farm.id").
 		Where("user_farm.user_id = ?", userID).
 		Offset((pageNum - 1) * pageSize).
@@ -193,17 +192,15 @@ func (dao *AdminDAO) GetUserFarms(query map[string]any) (*[]model.Farm, int64, e
 	return &farms, total, err
 }
 
-// GetUserMiners 获取用户的矿机
-func (dao *AdminDAO) GetUserMiners(query map[string]any) (*[]model.Miner, int64, error) {
+// 获取用户的矿机
+func (dao *AdminDAO) GetUserMiners(ctx context.Context, userID, farmID int, query map[string]any) (*[]model.Miner, int64, error) {
 	var miners []model.Miner
 	var total int64
 
-	userID := query["user_id"].(int)
-	farmID := query["farm_id"].(int)
 	pageNum := query["page_num"].(int)
 	pageSize := query["page_size"].(int)
 
-	if err := utils.DB.
+	if err := utils.DB.WithContext(ctx).
 		Model(model.Miner{}).
 		Joins("JOIN farm_miner ON farm_miner.miner_id = miner.id").
 		Joins("JOIN user_miner ON user_miner.miner_id = miner.id").
@@ -213,7 +210,7 @@ func (dao *AdminDAO) GetUserMiners(query map[string]any) (*[]model.Miner, int64,
 		return nil, -1, err
 	}
 
-	err := utils.DB.
+	err := utils.DB.WithContext(ctx).
 		Model(model.Miner{}).
 		Joins("JOIN farm_miner ON farm_miner.miner_id = miner.id").
 		Joins("JOIN user_miner ON user_miner.miner_id = miner.id").
@@ -227,112 +224,112 @@ func (dao *AdminDAO) GetUserMiners(query map[string]any) (*[]model.Miner, int64,
 }
 
 // 设置用户状态
-func (dao *AdminDAO) SetUserStatus(userID int, status status.UserStatus) error {
+func (dao *AdminDAO) SetUserStatus(ctx context.Context, userID int, status status.UserStatus) error {
 	var user model.User
-	if err := utils.DB.First(&user, userID).Error; err != nil {
+	if err := utils.DB.WithContext(ctx).First(&user, userID).Error; err != nil {
 		return err
 	}
 
 	user.Status = status
-	if err := utils.DB.Save(user).Error; err != nil {
+	if err := utils.DB.WithContext(ctx).Save(user).Error; err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (m *AdminDAO) CreateGlobalFs(fs *model.Fs) error {
+func (m *AdminDAO) CreateGlobalFs(ctx context.Context, fs *model.Fs) error {
 	return nil
 }
 
-func (m *AdminDAO) DeleteGlobalFs(fsID int) error {
+func (m *AdminDAO) DeleteGlobalFs(ctx context.Context, fsID int) error {
 	return nil
 }
 
-func (m *AdminDAO) UpdateGlobalFs(fsID int) error {
+func (m *AdminDAO) UpdateGlobalFs(ctx context.Context, fsID int) error {
 	return nil
 }
 
-func (m *AdminDAO) GetGlobalFs() (*[]model.Fs, error) {
+func (m *AdminDAO) GetGlobalFs(ctx context.Context) (*[]model.Fs, error) {
 	var globalFs []model.Fs
-	err := utils.DB.
+	err := utils.DB.WithContext(ctx).
 		Where("is_global=?", 1).
 		Find(&globalFs).Error
 	return &globalFs, err
 }
 
 // 获取充值返现
-func (m *AdminDAO) GetInviteReward() (float32, error) {
+func (m *AdminDAO) GetInviteReward(ctx context.Context) (float32, error) {
 	var system model.System
-	if err := utils.DB.First(&system).Error; err != nil {
+	if err := utils.DB.WithContext(ctx).First(&system).Error; err != nil {
 		return -1, err
 	}
 	return system.InviteReward, nil
 }
 
 // 设置充值返现
-func (m *AdminDAO) SetInviteReward(reward float32) error {
+func (m *AdminDAO) SetInviteReward(ctx context.Context, reward float32) error {
 	var system model.System
-	if err := utils.DB.First(&system).Error; err != nil {
+	if err := utils.DB.WithContext(ctx).First(&system).Error; err != nil {
 		return err
 	}
 	system.InviteReward = reward
-	return utils.DB.Save(system).Error
+	return utils.DB.WithContext(ctx).Save(system).Error
 }
 
 // 获取充值比率
-func (m *AdminDAO) GetRechargeRatio() (float32, error) {
+func (m *AdminDAO) GetRechargeRatio(ctx context.Context) (float32, error) {
 	var system model.System
-	if err := utils.DB.First(&system).Error; err != nil {
+	if err := utils.DB.WithContext(ctx).First(&system).Error; err != nil {
 		return -1, err
 	}
 	return system.RechargeRatio, nil
 }
 
 // 设置充值比率
-func (m *AdminDAO) SetRechargeRatio(ratio float32) error {
+func (m *AdminDAO) SetRechargeRatio(ctx context.Context, ratio float32) error {
 	var system model.System
-	if err := utils.DB.First(&system).Error; err != nil {
+	if err := utils.DB.WithContext(ctx).First(&system).Error; err != nil {
 		return err
 	}
 	system.RechargeRatio = ratio
-	return utils.DB.Save(system).Error
+	return utils.DB.WithContext(ctx).Save(system).Error
 }
 
 // 获取充值返现
-func (m *AdminDAO) GetRechargeReward() (float32, error) {
+func (m *AdminDAO) GetRechargeReward(ctx context.Context) (float32, error) {
 	var system model.System
-	if err := utils.DB.First(&system).Error; err != nil {
+	if err := utils.DB.WithContext(ctx).First(&system).Error; err != nil {
 		return -1, err
 	}
 	return system.InviteReward, nil
 }
 
 // 设置充值返现
-func (m *AdminDAO) SetRechargeReward(reward float32) error {
+func (m *AdminDAO) SetRechargeReward(ctx context.Context, reward float32) error {
 	var system model.System
-	if err := utils.DB.First(&system).Error; err != nil {
+	if err := utils.DB.WithContext(ctx).First(&system).Error; err != nil {
 		return err
 	}
 	system.RechargeReward = reward
-	return utils.DB.Save(system).Error
+	return utils.DB.WithContext(ctx).Save(system).Error
 }
 
 // 获取注册开关
-func (m *AdminDAO) GetSwitchRegister() (status.RegisterStatus, error) {
+func (m *AdminDAO) GetSwitchRegister(ctx context.Context) (status.RegisterStatus, error) {
 	var system model.System
-	if err := utils.DB.First(&system).Error; err != nil {
+	if err := utils.DB.WithContext(ctx).First(&system).Error; err != nil {
 		return status.RegisterNone, err
 	}
 	return system.SwitchRegister, nil
 }
 
 // 设置注册开关
-func (m *AdminDAO) SetSwitchRegister(s status.RegisterStatus) error {
+func (m *AdminDAO) SetSwitchRegister(ctx context.Context, s status.RegisterStatus) error {
 	var system model.System
-	if err := utils.DB.First(&system).Error; err != nil {
+	if err := utils.DB.WithContext(ctx).First(&system).Error; err != nil {
 		return err
 	}
 	system.SwitchRegister = s
-	return utils.DB.Save(system).Error
+	return utils.DB.WithContext(ctx).Save(system).Error
 }

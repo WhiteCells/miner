@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"miner/common/dto"
@@ -35,8 +36,8 @@ func NewUserService() *UserService {
 }
 
 // 登录
-func (m *UserService) Login(ctx *gin.Context, req *dto.LoginReq) ([]string, string, *model.User, error) {
-	user, err := m.userDAO.GetUserByEmail(req.Email)
+func (m *UserService) Login(ctx context.Context, clientIP string, req *dto.LoginReq) ([]string, string, *model.User, error) {
+	user, err := m.userDAO.GetUserByEmail(ctx, req.Email)
 	if err != nil {
 		return nil, "", nil, err
 	}
@@ -58,14 +59,12 @@ func (m *UserService) Login(ctx *gin.Context, req *dto.LoginReq) ([]string, stri
 		return nil, "", nil, errors.New("failed to generate token")
 	}
 
-	user.LastLoginIP = ctx.ClientIP()
+	user.LastLoginIP = clientIP
 	user.LastLoginAt = time.Now()
 	var permissions []string
 	if user.Role == role.Admin {
 		permissions = []string{"*:*:*"}
 	}
-
-	ctx.Set("user_id", user.ID)
 
 	return permissions, token, user, nil
 }
@@ -91,7 +90,7 @@ func (s *UserService) Logout(ctx *gin.Context) error {
 
 // 注册
 func (m *UserService) Register(ctx *gin.Context, req *dto.RegisterReq) (string, error) {
-	_, err := m.userDAO.GetUserByEmail(req.Email)
+	_, err := m.userDAO.GetUserByEmail(ctx, req.Email)
 	if err == nil {
 		return "", errors.New("user email exists")
 	}
@@ -136,7 +135,7 @@ func (m *UserService) Register(ctx *gin.Context, req *dto.RegisterReq) (string, 
 		Key:         key,
 	}
 
-	if err := m.userDAO.CreateUser(user); err != nil {
+	if err := m.userDAO.CreateUser(ctx, user); err != nil {
 		return "", err
 	}
 
@@ -146,7 +145,7 @@ func (m *UserService) Register(ctx *gin.Context, req *dto.RegisterReq) (string, 
 		if err := m.addInvitePoints(ctx, user.ID, req.InviteCode); err != nil {
 			return secret, errors.New("failed to add invite point")
 		}
-		if err := m.userDAO.UpdateUser(user); err != nil {
+		if err := m.userDAO.UpdateUser(ctx, user); err != nil {
 			return secret, errors.New("failed to update user")
 		}
 	}
@@ -155,11 +154,11 @@ func (m *UserService) Register(ctx *gin.Context, req *dto.RegisterReq) (string, 
 }
 
 func (s *UserService) addInvitePoints(ctx *gin.Context, userID int, inviteCode string) error {
-	invitePoints, err := s.adminDAO.GetInviteReward()
+	invitePoints, err := s.adminDAO.GetInviteReward(ctx)
 	if err != nil {
 		return err
 	}
-	user, err := s.userDAO.GetUserByInviteCode(inviteCode)
+	user, err := s.userDAO.GetUserByInviteCode(ctx, inviteCode)
 	if err != nil {
 		return err
 	}
@@ -174,28 +173,28 @@ func (s *UserService) addInvitePoints(ctx *gin.Context, userID int, inviteCode s
 			Time:    time.Now(),
 			Detail:  detail,
 		}
-		s.pointslogDAO.CreatePointslog(record)
+		s.pointslogDAO.CreatePointslog(ctx, record)
 	}()
-	return s.userDAO.UpdateUser(user)
+	return s.userDAO.UpdateUser(ctx, user)
 }
 
-func (m *UserService) GetUserAddress(userID int) (string, error) {
-	return m.userDAO.GetUserAddress(userID)
+func (m *UserService) GetUserAddress(ctx context.Context, userID int) (string, error) {
+	return m.userDAO.GetUserAddress(ctx, userID)
 }
 
-func (m *UserService) GetUserPointsBalance(userID int) (float32, error) {
-	return m.userDAO.GetUserPointsBalance(userID)
+func (m *UserService) GetUserPointsBalance(ctx context.Context, userID int) (float32, error) {
+	return m.userDAO.GetUserPointsBalance(ctx, userID)
 }
 
-func (m *UserService) GetUserOperlogs(userID int, query map[string]any) (*[]model.Operlog, error) {
-	return m.userDAO.GetUserOperlogs(userID, query)
+func (m *UserService) GetUserOperlogs(ctx context.Context, userID int, query map[string]any) (*[]model.Operlog, error) {
+	return m.userDAO.GetUserOperlogs(ctx, userID, query)
 }
 
-func (m *UserService) GetUserPointslog(userID int, query map[string]any) (*[]model.Pointslog, error) {
-	return m.userDAO.GetUserPointslogs(userID, query)
+func (m *UserService) GetUserPointslog(ctx context.Context, userID int, query map[string]any) (*[]model.Pointslog, error) {
+	return m.userDAO.GetUserPointslogs(ctx, userID, query)
 }
 
-func (m *UserService) QuitFarm(userID int, farmID int) error {
+func (m *UserService) QuitFarm(ctx context.Context, userID int, farmID int) error {
 
 	return nil
 }
