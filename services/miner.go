@@ -168,16 +168,18 @@ func (m *MinerService) UpdateMinerWallet(ctx context.Context, userID int, req *d
 	if !m.validPerm(ctx, userID, req.FarmID, []perm.FarmPerm{perm.FarmOwner, perm.FarmManager}) {
 		return errors.New("permission denied")
 	}
-
-	miner, err := m.minerRDB.GetByID(ctx, req.FarmID, req.MinerID)
+	miner, err := m.minerDAO.GetMinerByMinerID(ctx, userID, req.MinerID)
+	if err != nil {
+		return err
+	}
+	minerInfo, err := m.minerRDB.GetMinerByRigID(ctx, miner.RigID)
 	if err != nil {
 		return errors.New("miner not found")
 	}
-
-	if err := m.minerRDB.Set(ctx, req.FarmID, miner); err != nil {
+	minerInfo.HiveOsWallet = req.Wallet
+	if err := m.minerRDB.UpdateMinerByRigID(ctx, miner.RigID, minerInfo); err != nil {
 		return err
 	}
-
 	return nil
 }
 
@@ -206,21 +208,29 @@ func (m *MinerService) GetWatchdog(ctx context.Context, userID, farmID, minerID 
 	return &minerInfo.HiveOsConfig.Watchdog, nil
 }
 
-func (s *MinerService) SetAutoFan(ctx context.Context, req *dto.SetAutoFanReq) error {
-	miner, err := s.minerRDB.GetByID(ctx, req.FarmID, req.MinerID)
+func (m *MinerService) SetAutoFan(ctx context.Context, userID int, req *dto.SetAutoFanReq) error {
+	miner, err := m.minerDAO.GetMinerByMinerID(ctx, userID, req.MinerID)
 	if err != nil {
 		return err
 	}
-	miner.HiveOsAutoFan = req.AutoFan
-	return s.minerRDB.Set(ctx, req.FarmID, miner)
+	minerInfo, err := m.minerRDB.GetMinerByRigID(ctx, miner.RigID)
+	if err != nil {
+		return err
+	}
+	minerInfo.HiveOsAutoFan = req.AutoFan
+	return m.minerRDB.UpdateMinerByRigID(ctx, miner.RigID, minerInfo)
 }
 
-func (s *MinerService) GetAutoFan(ctx context.Context, farmID, minerID int) (*utils.HiveOsAutoFan, error) {
-	miner, err := s.minerRDB.GetByID(ctx, farmID, minerID)
+func (m *MinerService) GetAutoFan(ctx context.Context, userID, farmID, minerID int) (*utils.HiveOsAutoFan, error) {
+	miner, err := m.minerDAO.GetMinerByMinerID(ctx, userID, minerID)
 	if err != nil {
 		return nil, err
 	}
-	return &miner.HiveOsAutoFan, nil
+	minerInfo, err := m.minerRDB.GetMinerByRigID(ctx, miner.RigID)
+	if err != nil {
+		return nil, err
+	}
+	return &minerInfo.HiveOsAutoFan, nil
 }
 
 func (m *MinerService) SetOptions(ctx context.Context, userID int, req *dto.SetOptionsReq) error {
