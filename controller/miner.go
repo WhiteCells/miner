@@ -2,47 +2,52 @@ package controller
 
 import (
 	"miner/common/dto"
+	"miner/common/params"
 	"miner/common/rsp"
-	"miner/service"
+	"miner/services"
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
 type MinerController struct {
-	minerService *service.MinerService
+	minerService *services.MinerService
 }
 
 func NewMinerController() *MinerController {
 	return &MinerController{
-		minerService: service.NewMinerService(),
+		minerService: services.NewMinerService(),
 	}
 }
 
-// CreateMiner 创建矿机
-func (c *MinerController) CreateMiner(ctx *gin.Context) {
+// 创建矿机
+func (m *MinerController) CreateMiner(ctx *gin.Context) {
 	var req dto.CreateMinerReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
-	miner, err := c.minerService.CreateMiner(ctx, &req)
-	if err != nil {
+	userID := ctx.GetInt("user_id")
+
+	if err := m.minerService.CreateMiner(ctx, userID, req.FarmID, &req); err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
 
-	rsp.Success(ctx, http.StatusOK, "create miner success", miner)
+	rsp.Success(ctx, http.StatusOK, "create miner success", nil)
 }
 
-// DeleteMiner 删除矿机
-func (c *MinerController) DeleteMiner(ctx *gin.Context) {
-	var req dto.DeleteMinerReq
+// 删除矿机
+func (m *MinerController) DeleteMiner(ctx *gin.Context) {
+	var req dto.DelMinerReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
-	if err := c.minerService.DeleteMiner(ctx, &req); err != nil {
+	userID := ctx.GetInt("user_id")
+
+	if err := m.minerService.DelMiner(ctx, userID, req.MinerID); err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
@@ -50,14 +55,16 @@ func (c *MinerController) DeleteMiner(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "delete miner success", nil)
 }
 
-// UpdateMiner 更新矿机
-func (c *MinerController) UpdateMiner(ctx *gin.Context) {
+// 更新矿机
+func (m *MinerController) UpdateMiner(ctx *gin.Context) {
 	var req dto.UpdateMinerReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
-	if err := c.minerService.UpdateMiner(ctx, &req); err != nil {
+	userID := ctx.GetInt("user_id")
+
+	if err := m.minerService.UpdateMiner(ctx, userID, req.FarmID, req.MinerID, req.UpdateInfo); err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
@@ -65,14 +72,16 @@ func (c *MinerController) UpdateMiner(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "update miner success", nil)
 }
 
-// UpdateMinerWatchdog
+// 更新矿机 watchdog
 func (c *MinerController) UpdateMinerWatchdog(ctx *gin.Context) {
 	var req dto.UpdateMinerWatchdogReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
-	if err := c.minerService.UpdateMinerWatchdog(ctx, &req); err != nil {
+	userID := ctx.GetInt("user_id")
+
+	if err := c.minerService.UpdateMinerWatchdog(ctx, userID, req.FarmID, req.MinerID, &req); err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
@@ -80,14 +89,16 @@ func (c *MinerController) UpdateMinerWatchdog(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "update miner watchdog success", nil)
 }
 
-// UpdateMinerOptions
+// 更新矿机 options
 func (c *MinerController) UpdateMinerOptions(ctx *gin.Context) {
 	var req dto.UpdateMinerOptionsReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
-	if err := c.minerService.UpdateMinerOptions(ctx, &req); err != nil {
+	userID := ctx.GetInt("user_id")
+
+	if err := c.minerService.UpdateMinerOptions(ctx, userID, &req); err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
@@ -95,14 +106,16 @@ func (c *MinerController) UpdateMinerOptions(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "update miner options success", nil)
 }
 
-// UpdateMinerAutofan
+// 更新矿机 autofan
 func (c *MinerController) UpdateMinerAutofan(ctx *gin.Context) {
 	var req dto.UpdateMinerAutofanReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
-	if err := c.minerService.UpdateMinerAutofan(ctx, &req); err != nil {
+	userID := ctx.GetInt("user_id")
+
+	if err := c.minerService.UpdateMinerAutofan(ctx, userID, &req); err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
@@ -110,14 +123,16 @@ func (c *MinerController) UpdateMinerAutofan(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "update miner autofan success", nil)
 }
 
-// UpdateMinerWallet
+// 更新矿机 wallet
 func (c *MinerController) UpdateMinerWallet(ctx *gin.Context) {
 	var req dto.UpdateMinerWalletReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
-	if err := c.minerService.UpdateMinerWallet(ctx, &req); err != nil {
+	userID := ctx.GetInt("user_id")
+
+	if err := c.minerService.UpdateMinerWallet(ctx, userID, &req); err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
@@ -125,23 +140,42 @@ func (c *MinerController) UpdateMinerWallet(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "update miner wallet success", nil)
 }
 
-// GetMiner 获取用户矿机
+// 获取矿场下的矿机
 func (c *MinerController) GetFarmAllMiner(ctx *gin.Context) {
-	farmID := ctx.Query("farm_id")
-	miners, err := c.minerService.GetFarmAllMiner(ctx, farmID)
+	var params params.PageParams
+	if err := ctx.ShouldBindQuery(&params); err != nil {
+		rsp.Error(ctx, http.StatusBadRequest, "invalid parmas", nil)
+		return
+	}
+	query := map[string]any{
+		"page_num":  params.PageNum,
+		"page_size": params.PageSize,
+	}
+	farmID, err := strconv.Atoi(ctx.Query("farm_id"))
+	if err != nil {
+		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
+		return
+	}
+
+	miners, total, err := c.minerService.GetMinersByFarmID(ctx, farmID, query)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
 
-	rsp.QuerySuccess(ctx, http.StatusOK, "get user all miner success", miners)
+	rsp.DBQuerySuccess(ctx, http.StatusOK, "get user all miner success", miners, total)
 }
 
-// GetMinerByID
-func (c *MinerController) GetMinerByID(ctx *gin.Context) {
-	farmID := ctx.Query("farm_id")
-	minerID := ctx.Query("miner_id")
-	miner, err := c.minerService.GetMinerByID(ctx, farmID, minerID)
+// 获取指定矿机
+func (c *MinerController) GetMinerByMinerID(ctx *gin.Context) {
+	minerID, err := strconv.Atoi(ctx.Query("miner_id"))
+	if err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
+		return
+	}
+	userID := ctx.GetInt("user_id")
+
+	miner, err := c.minerService.GetMinerByMinerID(ctx, userID, minerID)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
@@ -150,14 +184,16 @@ func (c *MinerController) GetMinerByID(ctx *gin.Context) {
 	rsp.QuerySuccess(ctx, http.StatusOK, "get miner by id success", miner)
 }
 
-// ApplyFlightsheet 矿机应用飞行表
+// 矿机应用飞行表
 func (c *MinerController) ApplyFs(ctx *gin.Context) {
 	var req dto.ApplyMinerFsReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
-	if err := c.minerService.ApplyFs(ctx, &req); err != nil {
+	userID := ctx.GetInt("user_id")
+
+	if err := c.minerService.ApplyFs(ctx, userID, req.FarmID, req.MinerID, req.FsID); err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
@@ -165,14 +201,14 @@ func (c *MinerController) ApplyFs(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "apply miner flightsheet success", nil)
 }
 
-// Transfer 转移矿机所有权
+// 转移矿机所有权
 func (c *MinerController) Transfer(ctx *gin.Context) {
 	var req dto.TransferMinerReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
-	if err := c.minerService.Transfer(ctx, &req); err != nil {
+	if err := c.minerService.Transfer(ctx, req.FromFarmID, req.MinerID, req.ToFarmHash); err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
@@ -181,18 +217,18 @@ func (c *MinerController) Transfer(ctx *gin.Context) {
 }
 
 // GetRigConf 获取 rig.conf
-func (c *MinerController) GetRigConf(ctx *gin.Context) {
-	farmID := ctx.Query("farm_id")
-	minerID := ctx.Query("miner_id")
-	conf, err := c.minerService.GetRigConf(ctx, farmID, minerID)
-	if err != nil {
-		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
-		return
-	}
-	rsp.Success(ctx, http.StatusOK, "get rig.conf", conf)
-}
+// func (c *MinerController) GetRigConf(ctx *gin.Context) {
+// 	farmID := ctx.Query("farm_id")
+// 	minerID := ctx.Query("miner_id")
+// 	conf, err := c.minerService.GetRigConf(ctx, farmID, minerID)
+// 	if err != nil {
+// 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
+// 		return
+// 	}
+// 	rsp.Success(ctx, http.StatusOK, "get rig.conf", conf)
+// }
 
-// SetWatchdog 设置 watchdog 选项
+// 设置矿机 watchdog 选项
 func (c *MinerController) SetWatchdog(ctx *gin.Context) {
 	var req dto.SetWatchdogReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -206,10 +242,19 @@ func (c *MinerController) SetWatchdog(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "set watchdog success", nil)
 }
 
-// GetWatchdog 获取 watchdog 选项
+// 获取矿机 watchdog 选项
 func (c *MinerController) GetWatchdog(ctx *gin.Context) {
-	farmID := ctx.Query("farm_id")
-	minerID := ctx.Query("miner_id")
+	farmID, err := strconv.Atoi(ctx.Query("farm_id"))
+	if err != nil {
+		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
+		return
+	}
+	minerID, err := strconv.Atoi(ctx.Query("miner_id"))
+	if err != nil {
+		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
+		return
+	}
+
 	watchdog, err := c.minerService.GetWatchdog(ctx, farmID, minerID)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
@@ -218,7 +263,7 @@ func (c *MinerController) GetWatchdog(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "get watchdog success", watchdog)
 }
 
-// SetAutoFan 设置 fan 选项
+// 设置矿机 fan 选项
 func (c *MinerController) SetAutoFan(ctx *gin.Context) {
 	var req dto.SetAutoFanReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -232,10 +277,19 @@ func (c *MinerController) SetAutoFan(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "get watchdog success", nil)
 }
 
-// GetAutoFan 获取 fan 选项
+// 获取矿机 fan 选项
 func (c *MinerController) GetAutoFan(ctx *gin.Context) {
-	farmID := ctx.Query("farm_id")
-	minerID := ctx.Query("miner_id")
+	farmID, err := strconv.Atoi(ctx.Query("farm_id"))
+	if err != nil {
+		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
+		return
+	}
+	minerID, err := strconv.Atoi(ctx.Query("miner_id"))
+	if err != nil {
+		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
+		return
+	}
+
 	autofan, err := c.minerService.GetAutoFan(ctx, farmID, minerID)
 	if err != nil {
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
@@ -244,7 +298,7 @@ func (c *MinerController) GetAutoFan(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "get auto fan success", autofan)
 }
 
-// SetOptions 设置 worker 选项
+// 设置矿机 worker 选项
 func (c *MinerController) SetOptions(ctx *gin.Context) {
 	var req dto.SetOptionsReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -258,10 +312,19 @@ func (c *MinerController) SetOptions(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "set options success", nil)
 }
 
-// GetOptions 获取 worker 选项
+// 获取矿机 worker 选项
 func (c *MinerController) GetOptions(ctx *gin.Context) {
-	farmID := ctx.Query("farm_id")
-	minerID := ctx.Query("miner_id")
+	farmID, err := strconv.Atoi(ctx.Query("farm_id"))
+	if err != nil {
+		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
+		return
+	}
+	minerID, err := strconv.Atoi(ctx.Query("miner_id"))
+	if err != nil {
+		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
+		return
+	}
+
 	options, err := c.minerService.GetOptions(ctx, farmID, minerID)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, "get options failed", err.Error())

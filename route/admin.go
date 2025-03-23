@@ -28,8 +28,9 @@ func (ar *AdminRoute) InitAdminRoute(r *gin.Engine) {
 		route.GET("/user_oper_logs", ar.adminController.GetUserOperlogs)
 		route.GET("/user_login_logs", ar.adminController.GetUserLoginlogs)
 		route.GET("/user_points_records", ar.adminController.GetUserPointslogs)
-		route.GET("/user_farms", ar.adminController.GetUserFarms)
-		route.GET("/user_miners", ar.adminController.GetUserMiners)
+		route.GET("/user_farms", ar.adminController.GetFarms)
+		route.GET("/user_miners", ar.adminController.GetMiners)
+		route.GET("/:farm_id/miners", ar.adminController.GetMinersByFarmID)
 		route.POST("/switch_register", ar.adminController.SetSwitchRegister)
 		route.GET("/switch_register", ar.adminController.GetSwitchRegister)
 		// route.POST("/global_fs", ar.adminController.SetGlobalFs)
@@ -43,9 +44,6 @@ func (ar *AdminRoute) InitAdminRoute(r *gin.Engine) {
 		// user_status
 		route.GET("/user_status", ar.adminController.GetUserStatus)
 		route.POST("/user_status", ar.adminController.SetUserStatus)
-		// miner_pool_cost
-		// route.GET("/miner_pool_cost", ar.adminController.GetMinePoolCost)
-		// route.POST("/miner_pool_cost", ar.adminController.SetMinePoolCost)
 		// mnemonic
 		route.POST("/mnemonic", ar.adminController.SetMnemonic)
 		route.GET("/mnemonic", ar.adminController.GetMnemonic)

@@ -10,6 +10,7 @@ import (
 
 type AdminService struct {
 	adminDAO     *mysql.AdminDAO
+	farmDAO      *mysql.FarmDAO
 	adminRDB     *redis.AdminRDB
 	bscApiKeyRDB *redis.BscApiKeyRDB
 }
@@ -17,6 +18,7 @@ type AdminService struct {
 func NewAdminService() *AdminService {
 	return &AdminService{
 		adminDAO: mysql.NewAdminDAO(),
+		farmDAO:  mysql.NewFarmDAO(),
 		adminRDB: redis.NewAdminRDB(),
 	}
 }
@@ -105,12 +107,16 @@ func (m *AdminService) GetUserLoginlogs(ctx context.Context, query map[string]an
 	return m.adminDAO.GetUserLoginlogs(ctx, query)
 }
 
-func (m *AdminService) GetUserFarms(ctx context.Context, userID int, query map[string]any) (*[]model.Farm, int64, error) {
-	return m.adminDAO.GetUserFarms(ctx, userID, query)
+func (m *AdminService) GetFarms(ctx context.Context, query map[string]any) (*[]model.Farm, int64, error) {
+	return m.farmDAO.GetFarms(ctx, query)
 }
 
-func (m *AdminService) GetUserMiners(ctx context.Context, userID, farmID int, query map[string]any) (*[]model.Miner, int64, error) {
-	return m.adminDAO.GetUserMiners(ctx, userID, farmID, query)
+func (m *AdminService) GetFarmsByUserID(ctx context.Context, userID int, query map[string]any) (*[]model.Farm, int64, error) {
+	return m.farmDAO.GetFarmsByUserID(ctx, userID, query)
+}
+
+func (m *AdminService) GetUserMiners(ctx context.Context, userID int, query map[string]any) (*[]model.Miner, int64, error) {
+	return m.adminDAO.GetUserMiners(ctx, userID, query)
 }
 
 // func (m *AdminService) CreateGlobalFs(ctx context.Context, req *dto.CreateFsReq) error {

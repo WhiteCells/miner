@@ -3,10 +3,10 @@ package redis
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"miner/common/perm"
 	"miner/model/info"
 	"miner/utils"
+	"strconv"
 )
 
 type MinerRDB struct{}
@@ -22,8 +22,9 @@ func NewMinerRDB() *MinerRDB {
 // +-----------------+------------+-------+
 // | miner:<farm_id> | <miner_id> |  info |
 // +-----------------+------------+-------+
-func (c *MinerRDB) Set(ctx context.Context, farmID string, miner *info.Miner) error {
-	field := MakeField(MinerField, farmID)
+func (c *MinerRDB) Set(ctx context.Context, farmID int, miner *info.Miner) error {
+	farmIDStr := strconv.Itoa(farmID)
+	field := MakeField(MinerField, farmIDStr)
 	minerJSON, err := json.Marshal(miner)
 	if err != nil {
 		return err
@@ -38,9 +39,11 @@ func (c *MinerRDB) Del(ctx context.Context, farmID string, minerID string) error
 }
 
 // 通过 ID 获取矿机
-func (c *MinerRDB) GetByID(ctx context.Context, farmID string, minerID string) (*info.Miner, error) {
-	field := MakeField(MinerField, farmID)
-	minerJSON, err := utils.RDB.HGet(ctx, field, minerID)
+func (c *MinerRDB) GetByID(ctx context.Context, farmID, minerID int) (*info.Miner, error) {
+	farmIDStr := strconv.Itoa(farmID)
+	minerIDStr := strconv.Itoa(minerID)
+	field := MakeField(MinerField, farmIDStr)
+	minerJSON, err := utils.RDB.HGet(ctx, field, minerIDStr)
 	if err != nil {
 		return nil, err
 	}
@@ -50,22 +53,23 @@ func (c *MinerRDB) GetByID(ctx context.Context, farmID string, minerID string) (
 }
 
 // 获取矿场下的所有矿机
-func (c *MinerRDB) GetAll(ctx context.Context, farmID string) (*[]info.Miner, error) {
-	field := MakeField(MinerField, farmID)
-	farmIDMinerID, err := utils.RDB.HGetAll(ctx, field)
-	if err != nil {
-		return nil, err
-	}
-	var miners []info.Miner
-	for minerID := range farmIDMinerID {
-		miner, err := c.GetByID(ctx, farmID, minerID)
-		if err != nil {
-			return nil, err
-		}
-		miners = append(miners, *miner)
-	}
-	return &miners, nil
-}
+// func (c *MinerRDB) GetAll(ctx context.Context, farmID int) (*[]info.Miner, error) {
+// 	farmIDStr := strconv.Itoa(farmID)
+// 	field := MakeField(MinerField, farmIDStr)
+// 	farmIDMinerID, err := utils.RDB.HGetAll(ctx, field)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	var miners []info.Miner
+// 	for minerID := range farmIDMinerID {
+// 		miner, err := c.GetByID(ctx, farmID, minerID)
+// 		if err != nil {
+// 			return nil, err
+// 		}
+// 		miners = append(miners, *miner)
+// 	}
+// 	return &miners, nil
+// }
 
 // 转移矿机
 // fromUserID
@@ -73,32 +77,32 @@ func (c *MinerRDB) GetAll(ctx context.Context, farmID string) (*[]info.Miner, er
 // fromMinerID
 // toUserID
 // toFarmID
-func (c *MinerRDB) Transfer(ctx context.Context, fromUserID, fromFarmID, MinerID, toUserID, toFarmID string) error {
-	// 检查 fromUserID 对 fromFarmID 的权限
-	// 检查 toUserID 对 toFarmID 的权限
-	if !c.validPerm(ctx, fromUserID, fromFarmID, perm.FarmOwner) ||
-		!c.validPerm(ctx, toUserID, toFarmID, perm.FarmOwner) {
-		return errors.New("permission denied")
-	}
+// func (c *MinerRDB) Transfer(ctx context.Context, fromUserID, fromFarmID, MinerID, toUserID, toFarmID string) error {
+// 	// 检查 fromUserID 对 fromFarmID 的权限
+// 	// 检查 toUserID 对 toFarmID 的权限
+// 	if !c.validPerm(ctx, fromUserID, fromFarmID, perm.FarmOwner) ||
+// 		!c.validPerm(ctx, toUserID, toFarmID, perm.FarmOwner) {
+// 		return errors.New("permission denied")
+// 	}
 
-	pipe := utils.RDB.Client.TxPipeline()
+// 	pipe := utils.RDB.Client.TxPipeline()
 
-	// 删除原有关联
-	field := MakeField(FarmField, fromFarmID)
-	pipe.HDel(ctx, field, MinerID)
+// 	// 删除原有关联
+// 	field := MakeField(FarmField, fromFarmID)
+// 	pipe.HDel(ctx, field, MinerID)
 
-	// 建立新的关联
-	field = MakeField(FarmField, toFarmID)
-	miner, err := c.GetByID(ctx, fromFarmID, MinerID)
-	if err != nil {
-		return err
-	}
-	pipe.HSet(ctx, field, MinerID, miner)
+// 	// 建立新的关联
+// 	field = MakeField(FarmField, toFarmID)
+// 	miner, err := c.GetByID(ctx, fromFarmID, MinerID)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	pipe.HSet(ctx, field, MinerID, miner)
 
-	_, err = pipe.Exec(ctx)
+// 	_, err = pipe.Exec(ctx)
 
-	return err
-}
+// 	return err
+// }
 
 // 应用飞行表
 // +---------------------+------------+
@@ -119,7 +123,6 @@ func (c *MinerRDB) ApplyFs(ctx context.Context, farmID string, minerID string, f
 		return err
 	}
 	// 更新 miner
-	miner.FS = fsID
 	miner.HiveOsWallet.FsID = fsID
 
 	miner.HiveOsWallet.CustomMiner = softInfo.MinerName

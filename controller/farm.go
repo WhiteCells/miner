@@ -2,6 +2,7 @@ package controller
 
 import (
 	"miner/common/dto"
+	"miner/common/params"
 	"miner/common/rsp"
 	"miner/services"
 	"net/http"
@@ -88,23 +89,17 @@ func (c *FarmController) UpdateFarm(ctx *gin.Context) {
 
 // 获取用户所有的矿场
 func (c *FarmController) GetFarms(ctx *gin.Context) {
-	pageNum, err := strconv.Atoi(ctx.Query("page_num"))
-	if err != nil || pageNum <= 0 {
+	var params params.PageParams
+	if err := ctx.ShouldBindQuery(&params); err != nil {
 		rsp.Error(ctx, http.StatusBadRequest, "invalid parmas", nil)
 		return
 	}
-	pageSize, err := strconv.Atoi(ctx.Query("page_size"))
-	if err != nil || pageSize <= 0 {
-		rsp.Error(ctx, http.StatusBadRequest, "invalid params", nil)
-		return
-	}
 	query := map[string]any{
-		"page_num":  pageNum,
-		"page_size": pageSize,
+		"page_num":  params.PageNum,
+		"page_size": params.PageSize,
 	}
-	userID := ctx.GetInt("user_id")
 
-	farms, total, err := c.farmService.GetFarms(ctx, userID, query)
+	farms, total, err := c.farmService.GetFarms(ctx, query)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
@@ -114,9 +109,14 @@ func (c *FarmController) GetFarms(ctx *gin.Context) {
 }
 
 // 获取指定矿场
-func (c *FarmController) GetFarmByID(ctx *gin.Context) {
-	farmID := ctx.Param("farm_id")
-	farm, err := c.farmService.GetFarmByID(ctx, farmID)
+func (c *FarmController) GetFarmByFarmID(ctx *gin.Context) {
+	farmID, err := strconv.Atoi(ctx.Param("farm_id"))
+	if err != nil {
+		rsp.Error(ctx, http.StatusBadRequest, "invalid params", nil)
+		return
+	}
+
+	farm, err := c.farmService.GetFarmByFarmID(ctx, farmID)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
@@ -132,8 +132,10 @@ func (c *FarmController) ApplyFs(ctx *gin.Context) {
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
+	userID := ctx.GetInt("user_id")
 
-	if err := c.farmService.ApplyFs(ctx, &req); err != nil {
+	if err := c.farmService.ApplyFs(ctx, userID, req.FarmID, req.FsID); err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
 

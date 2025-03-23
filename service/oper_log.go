@@ -1,25 +1,25 @@
 package service
 
-import (
-	"miner/dao/mysql"
-)
+// import (
+// 	"miner/dao/mysql"
+// )
 
-type OperLogService struct {
-	operLogDAO *mysql.OperLogDAO
-}
-
-func NewOperLogService() *OperLogService {
-	return &OperLogService{
-		operLogDAO: mysql.NewOperLogDAO(),
-	}
-}
-
-// GetOperLogs 获取用户操作日志
-// func (s *OperLogService) GetOperLogs(ctx context.Context, query map[string]any) (*[]model.Operlog, int64, error) {
-// 	// 调用 DAO 层获取日志
-// 	logs, total, err := s.operLogDAO.GetOperLogs(query)
-// 	if err != nil {
-// 		return nil, -1, fmt.Errorf("failed to get oper logs: %w", err)
-// 	}
-// 	return logs, total, nil
+// type OperLogService struct {
+// 	operLogDAO *mysql.OperLogDAO
 // }
+
+// func NewOperLogService() *OperLogService {
+// 	return &OperLogService{
+// 		operLogDAO: mysql.NewOperLogDAO(),
+// 	}
+// }
+
+// // GetOperLogs 获取用户操作日志
+// // func (s *OperLogService) GetOperLogs(ctx context.Context, query map[string]any) (*[]model.Operlog, int64, error) {
+// // 	// 调用 DAO 层获取日志
+// // 	logs, total, err := s.operLogDAO.GetOperLogs(query)
+// // 	if err != nil {
+// // 		return nil, -1, fmt.Errorf("failed to get oper logs: %w", err)
+// // 	}
+// // 	return logs, total, nil
+// // }

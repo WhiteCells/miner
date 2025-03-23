@@ -12,3 +12,12 @@ type Farm struct {
 func (Farm) TableName() string {
 	return "farm"
 }
+
+func GetFarmallowChangeField() map[string]bool {
+	return map[string]bool{
+		"name":      true,
+		"coin_type": true,
+		"mine_pool": true,
+		"hash":      true,
+	}
+}

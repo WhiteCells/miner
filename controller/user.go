@@ -80,7 +80,7 @@ func (c *UserController) Logout(ctx *gin.Context) {
 // 	rsp.Success(ctx, http.StatusOK, "update passwd success", nil)
 // }
 
-// GetPointsBalance 获取积分余额
+// 获取积分余额
 func (c *UserController) GetPointsBalance(ctx *gin.Context) {
 	userID := ctx.GetInt("user_id")
 	balance, err := c.userService.GetUserPointsBalance(ctx, userID)
@@ -91,6 +91,7 @@ func (c *UserController) GetPointsBalance(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "get points balance success", balance)
 }
 
+// 获取用户充值地址
 func (c *UserController) GetUserAddress(ctx *gin.Context) {
 	userID := ctx.GetInt("user_id")
 	address, err := c.userService.GetUserAddress(ctx, userID)

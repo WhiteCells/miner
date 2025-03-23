@@ -78,8 +78,11 @@ func (dao *MinerDAO) DelMiner(ctx context.Context, userID, minerID int) error {
 }
 
 // 更新矿机
-func (dao *MinerDAO) UpdateMiner(ctx context.Context, miner *model.Miner) error {
-	return utils.DB.WithContext(ctx).Save(miner).Error
+func (dao *MinerDAO) UpdateMiner(ctx context.Context, userID, minerID int, updateInfo map[string]any) error {
+	return utils.DB.WithContext(ctx).
+		Model(&model.Miner{}).
+		Where("id=?", minerID).
+		Updates(updateInfo).Error
 }
 
 // 获取指定矿机
@@ -97,7 +100,34 @@ func (dao *MinerDAO) GetMinerByID(ctx context.Context, userID, minerID int) (*mo
 }
 
 // 获取指定矿场的所有矿机
-func (dao *MinerDAO) GetMiners(ctx context.Context, farmID int, query map[string]any) (*[]model.Miner, int64, error) {
+func (dao *MinerDAO) GetMinersByFarmID(ctx context.Context, farmID int, query map[string]any) (*[]model.Miner, int64, error) {
+	var miners []model.Miner
+	var total int64
+
+	pageNum := query["page_num"].(int)
+	pageSize := query["page_size"].(int)
+
+	if err := utils.DB.WithContext(ctx).
+		Model(&relation.FarmMiner{}).
+		Where("farm_id=?", farmID).
+		Count(&total).Error; err != nil {
+		return nil, -1, err
+	}
+
+	if err := utils.DB.WithContext(ctx).
+		Joins("JOIN farm_miner ON miner.id = farm_miner.miner_id").
+		Where("farm_miner.farm_id = ?", farmID).
+		Offset((pageNum - 1) * pageSize).
+		Limit(pageSize).
+		Find(&miners).Error; err != nil {
+		return nil, -1, err
+	}
+
+	return &miners, total, nil
+}
+
+// 获取所有矿机
+func (MinerDAO) GetMiners(ctx context.Context, query map[string]any) (*[]model.Miner, int64, error) {
 	var miners []model.Miner
 	var total int64
 
@@ -110,14 +140,14 @@ func (dao *MinerDAO) GetMiners(ctx context.Context, farmID int, query map[string
 		return nil, -1, err
 	}
 
-	err := utils.DB.WithContext(ctx).
-		Joins("JOIN farm_miner ON miner.id = farm_miner.miner_id").
-		Where("farm_miner.farm_id = ?", farmID).
+	if err := db.
 		Offset((pageNum - 1) * pageSize).
 		Limit(pageSize).
-		Find(&miners).Error
+		Find(&miners).Error; err != nil {
+		return nil, -1, err
+	}
 
-	return &miners, total, err
+	return &miners, total, nil
 }
 
 // 更新矿机状态
@@ -168,12 +198,12 @@ func (MinerDAO) UnApplyFs(ctx context.Context, minerID, fsID int) error {
 }
 
 // 转移
-func (dao *MinerDAO) Transfer(ctx context.Context, farmID, minerID, fromFarmID int, farmHash string) error {
+func (dao *MinerDAO) Transfer(ctx context.Context, fromFarmID, minerID int, toFarmHash string) error {
 	err := utils.DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		// 通过 Farm hash 找到矿场
 		var farm model.Farm
 		if err := tx.
-			Where("hash = ?", farmHash).
+			Where("hash = ?", toFarmHash).
 			First(&farm).Error; err != nil {
 			return err
 		}
@@ -187,4 +217,12 @@ func (dao *MinerDAO) Transfer(ctx context.Context, farmID, minerID, fromFarmID i
 		return nil
 	})
 	return err
+}
+
+func (MinerDAO) ExistsRigID(ctx context.Context, rigID string) bool {
+	var count int64
+	err := utils.DB.WithContext(ctx).
+		Model(&model.Miner{}).
+		Count(&count).Error
+	return err == nil
 }

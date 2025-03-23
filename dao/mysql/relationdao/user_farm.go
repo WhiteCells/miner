@@ -1,6 +1,7 @@
 package relationdao
 
 import (
+	"context"
 	"miner/common/perm"
 	"miner/model/relation"
 	"miner/utils"
@@ -13,7 +14,7 @@ func NewUserFarmDAO() *UserFarmDAO {
 	return &UserFarmDAO{}
 }
 
-func (UserFarmDAO) BindUserToFarm(userID int, farmID int, p perm.FarmPerm) error {
+func (UserFarmDAO) BindUserToFarm(ctx context.Context, userID int, farmID int, p perm.FarmPerm) error {
 	userFarm := relation.UserFarm{
 		UserID: userID,
 		FarmID: farmID,
@@ -22,13 +23,13 @@ func (UserFarmDAO) BindUserToFarm(userID int, farmID int, p perm.FarmPerm) error
 	return utils.DB.Create(userFarm).Error
 }
 
-func (UserFarmDAO) UnBindUserFromFarm(userID int, farmID int) error {
+func (UserFarmDAO) UnBindUserFromFarm(ctx context.Context, userID int, farmID int) error {
 	return utils.DB.
 		Where("user_id = ? AND farm_id = ?", userID, farmID).
 		Delete(&relation.UserFarm{}).Error
 }
 
-func (UserFarmDAO) GetPerm(userID int, farmID int) (perm.FarmPerm, error) {
+func (UserFarmDAO) GetPerm(ctx context.Context, userID int, farmID int) (perm.FarmPerm, error) {
 	var userFarm relation.UserFarm
 	err := utils.DB.
 		Where("user_id = ? AND farm_id = ?", userID, farmID).

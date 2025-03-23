@@ -9,26 +9,26 @@ import (
 )
 
 type HiveOsRoute struct {
-	hiveOsController *controller.HiveOsController
+	hiveosController *controller.HiveosController
 }
 
 func NewHiveosRoute() *HiveOsRoute {
 	return &HiveOsRoute{
-		hiveOsController: controller.NewHiveOsController(),
+		hiveosController: controller.NewHiveOsController(),
 	}
 }
 
-func (hr *HiveOsRoute) InitHiveosRoute(r *gin.Engine) {
+func (m *HiveOsRoute) InitHiveosRoute(r *gin.Engine) {
 	route := r.Group("")
 	{
-		route.POST("/worker/api", hr.hiveOsController.Poll)
+		route.POST("/worker/api", m.hiveosController.Poll)
 		route.Use(middleware.JWTAuth())
 		// route.Use(middleware.IPAuth())
 		route.Use(middleware.RoleAuth(role.User, role.Admin))
 		route.Use(middleware.StatusAuth())
-		route.POST("/task", hr.hiveOsController.PostTask)
-		route.GET("/task", hr.hiveOsController.GetTaskRes)
-		route.GET("/stats", hr.hiveOsController.GetMinerStats)
-		route.GET("/info", hr.hiveOsController.GetMinerInfo)
+		route.POST("/task", m.hiveosController.PostTask)
+		route.GET("/task", m.hiveosController.GetTaskRes)
+		route.GET("/stats", m.hiveosController.GetMinerStats)
+		route.GET("/info", m.hiveosController.GetMinerInfo)
 	}
 }

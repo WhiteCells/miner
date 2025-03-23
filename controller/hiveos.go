@@ -3,35 +3,35 @@ package controller
 import (
 	"miner/common/dto"
 	"miner/common/rsp"
-	"miner/service"
+	"miner/services"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
-type HiveOsController struct {
-	hiveOsService *service.HiveOsService
+type HiveosController struct {
+	hiveosService *services.HiveosService
 }
 
-func NewHiveOsController() *HiveOsController {
-	return &HiveOsController{
-		hiveOsService: service.NewHiveOsService(),
+func NewHiveOsController() *HiveosController {
+	return &HiveosController{
+		hiveosService: services.NewHiveosService(),
 	}
 }
 
 // 轮询
-func (c *HiveOsController) Poll(ctx *gin.Context) {
-	c.hiveOsService.Poll(ctx)
+func (m *HiveosController) Poll(ctx *gin.Context) {
+	m.hiveosService.Poll(ctx)
 }
 
 // 发送任务
-func (c *HiveOsController) PostTask(ctx *gin.Context) {
+func (c *HiveosController) PostTask(ctx *gin.Context) {
 	var req dto.PostTaskReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		rsp.Error(ctx, http.StatusBadRequest, "req fromat failed", err.Error())
 		return
 	}
-	taskID, err := c.hiveOsService.PostTask(ctx, &req)
+	taskID, err := c.hiveosService.PostTask(ctx, &req)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, "post task failed", err.Error())
 		return
@@ -40,9 +40,9 @@ func (c *HiveOsController) PostTask(ctx *gin.Context) {
 }
 
 // 获取命令结果
-func (c *HiveOsController) GetTaskRes(ctx *gin.Context) {
+func (c *HiveosController) GetTaskRes(ctx *gin.Context) {
 	taskID := ctx.Query("task_id")
-	task, err := c.hiveOsService.GetTaskRes(ctx, taskID)
+	task, err := c.hiveosService.GetTaskRes(ctx, taskID)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, "get task res failed", err.Error())
 		return
@@ -51,9 +51,9 @@ func (c *HiveOsController) GetTaskRes(ctx *gin.Context) {
 }
 
 // 获取状态
-func (c *HiveOsController) GetTaskStats(ctx *gin.Context) {
+func (c *HiveosController) GetTaskStats(ctx *gin.Context) {
 	taskID := ctx.Query("task_id")
-	taskStatus, err := c.hiveOsService.GetTaskStats(ctx, taskID)
+	taskStatus, err := c.hiveosService.GetTaskStats(ctx, taskID)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, "get task status failed", err.Error())
 		return
@@ -62,9 +62,9 @@ func (c *HiveOsController) GetTaskStats(ctx *gin.Context) {
 }
 
 // 获取矿机统计信息
-func (c *HiveOsController) GetMinerStats(ctx *gin.Context) {
+func (c *HiveosController) GetMinerStats(ctx *gin.Context) {
 	rigID := ctx.Query("rig_id")
-	stats, err := c.hiveOsService.GetMinerStats(ctx, rigID)
+	stats, err := c.hiveosService.GetMinerStats(ctx, rigID)
 	if err != nil {
 		if err.Error() == "redis: nil" {
 			rsp.Success(ctx, http.StatusOK, "get miner stats success", nil)
@@ -77,9 +77,9 @@ func (c *HiveOsController) GetMinerStats(ctx *gin.Context) {
 }
 
 // 获取矿机信息
-func (c *HiveOsController) GetMinerInfo(ctx *gin.Context) {
+func (c *HiveosController) GetMinerInfo(ctx *gin.Context) {
 	rigID := ctx.Query("rig_id")
-	info, err := c.hiveOsService.GetMinerInfo(ctx, rigID)
+	info, err := c.hiveosService.GetMinerInfo(ctx, rigID)
 	if err != nil {
 		if err.Error() == "redis: nil" {
 			rsp.Success(ctx, http.StatusOK, "get miner stats success", nil)

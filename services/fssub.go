@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"errors"
 	"miner/dao/mysql"
 	"miner/model"
 )
@@ -25,7 +26,17 @@ func (m *FssubService) DelFssub(ctx context.Context, fsID, fssubID int) error {
 }
 
 func (m *FssubService) UpdateFssub(ctx context.Context, fsID, fssubID int, updateInfo map[string]any) error {
-	return nil
+	allow := model.GetFssubAllowChangeField()
+	updates := make(map[string]any)
+	for key, val := range updateInfo {
+		if allow[key] {
+			updates[key] = val
+		}
+	}
+	if len(updates) == 0 {
+		return errors.New("no field update")
+	}
+	return m.fssubDAO.UpdateFssub(ctx, fssubID, updates)
 }
 
 func (m *FssubService) GetFssubByID(ctx context.Context, fssubID int) (*model.Fssub, error) {

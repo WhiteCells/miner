@@ -31,16 +31,11 @@ func (m *FarmService) DelFarm(ctx context.Context, userID, farmID int) error {
 }
 
 func (m *FarmService) UpdateFarm(ctx context.Context, userID, farmID int, updateInfo map[string]any) error {
-	var allowChangeField = map[string]bool{
-		"name":      true,
-		"coin_type": true,
-		"mine_pool": true,
-		"hash":      true,
-	}
+	allow := model.GetFarmallowChangeField()
 	updates := make(map[string]any)
-	for key, value := range updateInfo {
-		if allowChangeField[key] {
-			updates[key] = value
+	for key, val := range updateInfo {
+		if allow[key] {
+			updates[key] = val
 		}
 	}
 	if len(updates) == 0 {
@@ -49,12 +44,12 @@ func (m *FarmService) UpdateFarm(ctx context.Context, userID, farmID int, update
 	return m.farmDAO.UpdateFarm(ctx, userID, farmID, updates)
 }
 
-func (m *FarmService) GetFarmByID(ctx context.Context, farmID int) (*model.Farm, error) {
-	return m.farmDAO.GetFarmByID(ctx, farmID)
+func (m *FarmService) GetFarmByFarmID(ctx context.Context, farmID int) (*model.Farm, error) {
+	return m.farmDAO.GetFarmByFarmID(ctx, farmID)
 }
 
-func (m *FarmService) GetFarms(ctx context.Context, userID int, query map[string]any) (*[]model.Farm, int64, error) {
-	return m.farmDAO.GetFarms(ctx, userID, query)
+func (m *FarmService) GetFarms(ctx context.Context, query map[string]any) (*[]model.Farm, int64, error) {
+	return m.farmDAO.GetFarms(ctx, query)
 }
 
 func (m *FarmService) ApplyFs(ctx context.Context, userID int, farmID int, fsID int) error {

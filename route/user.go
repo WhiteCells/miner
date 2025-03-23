@@ -10,16 +10,16 @@ import (
 )
 
 type UserRoute struct {
-	userController         *controller.UserController
-	operLogController      *controller.OperLogController
-	pointsRecordController *controller.PointsRecordController
+	userController      *controller.UserController
+	operlogController   *controller.OperlogController
+	pointslogController *controller.PointslogController
 }
 
 func NewUserRoute() *UserRoute {
 	return &UserRoute{
-		userController:         controller.NewUserController(),
-		operLogController:      controller.NewOperLogController(),
-		pointsRecordController: controller.NewPointsRecordController(),
+		userController:      controller.NewUserController(),
+		operlogController:   controller.NewOperLogController(),
+		pointslogController: controller.NewPointsRecordController(),
 	}
 }
 
@@ -36,10 +36,9 @@ func (ur *UserRoute) InitUserRoute(r *gin.Engine) {
 	limiter := middleware.NewLimiter(1, time.Second)
 	{
 		route.POST("/logout", ur.userController.Logout)
-		// route.POST("/update_passwd", ur.userController.UpdatePasswd)
 		route.GET("/balance", limiter.Limit(), ur.userController.GetPointsBalance)
-		route.GET("/oper_logs", ur.operLogController.GetOperLogs)
-		route.GET("/points_records", ur.pointsRecordController.GetPointsRecords)
+		route.GET("/oper_logs", ur.operlogController.GetOperlogs)
+		route.GET("/points_records", ur.pointslogController.GetPointslogs)
 		route.GET("/address", ur.userController.GetUserAddress)
 		// coin
 		// route.GET("/coins", ur.userController.GetCoins)

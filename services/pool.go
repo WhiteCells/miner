@@ -16,6 +16,6 @@ func NewPoolService() *PoolService {
 	}
 }
 
-func (m *PoolService) CreatePool(ctx context.Context, userID int, pool *model.Pool) error {
-	return m.poolDAO.CreatePool(ctx, userID, pool)
+func (m *PoolService) CreatePool(ctx context.Context, coinID int, pool *model.Pool) error {
+	return m.poolDAO.CreatePool(ctx, coinID, pool)
 }

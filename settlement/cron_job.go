@@ -86,7 +86,7 @@ func processUserPoints(ctx context.Context, user *model.User) {
 	if user.LastCheckAt.Before(now.Add(-24*time.Hour)) ||
 		user.LastCheckAt.Before(time.Date(now.Year(), now.Month(), now.Day(), 12, 0, 0, 0, now.Location())) {
 
-		farms, err := farmDAO.GetFarms(ctx, user.ID)
+		farms, err := farmDAO.GetAllFarmsByUserID(ctx, user.ID)
 		if err != nil {
 			log := fmt.Sprintf("%d failed to get all farm", user.ID)
 			utils.Logger.Error(log)
@@ -95,7 +95,7 @@ func processUserPoints(ctx context.Context, user *model.User) {
 
 		gpuNum := 0
 		for _, farm := range *farms {
-			p, err := userFarmDAO.GetPerm(user.ID, farm.ID)
+			p, err := userFarmDAO.GetPerm(ctx, user.ID, farm.ID)
 			if err != nil {
 				continue
 			}

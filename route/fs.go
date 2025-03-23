@@ -28,7 +28,7 @@ func (fr *FsRoute) InitFsRoute(r *gin.Engine) {
 		route.POST("", fr.fsController.CreateFs)
 		route.DELETE("", fr.fsController.DeleteFs)
 		route.PUT("", fr.fsController.UpdateFs)
-		route.GET("", fr.fsController.GetAllFs)
+		route.GET("", fr.fsController.GetFss)
 		route.GET("/:fs_id", fr.fsController.GetFsByID)
 		// route.PUT("/apply_wallet", fr.fsController.ApplyWallet)
 	}

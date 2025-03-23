@@ -2,6 +2,7 @@ package controller
 
 import (
 	"miner/common/dto"
+	"miner/common/params"
 	"miner/common/rsp"
 	"miner/services"
 	"net/http"
@@ -12,30 +13,28 @@ import (
 
 type AdminController struct {
 	adminService *services.AdminService
+	minerService *services.MinerService
 }
 
 func NewAdminController() *AdminController {
 	return &AdminController{
 		adminService: services.NewAdminService(),
+		minerService: services.NewMinerService(),
 	}
 }
 
 // 获取所有用户
 func (c *AdminController) GetUsers(ctx *gin.Context) {
-	pageNum, err := strconv.Atoi(ctx.Query("page_num"))
-	if err != nil || pageNum <= 0 {
+	var params params.PageParams
+	if err := ctx.ShouldBindQuery(&params); err != nil {
 		rsp.Error(ctx, http.StatusBadRequest, "invalid parmas", nil)
 		return
 	}
-	pageSize, err := strconv.Atoi(ctx.Query("page_size"))
-	if err != nil || pageSize <= 0 {
-		rsp.Error(ctx, http.StatusBadRequest, "invalid params", nil)
-		return
-	}
 	query := map[string]any{
-		"page_num":  pageNum,
-		"page_size": pageSize,
+		"page_num":  params.PageNum,
+		"page_size": params.PageSize,
 	}
+
 	users, total, err := c.adminService.GetUsers(ctx, query)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
@@ -47,19 +46,14 @@ func (c *AdminController) GetUsers(ctx *gin.Context) {
 
 // 获取所有用户操作日志
 func (c *AdminController) GetUserOperlogs(ctx *gin.Context) {
-	pageNum, err := strconv.Atoi(ctx.Query("page_num"))
-	if err != nil || pageNum <= 0 {
+	var params params.PageParams
+	if err := ctx.ShouldBindQuery(&params); err != nil {
 		rsp.Error(ctx, http.StatusBadRequest, "invalid parmas", nil)
 		return
 	}
-	pageSize, err := strconv.Atoi(ctx.Query("page_size"))
-	if err != nil || pageSize <= 0 {
-		rsp.Error(ctx, http.StatusBadRequest, "invalid params", nil)
-		return
-	}
 	query := map[string]any{
-		"page_num":  pageNum,
-		"page_size": pageSize,
+		"page_num":  params.PageNum,
+		"page_size": params.PageSize,
 	}
 
 	users, total, err := c.adminService.GetUserOperlogs(ctx, query)
@@ -73,19 +67,14 @@ func (c *AdminController) GetUserOperlogs(ctx *gin.Context) {
 
 // 获取用户登陆日志
 func (c *AdminController) GetUserLoginlogs(ctx *gin.Context) {
-	pageNum, err := strconv.Atoi(ctx.Query("page_num"))
-	if err != nil || pageNum <= 0 {
+	var params params.PageParams
+	if err := ctx.ShouldBindQuery(&params); err != nil {
 		rsp.Error(ctx, http.StatusBadRequest, "invalid parmas", nil)
 		return
 	}
-	pageSize, err := strconv.Atoi(ctx.Query("page_size"))
-	if err != nil || pageSize <= 0 {
-		rsp.Error(ctx, http.StatusBadRequest, "invalid params", nil)
-		return
-	}
 	query := map[string]any{
-		"page_num":  pageNum,
-		"page_size": pageSize,
+		"page_num":  params.PageNum,
+		"page_size": params.PageSize,
 	}
 
 	users, total, err := c.adminService.GetUserLoginlogs(ctx, query)
@@ -99,19 +88,14 @@ func (c *AdminController) GetUserLoginlogs(ctx *gin.Context) {
 
 // 获取用户的积分记录
 func (c *AdminController) GetUserPointslogs(ctx *gin.Context) {
-	pageNum, err := strconv.Atoi(ctx.Query("page_num"))
-	if err != nil || pageNum <= 0 {
+	var params params.PageParams
+	if err := ctx.ShouldBindQuery(&params); err != nil {
 		rsp.Error(ctx, http.StatusBadRequest, "invalid parmas", nil)
 		return
 	}
-	pageSize, err := strconv.Atoi(ctx.Query("page_size"))
-	if err != nil || pageSize <= 0 {
-		rsp.Error(ctx, http.StatusBadRequest, "invalid params", nil)
-		return
-	}
 	query := map[string]any{
-		"page_num":  pageNum,
-		"page_size": pageSize,
+		"page_num":  params.PageNum,
+		"page_size": params.PageSize,
 	}
 
 	users, total, err := c.adminService.GetUserPointslogs(ctx, query)
@@ -124,24 +108,18 @@ func (c *AdminController) GetUserPointslogs(ctx *gin.Context) {
 }
 
 // 获取用户的所有矿场
-func (c *AdminController) GetUserFarms(ctx *gin.Context) {
-	pageNum, err := strconv.Atoi(ctx.Query("page_num"))
-	if err != nil || pageNum <= 0 {
-		rsp.Error(ctx, http.StatusBadRequest, "invalid parmas", nil)
-		return
-	}
-	pageSize, err := strconv.Atoi(ctx.Query("page_size"))
-	if err != nil || pageSize <= 0 {
+func (c *AdminController) GetFarms(ctx *gin.Context) {
+	var params params.PageParams
+	if err := ctx.ShouldBindQuery(&params); err != nil {
 		rsp.Error(ctx, http.StatusBadRequest, "invalid parmas", nil)
 		return
 	}
 	query := map[string]any{
-		"page_num":  pageNum,
-		"page_size": pageSize,
+		"page_num":  params.PageNum,
+		"page_size": params.PageSize,
 	}
 
-	userID := ctx.GetInt("user_id")
-	farms, total, err := c.adminService.GetUserFarms(ctx, userID, query)
+	farms, total, err := c.adminService.GetFarms(ctx, query)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
@@ -150,24 +128,46 @@ func (c *AdminController) GetUserFarms(ctx *gin.Context) {
 	rsp.DBQuerySuccess(ctx, http.StatusOK, "admin get user farms success", farms, total)
 }
 
-// 获取用户的所有矿机
-func (c *AdminController) GetUserMiners(ctx *gin.Context) {
-	pageNum, err := strconv.Atoi(ctx.Query("page_num"))
-	if err != nil || pageNum <= 0 {
-		rsp.Error(ctx, http.StatusBadRequest, "invalid parmas", nil)
-		return
-	}
-	pageSize, err := strconv.Atoi(ctx.Query("page_size"))
-	if err != nil || pageSize <= 0 {
+// 获取矿场下矿机
+func (m *AdminController) GetMinersByFarmID(ctx *gin.Context) {
+	var params params.PageParams
+	if err := ctx.ShouldBindQuery(&params); err != nil {
 		rsp.Error(ctx, http.StatusBadRequest, "invalid parmas", nil)
 		return
 	}
 	query := map[string]any{
-		"page_num":  pageNum,
-		"page_size": pageSize,
+		"page_num":  params.PageNum,
+		"page_size": params.PageSize,
 	}
 
-	miners, total, err := c.adminService.GetUserMiners(ctx, query)
+	farmID, err := strconv.Atoi(ctx.Param("farm_id"))
+	if err != nil {
+		rsp.Error(ctx, http.StatusBadRequest, "invalid parmas", nil)
+		return
+	}
+
+	miners, total, err := m.minerService.GetMinersByFarmID(ctx, farmID, query)
+	if err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
+		return
+	}
+
+	rsp.DBQuerySuccess(ctx, http.StatusOK, "admin get miners success", miners, total)
+}
+
+// 获取所有矿机
+func (m *AdminController) GetMiners(ctx *gin.Context) {
+	var params params.PageParams
+	if err := ctx.ShouldBindQuery(&params); err != nil {
+		rsp.Error(ctx, http.StatusBadRequest, "invalid parmas", nil)
+		return
+	}
+	query := map[string]any{
+		"page_num":  params.PageNum,
+		"page_size": params.PageSize,
+	}
+
+	miners, total, err := m.minerService.GetMiners(ctx, query)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return

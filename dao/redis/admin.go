@@ -56,9 +56,9 @@ func (c *AdminRDB) GetUserFarms(ctx context.Context, userID string) (*[]info.Far
 }
 
 // 获取指定用户的所有矿机
-func (c *AdminRDB) GetUserMiners(ctx context.Context, farmID string) (*[]info.Miner, error) {
-	return c.minerRDB.GetAll(ctx, farmID)
-}
+// func (c *AdminRDB) GetUserMiners(ctx context.Context, farmID string) (*[]info.Miner, error) {
+// 	return c.minerRDB.GetAll(ctx, farmID)
+// }
 
 // +-----------------------+------+
 // | key                   | val  |

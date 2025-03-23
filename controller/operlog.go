@@ -1,10 +1,10 @@
 package controller
 
 import (
+	"miner/common/params"
 	"miner/common/rsp"
 	"miner/services"
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -19,59 +19,41 @@ func NewOperLogController() *OperlogController {
 	}
 }
 
-// GetOperLogs 获取用户日志
-func (m *OperlogController) GetOperLogs(ctx *gin.Context) {
-	userID, exists := ctx.Value("user_id").(string)
-	if !exists {
-		rsp.Error(ctx, http.StatusBadRequest, "invalid user_id in context", nil)
+// 获取用户操作日志
+func (m *OperlogController) GetOperlogs(ctx *gin.Context) {
+	var params params.PageParams
+	if err := ctx.ShouldBindQuery(&params); err != nil {
+		rsp.Error(ctx, http.StatusBadRequest, "invalid parmas", nil)
 		return
 	}
-
-	// action
-	// action := ctx.Query("action")
-
-	// 解析时间字符串为 time.Time 类型
-	// startTimeStr := ctx.Query("start_time")
-	// endTimeStr := ctx.Query("end_time")
-	// var startTime, endTime time.Time
-	// var err error
-	// if startTimeStr != "" {
-	// 	startTime, err = time.Parse(time.RFC3339, startTimeStr)
-	// 	if err != nil {
-	// 		rsp.Error(ctx, http.StatusBadRequest, "invalid start_time format", nil)
-	// 		return
-	// 	}
-	// }
-	// if endTimeStr != "" {
-	// 	endTime, err = time.Parse(time.RFC3339, endTimeStr)
-	// 	if err != nil {
-	// 		rsp.Error(ctx, http.StatusBadRequest, "invalid end_time format", nil)
-	// 		return
-	// 	}
-	// }
-
-	// 分页参数解析
-	pageNum, err := strconv.Atoi(ctx.Query("page_num"))
-	if err != nil || pageNum <= 0 {
-		rsp.Error(ctx, http.StatusBadRequest, "invalid page_numt", nil)
-		return
-	}
-	pageSize, err := strconv.Atoi(ctx.Query("page_size"))
-	if err != nil || pageSize <= 0 {
-		rsp.Error(ctx, http.StatusBadRequest, "invalid page_size", nil)
-		return
-	}
-
 	query := map[string]any{
-		"user_id": userID,
-		// "action":  action,
-		// "start_time": startTime,
-		// "end_time":   endTime,
-		"page_num":  pageNum,
-		"page_size": pageSize,
+		"page_num":  params.PageNum,
+		"page_size": params.PageSize,
 	}
 
 	logs, total, err := m.operlogService.GetOperlogs(ctx, query)
+	if err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
+		return
+	}
+
+	rsp.DBQuerySuccess(ctx, http.StatusOK, "get oper logs success", logs, total)
+}
+
+// 获取指定用户日志
+func (m *OperlogController) GetOperlogByUserID(ctx *gin.Context) {
+	var params params.PageParams
+	if err := ctx.ShouldBindQuery(&params); err != nil {
+		rsp.Error(ctx, http.StatusBadRequest, "invalid parmas", nil)
+		return
+	}
+	query := map[string]any{
+		"page_num":  params.PageNum,
+		"page_size": params.PageSize,
+	}
+	userID := ctx.GetInt("user_id")
+
+	logs, total, err := m.operlogService.GetOperlogByID(ctx, userID, query)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return

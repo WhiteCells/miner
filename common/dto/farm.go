@@ -14,14 +14,9 @@ type UpdateFarmReq struct {
 	UpdateInfo map[string]any `json:"update_info" binding:"required"`
 }
 
-type UpdateFarmHashReq struct {
-	FarmID string `json:"farm_id" binding:"required"`
-	Hash   string `json:"hash" binding:"required,len=40"`
-}
-
 type ApplyFarmFsReq struct {
-	FarmID string `json:"farm_id" binding:"required"`
-	FsID   string `json:"fs_id" binding:"required"`
+	FarmID int `json:"farm_id" binding:"required"`
+	FsID   int `json:"fs_id" binding:"required"`
 }
 
 type TransferFarmReq struct {

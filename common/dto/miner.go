@@ -3,13 +3,13 @@ package dto
 import "miner/utils"
 
 type CreateMinerReq struct {
-	FarmID string `json:"farm_id" binding:"required,min=1,max=20"`
+	FarmID int    `json:"farm_id" binding:"required,min=1,max=20"`
 	Name   string `json:"name" binding:"required,min=1,max=20"`
 }
 
-type DeleteMinerReq struct {
-	FarmID  string `json:"farm_id" binding:"required"`
-	MinerID string `json:"miner_id" binding:"required"`
+type DelMinerReq struct {
+	FarmID  int `json:"farm_id" binding:"required"`
+	MinerID int `json:"miner_id" binding:"required"`
 }
 
 /*
@@ -74,63 +74,62 @@ update_info
 	HiveOsAutoFan utils.HiveOsAutoFan `json:"hive_os_auto_fan"`
 */
 type UpdateMinerReq struct {
-	FarmID     string         `json:"farm_id" binding:"required"`
-	MinerID    string         `json:"miner_id" binding:"required"`
+	FarmID     int            `json:"farm_id" binding:"required"`
+	MinerID    int            `json:"miner_id" binding:"required"`
 	UpdateInfo map[string]any `json:"update_info" binding:"required"`
 }
 
 type UpdateMinerWatchdogReq struct {
-	FarmID   string         `json:"farm_id"`
-	MinerID  string         `json:"miner_id"`
+	FarmID   int            `json:"farm_id"`
+	MinerID  int            `json:"miner_id"`
 	Watchdog map[string]any `json:"watchdog"`
 }
 
 type UpdateMinerOptionsReq struct {
-	FarmID  string         `json:"farm_id"`
-	MinerID string         `json:"miner_id"`
+	FarmID  int            `json:"farm_id"`
+	MinerID int            `json:"miner_id"`
 	Options map[string]any `json:"options"`
 }
 
 type UpdateMinerWalletReq struct {
-	FarmID  string         `json:"farm_id"`
-	MinerID string         `json:"miner_id"`
+	FarmID  int            `json:"farm_id"`
+	MinerID int            `json:"miner_id"`
 	Wallet  map[string]any `json:"wallet"`
 }
 
 type UpdateMinerAutofanReq struct {
-	FarmID  string         `json:"farm_id"`
-	MinerID string         `json:"miner_id"`
+	FarmID  int            `json:"farm_id"`
+	MinerID int            `json:"miner_id"`
 	Autofan map[string]any `json:"autofan"`
 }
 
 type ApplyMinerFsReq struct {
-	FarmID   string `json:"farm_id" binding:"required"`
-	MinerID  string `json:"miner_id" binding:"required"`
-	FsID     string `json:"fs_id" binding:"required"`
+	FarmID   int    `json:"farm_id" binding:"required"`
+	MinerID  int    `json:"miner_id" binding:"required"`
+	FsID     int    `json:"fs_id" binding:"required"`
 	SoftName string `json:"soft_name" binding:"required"`
 }
 
 type TransferMinerReq struct {
-	FromFarmID string `json:"from_farm_id" binding:"required"`
-	MinerID    string `json:"from_miner_id" binding:"required"`
-	ToUserID   string `json:"to_user_id" binding:"required"`
-	ToFarmID   string `json:"to_farm_id" binding:"required"`
+	FromFarmID int    `json:"from_farm_id" binding:"required"`
+	MinerID    int    `json:"from_miner_id" binding:"required"`
+	ToFarmHash string `json:"to_farm_hash" binding:"required"`
 }
 
 type SetWatchdogReq struct {
-	FarmID   string         `json:"farm_id"`
-	MinerID  string         `json:"miner_id"`
+	FarmID   int            `json:"farm_id"`
+	MinerID  int            `json:"miner_id"`
 	Watchdog utils.Watchdog `json:"watchdog"`
 }
 
 type SetAutoFanReq struct {
-	FarmID  string              `json:"farm_id"`
-	MinerID string              `json:"miner_id"`
+	FarmID  int                 `json:"farm_id"`
+	MinerID int                 `json:"miner_id"`
 	AutoFan utils.HiveOsAutoFan `json:"autofan"`
 }
 
 type SetOptionsReq struct {
-	FarmID  string        `json:"farm_id"`
-	MinerID string        `json:"miner_id"`
+	FarmID  int           `json:"farm_id"`
+	MinerID int           `json:"miner_id"`
 	Options utils.Options `json:"options"`
 }

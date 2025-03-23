@@ -16,7 +16,7 @@ func NewPointslogService() *PointslogService {
 	}
 }
 
-func (m *PointslogService) GetPointslogByID(ctx context.Context, userID int, query map[string]any) (*[]model.Pointslog, int64, error) {
+func (m *PointslogService) GetPointslogByUserID(ctx context.Context, userID int, query map[string]any) (*[]model.Pointslog, int64, error) {
 	return m.pointslogDAO.GetPointslogByID(ctx, userID, query)
 }
 

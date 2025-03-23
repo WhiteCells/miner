@@ -1,8 +1,10 @@
 package relationdao
 
-type FarmMiner struct {
+type FarmMinerDAO struct {
 }
 
-func NewFarmMiner() *FarmMiner {
-	return &FarmMiner{}
+func NewFarmMinerDAO() *FarmMinerDAO {
+	return &FarmMinerDAO{}
 }
+
+// func (FarmMinerDAO) GetPerm(ctx context.Context, farmID, minerID int) perm.Perm

@@ -15,16 +15,6 @@ func NewFarmDAO() *FarmDAO {
 	return &FarmDAO{}
 }
 
-var allowChangeField = map[string]bool{
-	"name":      true,
-	"time_zone": true,
-	"hash":      true,
-}
-
-func (FarmDAO) AllowChangeField() map[string]bool {
-	return allowChangeField
-}
-
 // 创建矿场
 func (FarmDAO) CreateFarm(ctx context.Context, farm *model.Farm, userID int) error {
 	return utils.DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
@@ -64,39 +54,67 @@ func (FarmDAO) DelFarmByID(ctx context.Context, userID, farmID int) error {
 }
 
 // 更新矿场信息
-func (FarmDAO) UpdateFarm(ctx context.Context, userID, farmID int, updateInfo map[string]any) error {
+func (FarmDAO) UpdateFarm(ctx context.Context, userID, farmID int, updates map[string]any) error {
 	return utils.DB.WithContext(ctx).
 		Model(&model.Farm{}).
 		Where("id=?", farmID).
-		Updates(updateInfo).Error
+		Updates(updates).Error
 }
 
-// 获取用户的矿场
-func (FarmDAO) GetFarms(ctx context.Context, userID int, query map[string]any) (*[]model.Farm, int64, error) {
+// 获取所有矿场
+func (FarmDAO) GetFarms(ctx context.Context, query map[string]any) (*[]model.Farm, int64, error) {
 	var farms []model.Farm
 	var total int64
 
 	pageNum := query["page_num"].(int)
 	pageSize := query["page_size"].(int)
 
-	// 查询总数
-	if err := utils.DB.WithContext(ctx).Model(relation.UserFarm{}).Where("user_id = ?", userID).Count(&total).Error; err != nil {
+	db := utils.DB.WithContext(ctx).Where(&model.Farm{})
+
+	if err := db.
+		Count(&total).Error; err != nil {
 		return nil, -1, err
 	}
 
-	// 分页查询
-	err := utils.DB.WithContext(ctx).
+	if err := db.
+		Offset((pageNum - 1) * pageSize).
+		Limit(pageSize).
+		Find(&farms).Error; err != nil {
+		return nil, -1, err
+	}
+
+	return &farms, total, nil
+}
+
+// 获取用户的矿场
+func (FarmDAO) GetFarmsByUserID(ctx context.Context, userID int, query map[string]any) (*[]model.Farm, int64, error) {
+	var farms []model.Farm
+	var total int64
+
+	pageNum := query["page_num"].(int)
+	pageSize := query["page_size"].(int)
+
+	if err := utils.DB.WithContext(ctx).
+		Model(relation.UserFarm{}).
+		Where("user_id = ?", userID).
+		Count(&total).Error; err != nil {
+		return nil, -1, err
+	}
+
+	if err := utils.DB.WithContext(ctx).
 		Joins("JOIN user_farm ON farm.id = user_farm.farm_id").
 		Where("user_farm.user_id = ?", userID).
 		Offset((pageNum - 1) * pageSize).
 		Limit(pageSize).
-		Find(&farms).Error
+		Find(&farms).Error; err != nil {
+		return nil, -1, err
+	}
 
-	return &farms, total, err
+	return &farms, total, nil
 }
 
 // 获取指定矿场
-func (FarmDAO) GetFarmByID(ctx context.Context, farmID int) (*model.Farm, error) {
+func (FarmDAO) GetFarmByFarmID(ctx context.Context, farmID int) (*model.Farm, error) {
 	var farm model.Farm
 	err := utils.DB.WithContext(ctx).First(&farm, farmID).Error
 	return &farm, err
@@ -104,7 +122,12 @@ func (FarmDAO) GetFarmByID(ctx context.Context, farmID int) (*model.Farm, error)
 
 // 获取所有矿场
 func (FarmDAO) GetAllFarmsByUserID(ctx context.Context, userID int) (*[]model.Farm, error) {
-	return nil, nil
+	var farms []model.Farm
+	err := utils.DB.WithContext(ctx).
+		Model(&model.Farm{}).
+		Joins("JOIN user_farm ON user_farm.farm_id=farm").
+		Where("user_farm.user_id=?", userID).Error
+	return &farms, err
 }
 
 // 矿场应用飞行表

@@ -48,11 +48,11 @@ func (FssubDAO) DelFssub(ctx context.Context, fsID, fssubID int) error {
 	})
 }
 
-func (FssubDAO) UpdateFssub(ctx context.Context, fssubID int, fssub *model.Fssub) error {
+func (FssubDAO) UpdateFssub(ctx context.Context, fssubID int, updateInfo map[string]any) error {
 	return utils.DB.WithContext(ctx).
 		Model(&model.Fssub{}).
-		Where("fssub_id=?", fssubID).
-		Updates(fssub).Error
+		Where("id=?", fssubID).
+		Updates(updateInfo).Error
 }
 
 func (FssubDAO) GetFssubByID(ctx context.Context, fssubID int) (*model.Fssub, error) {
@@ -85,4 +85,19 @@ func (FssubDAO) GetFssubByFsID(ctx context.Context, fsID int, query map[string]a
 		Find(&fssubs).
 		Error
 	return &fssubs, total, err
+}
+
+// update
+func (FssubDAO) ApplyCoin(ctx context.Context, fssubID int, coinID int) error {
+	return utils.DB.WithContext(ctx).
+		Model(&model.Fssub{}).
+		Where("id=?", fssubID).
+		Update("coin_id", coinID).Error
+}
+
+func (FssubDAO) ApplyWallet(ctx context.Context, fssubID int, walletID int) error {
+	return utils.DB.WithContext(ctx).
+		Model(&model.Fssub{}).
+		Where("id=?", fssubID).
+		Update("coin_id", walletID).Error
 }

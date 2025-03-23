@@ -2,7 +2,6 @@ package mysql
 
 import (
 	"context"
-	"errors"
 	"miner/model"
 	"miner/model/relation"
 	"miner/utils"
@@ -17,18 +16,29 @@ func NewFsDAO() *FsDAO {
 }
 
 // 创建飞行表
-func (FsDAO) CreateFs(ctx context.Context, userID int, fs *model.Fs) error {
+func (FsDAO) CreateFs(ctx context.Context, userID int, fs *model.Fs, fssubIDs []int) error {
 	err := utils.DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		// 创建 fs
+		// fs
 		if err := tx.Create(fs).Error; err != nil {
 			return err
 		}
-		// 建立 user-fs 联系
+		// user-fs
 		userFs := &relation.UserFs{
 			UserID: userID,
 			FsID:   fs.ID,
 		}
 		if err := tx.Create(userFs).Error; err != nil {
+			return err
+		}
+		// fs-fssub
+		var fsFssubs []relation.FsFssub
+		for _, fssubID := range fssubIDs {
+			fsFssubs = append(fsFssubs, relation.FsFssub{
+				FsID:    fs.ID,
+				FssubID: fssubID,
+			})
+		}
+		if err := tx.Create(&fsFssubs).Error; err != nil {
 			return err
 		}
 		return nil
@@ -61,26 +71,28 @@ func (FsDAO) DelFs(ctx context.Context, userID int, fsID int) error {
 }
 
 // 更新飞行表
-func (FsDAO) UpdateFs(ctx context.Context, fsID int, fs *model.Fs) error {
-	return utils.DB.WithContext(ctx).Model(&model.Fs{}).Where("id=?", fsID).Updates(fs).Error
+func (FsDAO) UpdateFs(ctx context.Context, fsID int, updates map[string]any) error {
+	return utils.DB.WithContext(ctx).
+		Model(&model.Fs{}).
+		Where("id=?", fsID).
+		Updates(updates).Error
 }
 
 // 获取指定飞行表
-func (FsDAO) GetFsByID(ctx context.Context, fsID int) (*model.Fs, error) {
+func (FsDAO) GetFsByFsID(ctx context.Context, fsID int) (*model.Fs, error) {
 	var fs model.Fs
 	err := utils.DB.WithContext(ctx).First(&fs, fsID).Error
 	return &fs, err
 }
 
-// 获取所有飞行表
-func (FsDAO) GetFss(ctx context.Context, userID int, query map[string]any) (*[]model.Fs, int64, error) {
+// 获取指定用户指定飞行表
+func (FsDAO) GetFsByUserID(ctx context.Context, userID int, query map[string]any) (*[]model.Fs, int64, error) {
 	var fss []model.Fs
 	var total int64
 
 	pageNum := query["page_num"].(int)
 	pageSize := query["page_size"].(int)
 
-	// 获取总数
 	if err := utils.DB.WithContext(ctx).
 		Model(relation.UserFs{}).
 		Where("user_id = ?", userID).
@@ -88,14 +100,43 @@ func (FsDAO) GetFss(ctx context.Context, userID int, query map[string]any) (*[]m
 		return nil, -1, err
 	}
 
-	err := utils.DB.WithContext(ctx).
+	if err := utils.DB.WithContext(ctx).
 		Joins("JOIN user_fs ON user_fs.user_id=user.id").
 		Where("user_fs.user_id=?", userID).
 		Offset((pageNum - 1) * pageSize).
 		Limit(pageSize).
 		Find(&fss).
-		Error
-	return &fss, total, err
+		Error; err != nil {
+		return nil, -1, err
+	}
+
+	return &fss, total, nil
+}
+
+// 获取所有飞行表
+func (FsDAO) GetFss(ctx context.Context, query map[string]any) (*[]model.Fs, int64, error) {
+	var fss []model.Fs
+	var total int64
+
+	pageNum := query["page_num"].(int)
+	pageSize := query["page_size"].(int)
+
+	db := utils.DB.WithContext(ctx).Model(&model.Fs{})
+
+	if err := db.
+		Count(&total).Error; err != nil {
+		return nil, -1, err
+	}
+
+	if err := db.
+		Offset((pageNum - 1) * pageSize).
+		Limit(pageSize).
+		Find(&fss).
+		Error; err != nil {
+		return nil, -1, err
+	}
+
+	return &fss, total, nil
 }
 
 // 矿机应用飞行表
@@ -120,34 +161,31 @@ func (FsDAO) ApplyFsToMiner(ctx context.Context, fsID int, minerID int) error {
 }
 
 // 飞行表应用钱包
-func (FsDAO) ApplyWallet(ctx context.Context, fsID int, walletID int) error {
-	return utils.DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		// 检查飞行表币种和钱包币种是否一致
-		var fs model.Fs
-		if err := tx.First(&fs, fsID).Error; err != nil {
-			return err
-		}
-		var wallet model.Wallet
-		if err := tx.First(&wallet, walletID).Error; err != nil {
-			return err
-		}
-		if fs.CoinType != wallet.CoinType {
-			return errors.New("coin type inconsistent")
-		}
-		// 删除原有 Fs-wallet 联系
-		if err := tx.Model(&relation.FsWallet{}).
-			Where("Fs_id = ? AND wallet_id = ?", fsID, walletID).
-			Delete(&relation.FsWallet{}).Error; err != nil {
-			return err
-		}
-		// 建立新的 Fs-wallet 联系
-		FsWallet := &relation.FsWallet{
-			FsID:     fsID,
-			WalletID: walletID,
-		}
-		if err := tx.Create(&FsWallet).Error; err != nil {
-			return err
-		}
-		return nil
-	})
-}
+// func (FsDAO) ApplyWallet(ctx context.Context, fsID int, walletID int) error {
+// 	return utils.DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+// 		// 检查飞行表币种和钱包币种是否一致
+// 		var fs model.Fs
+// 		if err := tx.First(&fs, fsID).Error; err != nil {
+// 			return err
+// 		}
+// 		var wallet model.Wallet
+// 		if err := tx.First(&wallet, walletID).Error; err != nil {
+// 			return err
+// 		}
+// 		// 删除原有 Fs-wallet 联系
+// 		if err := tx.Model(&relation.FsWallet{}).
+// 			Where("Fs_id = ? AND wallet_id = ?", fsID, walletID).
+// 			Delete(&relation.FsWallet{}).Error; err != nil {
+// 			return err
+// 		}
+// 		// 建立新的 Fs-wallet 联系
+// 		FsWallet := &relation.FsWallet{
+// 			FsID:     fsID,
+// 			WalletID: walletID,
+// 		}
+// 		if err := tx.Create(&FsWallet).Error; err != nil {
+// 			return err
+// 		}
+// 		return nil
+// 	})
+// }
