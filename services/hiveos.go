@@ -20,7 +20,9 @@ import (
 )
 
 type HiveosService struct {
+	minerDAO     *mysql.MinerDAO
 	hiveosRDB    *redis.HiveOsRDB
+	farmDAO      *mysql.FarmDAO
 	farmRDB      *redis.FarmRDB
 	minerRDB     *redis.MinerRDB
 	taskRDB      *redis.TaskRDB
@@ -30,7 +32,9 @@ type HiveosService struct {
 
 func NewHiveosService() *HiveosService {
 	return &HiveosService{
+		minerDAO:     mysql.NewMinerDAO(),
 		hiveosRDB:    redis.NewHiveOsRDB(),
+		farmDAO:      mysql.NewFarmDAO(),
 		farmRDB:      redis.NewFarmRDB(),
 		minerRDB:     redis.NewMinerRDB(),
 		taskRDB:      redis.NewTaskRDB(),
@@ -67,23 +71,16 @@ func (m *HiveosService) helloCase(ctx *gin.Context, rigID string) {
 	}
 	m.formatOutput(&req)
 
-	// 从 req 中获取 rigID，根据 rigID 查询 hiveOsRDB farmID:minerID
-	userID, farmID, minerID, err := m.hiveosDAO.GetRigFarmAndMinerID(ctx, rigID)
+	miner, err := m.minerRDB.GetMinerByRigID(ctx, rigID)
 	if err != nil {
 		log.Println(rigID, "hiveosRDB.GetRigFarmAndMinerID")
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), "")
 		return
 	}
-	// 通过 farmID 和 minerID 获取 miner
-	miner, err := m.minerRDB.GetByID(ctx, farmID, minerID)
-	if err != nil {
-		log.Println(farmID, minerID, "minerRDB.GetByID")
-		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), "")
-		return
-	}
+
 	// 验证密码
-	if req.Params.Passwd != miner.Pass {
-		log.Println(req.Params.Passwd, miner.Pass, "req.Params.Passwd")
+	if req.Params.Passwd != miner.HiveOsConfig.RigPasswd {
+		log.Println(req.Params.Passwd, miner.HiveOsConfig.RigPasswd, "req.Params.Passwd")
 		rsp.Error(ctx, http.StatusInternalServerError, "invalid pass", "")
 		return
 	}
@@ -98,6 +95,7 @@ func (m *HiveosService) helloCase(ctx *gin.Context, rigID string) {
 	miner.GpuNum = len(req.Params.Gpu)
 
 	// 更新 farm GpuNum
+	farm, err := m.farmDAO.GetFarmByFarmID(ctx, farmID)
 	farm, err := m.farmRDB.GetByID(ctx, userID, farmID)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, "get farm failed", "")
@@ -157,7 +155,7 @@ func (m *HiveosService) helloCaseUseHash(ctx *gin.Context) {
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), "")
 		return
 	}
-	miner, err := m.minerService.CreateMiner(ctx, userID, farmID, req.Params.Mb.Bios)
+	err = m.minerService.CreateMiner(ctx, userID, farmID, req.Params.Mb.Bios)
 	if err != nil {
 		utils.Logger.Error("helloCaseUseHash CreateMinerByUserID, error" + err.Error())
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), "")

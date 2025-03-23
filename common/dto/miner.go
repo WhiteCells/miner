@@ -82,25 +82,25 @@ type UpdateMinerReq struct {
 type UpdateMinerWatchdogReq struct {
 	FarmID   int            `json:"farm_id"`
 	MinerID  int            `json:"miner_id"`
-	Watchdog map[string]any `json:"watchdog"`
+	Watchdog utils.Watchdog `json:"watchdog"`
 }
 
 type UpdateMinerOptionsReq struct {
-	FarmID  int            `json:"farm_id"`
-	MinerID int            `json:"miner_id"`
-	Options map[string]any `json:"options"`
+	FarmID  int           `json:"farm_id"`
+	MinerID int           `json:"miner_id"`
+	Options utils.Options `json:"options"`
 }
 
 type UpdateMinerWalletReq struct {
-	FarmID  int            `json:"farm_id"`
-	MinerID int            `json:"miner_id"`
-	Wallet  map[string]any `json:"wallet"`
+	FarmID  int                `json:"farm_id"`
+	MinerID int                `json:"miner_id"`
+	Wallet  utils.HiveOsWallet `json:"wallet"`
 }
 
 type UpdateMinerAutofanReq struct {
-	FarmID  int            `json:"farm_id"`
-	MinerID int            `json:"miner_id"`
-	Autofan map[string]any `json:"autofan"`
+	FarmID  int                 `json:"farm_id"`
+	MinerID int                 `json:"miner_id"`
+	Autofan utils.HiveOsAutoFan `json:"autofan"`
 }
 
 type ApplyMinerFsReq struct {

@@ -85,8 +85,16 @@ func (dao *MinerDAO) UpdateMiner(ctx context.Context, userID, minerID int, updat
 		Updates(updateInfo).Error
 }
 
+// 更新矿机状态
+func (dao *MinerDAO) UpdateMinerStatus(ctx context.Context, minerID int, status int) error {
+	return utils.DB.WithContext(ctx).
+		Model(&model.Miner{}).
+		Where("id = ?", minerID).
+		Update("status", status).Error
+}
+
 // 获取指定矿机
-func (dao *MinerDAO) GetMinerByID(ctx context.Context, userID, minerID int) (*model.Miner, error) {
+func (dao *MinerDAO) GetMinerByMinerID(ctx context.Context, userID, minerID int) (*model.Miner, error) {
 	var total int64
 	if err := utils.DB.WithContext(ctx).
 		Model(&relation.UserMiner{}).
@@ -148,14 +156,6 @@ func (MinerDAO) GetMiners(ctx context.Context, query map[string]any) (*[]model.M
 	}
 
 	return &miners, total, nil
-}
-
-// 更新矿机状态
-func (dao *MinerDAO) UpdateMinerStatus(ctx context.Context, minerID int, status int) error {
-	return utils.DB.WithContext(ctx).
-		Model(&model.Miner{}).
-		Where("id = ?", minerID).
-		Update("status", status).Error
 }
 
 // 获取矿机

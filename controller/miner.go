@@ -47,7 +47,7 @@ func (m *MinerController) DeleteMiner(ctx *gin.Context) {
 	}
 	userID := ctx.GetInt("user_id")
 
-	if err := m.minerService.DelMiner(ctx, userID, req.MinerID); err != nil {
+	if err := m.minerService.DelMiner(ctx, userID, req.FarmID, req.MinerID); err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
@@ -235,7 +235,9 @@ func (c *MinerController) SetWatchdog(ctx *gin.Context) {
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
-	if err := c.minerService.SetWatchdog(ctx, &req); err != nil {
+	userID := ctx.GetInt("user_id")
+
+	if err := c.minerService.SetWatchdog(ctx, userID, &req); err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
@@ -254,8 +256,9 @@ func (c *MinerController) GetWatchdog(ctx *gin.Context) {
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
+	userID := ctx.GetInt("user_id")
 
-	watchdog, err := c.minerService.GetWatchdog(ctx, farmID, minerID)
+	watchdog, err := c.minerService.GetWatchdog(ctx, userID, farmID, minerID)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
@@ -305,7 +308,9 @@ func (c *MinerController) SetOptions(ctx *gin.Context) {
 		rsp.Error(ctx, http.StatusBadRequest, "invalid request", err.Error())
 		return
 	}
-	if err := c.minerService.SetOptions(ctx, &req); err != nil {
+	userID := ctx.GetInt("user_id")
+
+	if err := c.minerService.SetOptions(ctx, userID, &req); err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, "set options failed", err.Error())
 		return
 	}
@@ -324,8 +329,9 @@ func (c *MinerController) GetOptions(ctx *gin.Context) {
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
+	userID := ctx.GetInt("user_id")
 
-	options, err := c.minerService.GetOptions(ctx, farmID, minerID)
+	options, err := c.minerService.GetOptions(ctx, userID, farmID, minerID)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, "get options failed", err.Error())
 		return

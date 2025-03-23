@@ -11,45 +11,82 @@ import (
 	"miner/dao/mysql/relationdao"
 	"miner/dao/redis"
 	"miner/model"
+	"miner/model/info"
 	"miner/utils"
 	"slices"
+	"strconv"
 )
 
 type MinerService struct {
 	minerDAO    *mysql.MinerDAO
-	userFarmDAO *relationdao.UserFarmDAO
 	minerRDB    *redis.MinerRDB
+	userFarmDAO *relationdao.UserFarmDAO
 }
 
 func NewMinerService() *MinerService {
 	return &MinerService{
 		minerDAO:    mysql.NewMinerDAO(),
-		userFarmDAO: relationdao.NewUserFarmDAO(),
 		minerRDB:    redis.NewMinerRDB(),
+		userFarmDAO: relationdao.NewUserFarmDAO(),
 	}
 }
 
 func (m *MinerService) CreateMiner(ctx context.Context, userID, farmID int, req *dto.CreateMinerReq) error {
-	// todo 检查用户对 farm 的权限
+	if !m.validPerm(ctx, userID, farmID, []perm.FarmPerm{perm.FarmOwner, perm.FarmManager}) {
+		return errors.New("permission denied")
+	}
+
 	rigID, err := m.generateRigID(ctx, 8)
 	if err != nil {
 		return err
 	}
+	pass, err := m.generateRigPass(ctx, 8)
+	if err != nil {
+		return err
+	}
+
 	miner := &model.Miner{
 		Name:  req.Name,
 		RigID: rigID,
+		Pass:  pass,
 	}
-	return m.minerDAO.CreateMiner(ctx, userID, farmID, miner)
+	if err := m.minerDAO.CreateMiner(ctx, userID, farmID, miner); err != nil {
+		return err
+	}
+
+	minerInfo := &info.Miner{
+		HiveOsConfig: utils.HiveOsConfig{
+			HiveOsUrl:     utils.GenerateHiveOsUrl(),
+			ApiHiveOsUrls: utils.GenerateHiveOsUrl(),
+			WorkerName:    req.Name,
+			FarmID:        strconv.Itoa(farmID),
+			RigID:         rigID,
+			RigPasswd:     pass,
+		},
+	}
+
+	// redis 缓存 miner 配置
+	if err := m.minerRDB.CreateMinerByRigID(ctx, rigID, minerInfo); err != nil {
+		if err := m.minerDAO.DelMiner(ctx, userID, miner.ID); err != nil {
+			return errors.New("set cached failed and del failed")
+		}
+		return errors.New("set cached failed")
+	}
+
+	return err
 }
 
-func (m *MinerService) DelMiner(ctx context.Context, userID, minerID int) error {
-	// todo 检查用户对 miner 的权限
+func (m *MinerService) DelMiner(ctx context.Context, userID, farmID, minerID int) error {
+	if !m.validPerm(ctx, userID, farmID, []perm.FarmPerm{perm.FarmOwner, perm.FarmManager}) {
+		return errors.New("permission denied")
+	}
 	return m.minerDAO.DelMiner(ctx, userID, minerID)
 }
 
 func (m *MinerService) UpdateMiner(ctx context.Context, userID, farmID, minerID int, updateInfo map[string]any) error {
-	// todo 检查用户对 miner 的权限
-	// todo 检查用户对 farm 的权限
+	if !m.validPerm(ctx, userID, farmID, []perm.FarmPerm{perm.FarmOwner, perm.FarmManager}) {
+		return errors.New("permission denied")
+	}
 	allow := model.GetMinerAllowChangeField()
 	updates := make(map[string]any)
 	for key, val := range updateInfo {
@@ -61,18 +98,23 @@ func (m *MinerService) UpdateMiner(ctx context.Context, userID, farmID, minerID 
 }
 
 func (m *MinerService) UpdateMinerWatchdog(ctx context.Context, userID, farmID, minerID int, req *dto.UpdateMinerWatchdogReq) error {
-	if !m.validPerm(ctx, userID, req.FarmID, []perm.FarmPerm{perm.FarmOwner, perm.FarmManager}) {
-		return errors.New("permission denied")
+	// if !m.validPerm(ctx, userID, req.FarmID, []perm.FarmPerm{perm.FarmOwner, perm.FarmManager}) {
+	// 	return errors.New("permission denied")
+	// }
+
+	miner, err := m.minerDAO.GetMinerByMinerID(ctx, userID, minerID)
+	if err != nil {
+		return err
 	}
 
-	miner, err := m.minerRDB.GetByID(ctx, req.FarmID, req.MinerID)
+	minerInfo, err := m.minerRDB.GetMinerByRigID(ctx, miner.RigID)
 	if err != nil {
 		return errors.New("miner not found")
 	}
 
-	utils.UpdateStructObjFromMap(&miner.HiveOsConfig.Watchdog, req.Watchdog)
+	minerInfo.HiveOsConfig.Watchdog = req.Watchdog
 
-	if err := m.minerRDB.Set(ctx, req.FarmID, miner); err != nil {
+	if err := m.minerRDB.UpdateMinerByRigID(ctx, miner.RigID, minerInfo); err != nil {
 		return err
 	}
 
@@ -84,14 +126,19 @@ func (m *MinerService) UpdateMinerOptions(ctx context.Context, userID int, req *
 		return errors.New("permission denied")
 	}
 
-	miner, err := m.minerRDB.GetByID(ctx, req.FarmID, req.MinerID)
+	miner, err := m.minerDAO.GetMinerByMinerID(ctx, userID, req.MinerID)
 	if err != nil {
-		return errors.New("miner not found")
+		return err
 	}
 
-	utils.UpdateStructObjFromMap(&miner.HiveOsConfig.Options, req.Options)
+	minerInfo, err := m.minerRDB.GetMinerByRigID(ctx, miner.RigID)
+	if err != nil {
+		return err
+	}
 
-	if err := m.minerRDB.Set(ctx, req.FarmID, miner); err != nil {
+	minerInfo.HiveOsConfig.Options = req.Options
+
+	if err := m.minerRDB.UpdateMinerByRigID(ctx, miner.RigID, minerInfo); err != nil {
 		return err
 	}
 
@@ -103,14 +150,14 @@ func (m *MinerService) UpdateMinerAutofan(ctx context.Context, userID int, req *
 		return errors.New("permission denied")
 	}
 
-	miner, err := m.minerRDB.GetByID(ctx, req.FarmID, req.MinerID)
+	miner, err := m.minerDAO.GetMinerByMinerID(ctx, userID, req.MinerID)
 	if err != nil {
 		return errors.New("miner not found")
 	}
 
-	utils.UpdateStructObjFromMap(&miner.HiveOsAutoFan, req.Autofan)
+	minerInfo, err := m.minerRDB.GetMinerByRigID(ctx, miner.RigID)
 
-	if err := m.minerRDB.Set(ctx, req.FarmID, miner); err != nil {
+	if err := m.minerRDB.UpdateMinerByRigID(ctx, miner.RigID, minerInfo); err != nil {
 		return err
 	}
 
@@ -127,8 +174,6 @@ func (m *MinerService) UpdateMinerWallet(ctx context.Context, userID int, req *d
 		return errors.New("miner not found")
 	}
 
-	utils.UpdateStructObjFromMap(&miner.HiveOsWallet, req.Wallet)
-
 	if err := m.minerRDB.Set(ctx, req.FarmID, miner); err != nil {
 		return err
 	}
@@ -136,21 +181,29 @@ func (m *MinerService) UpdateMinerWallet(ctx context.Context, userID int, req *d
 	return nil
 }
 
-func (s *MinerService) SetWatchdog(ctx context.Context, req *dto.SetWatchdogReq) error {
-	miner, err := s.minerRDB.GetByID(ctx, req.FarmID, req.MinerID)
+func (m *MinerService) SetWatchdog(ctx context.Context, userID int, req *dto.SetWatchdogReq) error {
+	miner, err := m.minerDAO.GetMinerByMinerID(ctx, userID, req.MinerID)
 	if err != nil {
 		return err
 	}
-	miner.HiveOsConfig.Watchdog = req.Watchdog
-	return s.minerRDB.Set(ctx, req.FarmID, miner)
+	minerInfo, err := m.minerRDB.GetMinerByRigID(ctx, miner.RigID)
+	if err != nil {
+		return err
+	}
+	minerInfo.HiveOsConfig.Watchdog = req.Watchdog
+	return m.minerRDB.UpdateMinerByRigID(ctx, miner.RigID, minerInfo)
 }
 
-func (s *MinerService) GetWatchdog(ctx context.Context, farmID, minerID int) (*utils.Watchdog, error) {
-	miner, err := s.minerRDB.GetByID(ctx, farmID, minerID)
+func (m *MinerService) GetWatchdog(ctx context.Context, userID, farmID, minerID int) (*utils.Watchdog, error) {
+	miner, err := m.minerDAO.GetMinerByMinerID(ctx, userID, minerID)
 	if err != nil {
 		return nil, err
 	}
-	return &miner.HiveOsConfig.Watchdog, nil
+	minerInfo, err := m.minerRDB.GetMinerByRigID(ctx, miner.RigID)
+	if err != nil {
+		return nil, err
+	}
+	return &minerInfo.HiveOsConfig.Watchdog, nil
 }
 
 func (s *MinerService) SetAutoFan(ctx context.Context, req *dto.SetAutoFanReq) error {
@@ -170,25 +223,33 @@ func (s *MinerService) GetAutoFan(ctx context.Context, farmID, minerID int) (*ut
 	return &miner.HiveOsAutoFan, nil
 }
 
-func (s *MinerService) SetOptions(ctx context.Context, req *dto.SetOptionsReq) error {
-	miner, err := s.minerRDB.GetByID(ctx, req.FarmID, req.MinerID)
+func (m *MinerService) SetOptions(ctx context.Context, userID int, req *dto.SetOptionsReq) error {
+	miner, err := m.minerDAO.GetMinerByMinerID(ctx, userID, req.MinerID)
 	if err != nil {
 		return err
 	}
-	miner.HiveOsConfig.Options = req.Options
-	return s.minerRDB.Set(ctx, req.FarmID, miner)
+	minerInfo, err := m.minerRDB.GetMinerByRigID(ctx, miner.RigID)
+	if err != nil {
+		return err
+	}
+	minerInfo.HiveOsConfig.Options = req.Options
+	return m.minerRDB.UpdateMinerByRigID(ctx, miner.RigID, minerInfo)
 }
 
-func (s *MinerService) GetOptions(ctx context.Context, farmID, minerID int) (*utils.Options, error) {
-	miner, err := s.minerRDB.GetByID(ctx, farmID, minerID)
+func (m *MinerService) GetOptions(ctx context.Context, userID, farmID, minerID int) (*utils.Options, error) {
+	miner, err := m.minerDAO.GetMinerByMinerID(ctx, userID, minerID)
 	if err != nil {
 		return nil, err
 	}
-	return &miner.HiveOsConfig.Options, nil
+	minerInfo, err := m.minerRDB.GetMinerByRigID(ctx, miner.RigID)
+	if err != nil {
+		return nil, err
+	}
+	return &minerInfo.HiveOsConfig.Options, nil
 }
 
 func (m *MinerService) GetMinerByMinerID(ctx context.Context, userID, minerID int) (*model.Miner, error) {
-	return m.minerDAO.GetMinerByID(ctx, userID, minerID)
+	return m.minerDAO.GetMinerByMinerID(ctx, userID, minerID)
 }
 
 func (m *MinerService) GetMinersByFarmID(ctx context.Context, farmID int, query map[string]any) (*[]model.Miner, int64, error) {
@@ -201,6 +262,7 @@ func (m *MinerService) GetMiners(ctx context.Context, query map[string]any) (*[]
 
 func (m *MinerService) ApplyFs(ctx context.Context, userID, farmID, minerID, fsID int) error {
 	// todo 检查用户对 miner 的权限
+	// 更新 miner cache
 	return m.minerDAO.ApplyFs(ctx, minerID, fsID)
 }
 
@@ -236,4 +298,20 @@ func (m *MinerService) generateRigID(ctx context.Context, length int) (string, e
 			return uid, nil
 		}
 	}
+}
+
+func (m *MinerService) generateRigPass(ctx context.Context, length int) (string, error) {
+	if length < 8 {
+		return "", errors.New("invalid argument")
+	}
+	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	str := make([]byte, length)
+	for i := range str {
+		num, err := rand.Int(rand.Reader, big.NewInt(int64(len(charset))))
+		if err != nil {
+			return "", err
+		}
+		str[i] = charset[num.Int64()]
+	}
+	return string(str), nil
 }

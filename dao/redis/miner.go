@@ -3,16 +3,50 @@ package redis
 import (
 	"context"
 	"encoding/json"
-	"miner/common/perm"
 	"miner/model/info"
 	"miner/utils"
-	"strconv"
 )
 
 type MinerRDB struct{}
 
 func NewMinerRDB() *MinerRDB {
 	return &MinerRDB{}
+}
+
+// key
+// rigID:<info>
+func (MinerRDB) CreateMinerByRigID(ctx context.Context, rigID string, miner *info.Miner) error {
+	field := MakeField(MinerField, rigID)
+	minerJSON, err := json.Marshal(miner)
+	if err != nil {
+		return err
+	}
+	return utils.RDB.Set(ctx, field, string(minerJSON))
+}
+
+func (MinerRDB) DelMinerByRigID(ctx context.Context, rigID string) error {
+	field := MakeField(MinerField, rigID)
+	return utils.RDB.Del(ctx, field)
+}
+
+func (MinerRDB) UpdateMinerByRigID(ctx context.Context, rigID string, miner *info.Miner) error {
+	field := MakeField(MinerField, rigID)
+	minerJSON, err := json.Marshal(miner)
+	if err != nil {
+		return err
+	}
+	return utils.RDB.Set(ctx, field, string(minerJSON))
+}
+
+func (MinerRDB) GetMinerByRigID(ctx context.Context, rigID string) (*info.Miner, error) {
+	field := MakeField(MinerField, rigID)
+	minerJSON, err := utils.RDB.Get(ctx, field)
+	if err != nil {
+		return nil, err
+	}
+	var miner info.Miner
+	err = json.Unmarshal([]byte(minerJSON), &miner)
+	return &miner, err
 }
 
 // 添加矿机
@@ -22,35 +56,37 @@ func NewMinerRDB() *MinerRDB {
 // +-----------------+------------+-------+
 // | miner:<farm_id> | <miner_id> |  info |
 // +-----------------+------------+-------+
-func (c *MinerRDB) Set(ctx context.Context, farmID int, miner *info.Miner) error {
-	farmIDStr := strconv.Itoa(farmID)
-	field := MakeField(MinerField, farmIDStr)
-	minerJSON, err := json.Marshal(miner)
-	if err != nil {
-		return err
-	}
-	return utils.RDB.HSet(ctx, field, miner.ID, string(minerJSON))
-}
+// key
+// rig_id:<farm_id:miner_id>:<info>
+// func (c *MinerRDB) Set(ctx context.Context, farmID int, miner *info.Miner) error {
+// 	farmIDStr := strconv.Itoa(farmID)
+// 	field := MakeField(MinerField, farmIDStr)
+// 	minerJSON, err := json.Marshal(miner)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	return utils.RDB.HSet(ctx, field, miner.ID, string(minerJSON))
+// }
 
 // 删除矿机
-func (c *MinerRDB) Del(ctx context.Context, farmID string, minerID string) error {
-	field := MakeField(MinerField, farmID)
-	return utils.RDB.HDel(ctx, field, minerID)
-}
+// func (c *MinerRDB) Del(ctx context.Context, farmID string, minerID string) error {
+// 	field := MakeField(MinerField, farmID)
+// 	return utils.RDB.HDel(ctx, field, minerID)
+// }
 
-// 通过 ID 获取矿机
-func (c *MinerRDB) GetByID(ctx context.Context, farmID, minerID int) (*info.Miner, error) {
-	farmIDStr := strconv.Itoa(farmID)
-	minerIDStr := strconv.Itoa(minerID)
-	field := MakeField(MinerField, farmIDStr)
-	minerJSON, err := utils.RDB.HGet(ctx, field, minerIDStr)
-	if err != nil {
-		return nil, err
-	}
-	var miner info.Miner
-	err = json.Unmarshal([]byte(minerJSON), &miner)
-	return &miner, err
-}
+// // 通过 ID 获取矿机
+// func (c *MinerRDB) GetByID(ctx context.Context, farmID, minerID int) (*info.Miner, error) {
+// 	farmIDStr := strconv.Itoa(farmID)
+// 	minerIDStr := strconv.Itoa(minerID)
+// 	field := MakeField(MinerField, farmIDStr)
+// 	minerJSON, err := utils.RDB.HGet(ctx, field, minerIDStr)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	var miner info.Miner
+// 	err = json.Unmarshal([]byte(minerJSON), &miner)
+// 	return &miner, err
+// }
 
 // 获取矿场下的所有矿机
 // func (c *MinerRDB) GetAll(ctx context.Context, farmID int) (*[]info.Miner, error) {
@@ -110,49 +146,49 @@ func (c *MinerRDB) GetByID(ctx context.Context, farmID, minerID int) (*info.Mine
 // +---------------------+------------+
 // | miner:fs:<miner_id> |  <fs_id>   |
 // +---------------------+------------+
-func (c *MinerRDB) ApplyFs(ctx context.Context, farmID string, minerID string, fsID string, softInfo *info.Soft) error {
-	pipe := utils.RDB.Client.TxPipeline()
-	// 获取 miner
-	field := MakeField(MinerField, farmID)
-	minerJSON, err := utils.RDB.Client.HGet(ctx, field, minerID).Result()
-	if err != nil {
-		return err
-	}
-	var miner info.Miner
-	if err = json.Unmarshal([]byte(minerJSON), &miner); err != nil {
-		return err
-	}
-	// 更新 miner
-	miner.HiveOsWallet.FsID = fsID
+// func (c *MinerRDB) ApplyFs(ctx context.Context, farmID string, minerID string, fsID string, softInfo *info.Soft) error {
+// 	pipe := utils.RDB.Client.TxPipeline()
+// 	// 获取 miner
+// 	field := MakeField(MinerField, farmID)
+// 	minerJSON, err := utils.RDB.Client.HGet(ctx, field, minerID).Result()
+// 	if err != nil {
+// 		return err
+// 	}
+// 	var miner info.Miner
+// 	if err = json.Unmarshal([]byte(minerJSON), &miner); err != nil {
+// 		return err
+// 	}
+// 	// 更新 miner
+// 	miner.HiveOsWallet.FsID = fsID
 
-	miner.HiveOsWallet.CustomMiner = softInfo.MinerName
-	miner.HiveOsWallet.CustomUserConfig = softInfo.CustomUserConfig
-	miner.HiveOsWallet.CustomAlgo = softInfo.CustomAlgo
-	miner.HiveOsWallet.CustomInstallURL = softInfo.CustomInstallUrl
-	miner.HiveOsWallet.CustomPass = softInfo.CustomPass
-	miner.HiveOsWallet.CustomTemplate = softInfo.CustomTemplate
-	miner.HiveOsWallet.CustomUrl = softInfo.CustomUrl
-	miner.HiveOsWallet.CustomTLS = softInfo.CustomTls
+// 	miner.HiveOsWallet.CustomMiner = softInfo.MinerName
+// 	miner.HiveOsWallet.CustomUserConfig = softInfo.CustomUserConfig
+// 	miner.HiveOsWallet.CustomAlgo = softInfo.CustomAlgo
+// 	miner.HiveOsWallet.CustomInstallURL = softInfo.CustomInstallUrl
+// 	miner.HiveOsWallet.CustomPass = softInfo.CustomPass
+// 	miner.HiveOsWallet.CustomTemplate = softInfo.CustomTemplate
+// 	miner.HiveOsWallet.CustomUrl = softInfo.CustomUrl
+// 	miner.HiveOsWallet.CustomTLS = softInfo.CustomTls
 
-	minerByte, err := json.Marshal(miner)
-	if err != nil {
-		return err
-	}
-	pipe.HSet(ctx, field, miner.ID, string(minerByte))
-	// 建立关联
-	key := MakeKey(MinerFsField, minerID)
-	pipe.Set(ctx, key, fsID, 0)
+// 	minerByte, err := json.Marshal(miner)
+// 	if err != nil {
+// 		return err
+// 	}
+// 	pipe.HSet(ctx, field, miner.ID, string(minerByte))
+// 	// 建立关联
+// 	key := MakeKey(MinerFsField, minerID)
+// 	pipe.Set(ctx, key, fsID, 0)
 
-	_, err = pipe.Exec(ctx)
+// 	_, err = pipe.Exec(ctx)
 
-	return err
-}
+// 	return err
+// }
 
 // 获取应用的飞行表
-func (c *MinerRDB) GetApplyFs(ctx context.Context, minerID string) (string, error) {
-	key := MakeKey(MinerFsField, minerID)
-	return utils.RDB.Get(ctx, key)
-}
+// func (c *MinerRDB) GetApplyFs(ctx context.Context, minerID string) (string, error) {
+// 	key := MakeKey(MinerFsField, minerID)
+// 	return utils.RDB.Get(ctx, key)
+// }
 
 // 添加管理员
 // fromUserID 操作的用户 ID
@@ -165,17 +201,17 @@ func (c *MinerRDB) GetApplyFs(ctx context.Context, minerID string) (string, erro
 // }
 
 // 是否有权限
-func (c *MinerRDB) validPerm(ctx context.Context, userID string, farmID string, p perm.FarmPerm) bool {
-	farmField := MakeField(FarmField, userID)
-	farmJSON, err := utils.RDB.HGet(ctx, farmField, farmID)
-	if err != nil {
-		return false
-	}
+// func (c *MinerRDB) validPerm(ctx context.Context, userID string, farmID string, p perm.FarmPerm) bool {
+// 	farmField := MakeField(FarmField, userID)
+// 	farmJSON, err := utils.RDB.HGet(ctx, farmField, farmID)
+// 	if err != nil {
+// 		return false
+// 	}
 
-	var farm info.Farm
-	if err := json.Unmarshal([]byte(farmJSON), &farm); err != nil {
-		return false
-	}
+// 	var farm info.Farm
+// 	if err := json.Unmarshal([]byte(farmJSON), &farm); err != nil {
+// 		return false
+// 	}
 
-	return farm.Perm == p
-}
+// 	return farm.Perm == p
+// }

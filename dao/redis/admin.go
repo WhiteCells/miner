@@ -16,20 +16,18 @@ import (
 )
 
 type AdminRDB struct {
-	userRDB     *UserRDB
-	farmRDB     *FarmRDB
-	minerRDB    *MinerRDB
-	SystemRDB   *SystemRDB
-	minepoolRDB *MinepoolRDB
+	userRDB   *UserRDB
+	farmRDB   *FarmRDB
+	minerRDB  *MinerRDB
+	SystemRDB *SystemRDB
 }
 
 func NewAdminRDB() *AdminRDB {
 	return &AdminRDB{
-		userRDB:     NewUserRDB(),
-		farmRDB:     NewFarmRDB(),
-		minerRDB:    NewMinerRDB(),
-		SystemRDB:   NewSystemRDB(),
-		minepoolRDB: NewMinpoolRDB(),
+		userRDB:   NewUserRDB(),
+		farmRDB:   NewFarmRDB(),
+		minerRDB:  NewMinerRDB(),
+		SystemRDB: NewSystemRDB(),
 	}
 }
 
@@ -156,16 +154,6 @@ func (c *AdminRDB) SetUserStatus(ctx context.Context, userID int, s status.UserS
 	}
 	user.Status = s
 	return c.userRDB.Set(ctx, user)
-}
-
-// 设置矿池的消耗
-func (c *AdminRDB) SetMinepoolCost(ctx context.Context, mpID string, cost float64) error {
-	mp, err := c.minepoolRDB.GetByID(ctx, mpID)
-	if err != nil {
-		return err
-	}
-	mp.Cost = cost
-	return c.minepoolRDB.Set(ctx, mp)
 }
 
 // 助记词
