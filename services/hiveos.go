@@ -126,31 +126,58 @@ func (m *HiveosService) helloCaseUseHash(ctx *gin.Context) {
 	body, err := io.ReadAll(ctx.Request.Body)
 	err = json.Unmarshal(body, &req)
 	if err != nil {
-		fmt.Println("JSON 解析错误:", err)
+		utils.Logger.Error("helloCaseUseHash Unmarshal req error:" + err.Error())
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), "")
 		return
 	}
 
-	userID, farmID, err := m.farmRDB.GetFarmIDByHash(ctx, req.Params.FarmHash)
+	// 获取 farm
+	farm, err := m.farmDAO.GetFarmByHash(ctx, req.Params.FarmHash)
+	// 创建 miner
+	rigID, err := m.minerService.generateRigID(ctx, 8)
 	if err != nil {
-		utils.Logger.Error("helloCaseUseHash GetUserAndFarmIDByHash, error" + err.Error())
+		rsp.Error(ctx, http.StatusBadRequest, err.Error(), "")
+		return
+	}
+	pass, err := m.minerService.generateRigPass(ctx, 8)
+	if err != nil {
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), "")
 		return
 	}
 	miner := &model.Miner{
-		Name: req.Params.WorkerName,
+		Name:  req.Params.WorkerName,
+		RigID: rigID,
+		Pass:  pass,
 	}
-	err = m.minerDAO.CreateMiner(ctx, userID, farmID)
-	m.minerRDB.CreateMinerByRigID(ctx)
-	if err != nil {
-		utils.Logger.Error("helloCaseUseHash CreateMinerByUserID, error" + err.Error())
-		rsp.Error(ctx, http.StatusBadRequest, err.Error(), "")
+	err = m.minerDAO.CreateMiner(ctx, farm.ID, miner)
+
+	// 创建 miner 缓存
+	minerInfo := &info.Miner{}
+	if err := m.minerRDB.CreateMinerByRigID(ctx, miner.RigID, minerInfo); err != nil {
+		utils.Logger.Error("helloCaseUseHash CreateMinerByRigID error" + err.Error())
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), "")
 		return
 	}
 
-	config := utils.GenerateHiveOsConfig(&miner.HiveOsConfig)
-	wallet := utils.GenerateHiveOsWallet(&miner.HiveOsWallet)
-	autofan := utils.GenerateHiveOsAutofan(&miner.HiveOsAutoFan)
+	if err := m.setMinerInfo(ctx, rigID, &req); err != nil {
+		utils.Logger.Error("helloCaseUseHash setMinerInfo error" + err.Error())
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), "")
+		return
+	}
+
+	// farm, err := m.farmDAO.GetFarmByHash(ctx, req.Params.FarmHash)
+
+	// createMinerReq := dto.CreateMinerReq{
+	// 	Name:   req.Params.WorkerName,
+	// 	FarmID: farm.ID,
+	// }
+	// // 这里会有一个逻辑问题
+	// // userID 应该是 farm 的管理员的 userID 还是使用 hash 的 userID
+	// m.minerService.CreateMiner(ctx, userID, farm.ID, &createMinerReq)
+
+	config := utils.GenerateHiveOsConfig(&minerInfo.HiveOsConfig)
+	wallet := utils.GenerateHiveOsWallet(&minerInfo.HiveOsWallet)
+	autofan := utils.GenerateHiveOsAutofan(&minerInfo.HiveOsAutoFan)
 
 	rsp := &dto.ServerHashRsp{
 		Jsonrpc: "2.0",
@@ -225,12 +252,7 @@ func (m *HiveosService) statsCase(ctx *gin.Context, rigID string) {
 		return
 	}
 
-	taskIDInt, err := strconv.Atoi(task.ID)
-	if err != nil {
-		return
-	}
-
-	log.Println("===> stats  taskID", taskIDInt)
+	log.Println("===> stats  taskID", task.ID)
 
 	// 对任务分类讨论
 	switch task.Type {
@@ -239,7 +261,7 @@ func (m *HiveosService) statsCase(ctx *gin.Context, rigID string) {
 			ID:      rigIDInt,
 			Jsonrpc: "2.0",
 			Result: dto.ServerRsp_Result{
-				ID:        taskIDInt,
+				ID:        task.ID,
 				Config:    config,
 				Wallet:    wallet,
 				Autofan:   autofan,
@@ -255,7 +277,7 @@ func (m *HiveosService) statsCase(ctx *gin.Context, rigID string) {
 			ID:      rigIDInt,
 			Jsonrpc: "2.0",
 			Result: dto.ServerRsp_Result{
-				ID:        taskIDInt,
+				ID:        task.ID,
 				Config:    config,
 				Wallet:    wallet,
 				Autofan:   autofan,

@@ -49,6 +49,7 @@ func (FarmDAO) DelFarmByID(ctx context.Context, userID, farmID int) error {
 		if err := tx.Delete(&model.Farm{}, farmID).Error; err != nil {
 			return err
 		}
+		// todo delete miner ?
 		return nil
 	})
 }
@@ -59,6 +60,13 @@ func (FarmDAO) UpdateFarm(ctx context.Context, userID, farmID int, updates map[s
 		Model(&model.Farm{}).
 		Where("id=?", farmID).
 		Updates(updates).Error
+}
+
+// 通过 hash 获取矿场
+func (FarmDAO) GetFarmByHash(ctx context.Context, hash string) (*model.Farm, error) {
+	var farm model.Farm
+	err := utils.DB.WithContext(ctx).First(&farm, "hash=?", hash).Error
+	return &farm, err
 }
 
 // 获取所有矿场

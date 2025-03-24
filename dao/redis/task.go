@@ -3,6 +3,7 @@ package redis
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"miner/dao/mysql"
 	"miner/model"
 	"miner/model/info"
@@ -77,12 +78,12 @@ func (c *TaskRDB) GetTask(ctx context.Context, rigID string) (*model.Task, error
 	// redis list 中弹出队头
 	taskID, err := c.LPop(ctx, rigID)
 	if err != nil {
-		return nil, err
+		return nil, errors.New("no task in redis list")
 	}
 	// 数据库中找到对应 id 的任务信息
 	var task model.Task
 	if err := utils.DB.Where("id = ?", taskID).First(&task).Error; err != nil {
-		return nil, err
+		return nil, errors.New("no task in db")
 	}
 	return &task, nil
 }
