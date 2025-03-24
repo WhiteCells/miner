@@ -6,6 +6,7 @@ import (
 	"miner/common/dto"
 	"miner/dao/mysql"
 	"miner/model"
+	"miner/utils"
 )
 
 type FarmService struct {
@@ -19,9 +20,11 @@ func NewFarmService() *FarmService {
 }
 
 func (m *FarmService) CreateFarm(ctx context.Context, userID int, req *dto.CreateFarmReq) error {
+	hash := utils.GenerateFarmHash(req.Name)
 	farm := &model.Farm{
 		Name:     req.Name,
 		TimeZone: req.TimeZone,
+		Hash:     hash,
 	}
 	return m.farmDAO.CreateFarm(ctx, farm, userID)
 }

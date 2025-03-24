@@ -63,18 +63,17 @@ func (m *HiveosService) Poll(ctx *gin.Context) {
 
 func (m *HiveosService) helloCase(ctx *gin.Context, rigID string) {
 	var req dto.HelloReq
-	//utils.Logger.Info(ctx.Request.GetBody())
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		utils.Logger.Error("helloCase ShouldBindJSON, error" + err.Error())
-		rsp.Error(ctx, http.StatusBadRequest, err.Error(), "")
+		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
 	m.formatOutput(&req)
 
 	miner, err := m.minerRDB.GetMinerByRigID(ctx, rigID)
 	if err != nil {
-		log.Println(rigID, "hiveosRDB.GetRigFarmAndMinerID")
-		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), "")
+		log.Println(rigID, "minerRDB.GetMinerByRigID")
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
 
@@ -88,24 +87,17 @@ func (m *HiveosService) helloCase(ctx *gin.Context, rigID string) {
 	// 对 req 的数据进行存储
 	errSetInfo := m.setMinerInfo(ctx, rigID, &req)
 	if errSetInfo != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, "failed to set hiveos info", "")
 		return
 	}
 
 	// 更新 miner GpuNum
 	miner.GpuNum = len(req.Params.Gpu)
+	if err := m.minerRDB.UpdateMinerByRigID(ctx, rigID, miner); err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, "failed to update miner info", "")
+		return
+	}
 
-	// 更新 farm GpuNum
-	farm, err := m.farmDAO.GetFarmByFarmID(ctx, farmID)
-	farm, err := m.farmRDB.GetByID(ctx, userID, farmID)
-	if err != nil {
-		rsp.Error(ctx, http.StatusInternalServerError, "get farm failed", "")
-		return
-	}
-	farm.GpuNum += miner.GpuNum
-	err_ := m.farmRDB.Set(ctx, userID, farm, farm.Perm)
-	if err_ != nil {
-		return
-	}
 	config := utils.GenerateHiveOsConfig(&miner.HiveOsConfig)
 	wallet := utils.GenerateHiveOsWallet(&miner.HiveOsWallet)
 	autofan := utils.GenerateHiveOsAutofan(&miner.HiveOsAutoFan)
@@ -138,24 +130,18 @@ func (m *HiveosService) helloCaseUseHash(ctx *gin.Context) {
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), "")
 		return
 	}
-	//utils.Logger.Info("helloCaseUseHash Body, info:" + string(body))
-	//if err := ctx.ShouldBindJSON(&req); err != nil {
-	//	utils.Logger.Error("helloCaseUseHash ShouldBindJSON, error" + err.Error())
-	//	rsp.Error(ctx, http.StatusBadRequest, err.Error(), "")
-	//	return
-	//}
-	//s.formatOutput(&req)
 
-	// 如果用户在已连接的情况下，再次使用 hash 连接，此时已经存在连接
-	// 第二次请求不会携带上一次使用的 rig_id 及 pass
-
-	userID, farmID, err := m.farmRDB.GetUserAndFarmIDByHash(ctx, req.Params.FarmHash)
+	userID, farmID, err := m.farmRDB.GetFarmIDByHash(ctx, req.Params.FarmHash)
 	if err != nil {
 		utils.Logger.Error("helloCaseUseHash GetUserAndFarmIDByHash, error" + err.Error())
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), "")
 		return
 	}
-	err = m.minerService.CreateMiner(ctx, userID, farmID, req.Params.Mb.Bios)
+	miner := &model.Miner{
+		Name: req.Params.WorkerName,
+	}
+	err = m.minerDAO.CreateMiner(ctx, userID, farmID)
+	m.minerRDB.CreateMinerByRigID(ctx)
 	if err != nil {
 		utils.Logger.Error("helloCaseUseHash CreateMinerByUserID, error" + err.Error())
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), "")

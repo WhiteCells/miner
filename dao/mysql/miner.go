@@ -16,7 +16,7 @@ func NewMinerDAO() *MinerDAO {
 }
 
 // 创建矿机
-func (dao *MinerDAO) CreateMiner(ctx context.Context, userID, farmID int, miner *model.Miner) error {
+func (dao *MinerDAO) CreateMiner(ctx context.Context, farmID int, miner *model.Miner) error {
 	// 创建矿机时就需要将用户与用户与矿机进行联系
 	err := utils.DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		// 创建 miner
@@ -24,15 +24,15 @@ func (dao *MinerDAO) CreateMiner(ctx context.Context, userID, farmID int, miner 
 			return err
 		}
 
-		// 建立 user-miner 关联
-		userMiner := &relation.UserMiner{
-			UserID:  userID,
-			MinerID: miner.ID,
-			// Perm:    perm.MinerOwner,
-		}
-		if err := tx.Create(userMiner).Error; err != nil {
-			return err
-		}
+		// // 建立 user-miner 关联
+		// userMiner := &relation.UserMiner{
+		// 	UserID:  userID,
+		// 	MinerID: miner.ID,
+		// 	// Perm:    perm.MinerOwner,
+		// }
+		// if err := tx.Create(userMiner).Error; err != nil {
+		// 	return err
+		// }
 
 		// 建立 farm-miner 关联
 		farmMiner := &relation.FarmMiner{

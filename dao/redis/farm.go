@@ -6,6 +6,7 @@ import (
 	"miner/common/perm"
 	"miner/model/info"
 	"miner/utils"
+	"strconv"
 	"strings"
 )
 
@@ -101,23 +102,24 @@ func (c *FarmRDB) DelMember(ctx context.Context, userID string, farmID string, m
 	return utils.RDB.HDel(ctx, field, farmID)
 }
 
-// +--------------------+---------------------+
-// | key                | val                 |
-// +--------------------+---------------------+
-// | farm:hash:<hash>   | <user_id>:<farm_id> |
-// +--------------------+---------------------+
-func (c *FarmRDB) SetFarmHashMapping(ctx context.Context, farmHash string, userID string, farmID string) error {
+// +--------------------+-----------+
+// | key                | val       |
+// +--------------------+-----------+
+// | farm:hash:<hash>   | <farm_id> |
+// +--------------------+-----------+
+func (FarmRDB) SetFarmHash(ctx context.Context, farmHash string, farmID int) error {
+	farmIDStr := strconv.Itoa(farmID)
 	key := MakeKey(FarmHashField, farmHash)
-	val := MakeVal(userID, farmID)
+	val := MakeVal(farmIDStr)
 	return utils.RDB.Set(ctx, key, val)
 }
 
-func (c *FarmRDB) DelFarmHashMapping(ctx context.Context, farmHash string) error {
+func (FarmRDB) DelFarmHash(ctx context.Context, farmHash string) error {
 	key := MakeKey(FarmHashField, farmHash)
 	return utils.RDB.Del(ctx, key)
 }
 
-func (s *FarmRDB) GetUserAndFarmIDByHash(ctx context.Context, farmHash string) (userID string, farmID string, err error) {
+func (FarmRDB) GetFarmIDByHash(ctx context.Context, farmHash string) (userID string, farmID string, err error) {
 	key := MakeKey(FarmHashField, farmHash)
 	farmMinerID, err := utils.RDB.Get(ctx, key)
 	if err != nil {

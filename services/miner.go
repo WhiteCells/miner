@@ -50,7 +50,7 @@ func (m *MinerService) CreateMiner(ctx context.Context, userID, farmID int, req 
 		RigID: rigID,
 		Pass:  pass,
 	}
-	if err := m.minerDAO.CreateMiner(ctx, userID, farmID, miner); err != nil {
+	if err := m.minerDAO.CreateMiner(ctx, farmID, miner); err != nil {
 		return err
 	}
 
@@ -80,7 +80,17 @@ func (m *MinerService) DelMiner(ctx context.Context, userID, farmID, minerID int
 	if !m.validPerm(ctx, userID, farmID, []perm.FarmPerm{perm.FarmOwner, perm.FarmManager}) {
 		return errors.New("permission denied")
 	}
-	return m.minerDAO.DelMiner(ctx, userID, minerID)
+	miner, err := m.minerDAO.GetMinerByMinerID(ctx, userID, minerID)
+	if err != nil {
+		return err
+	}
+	if err := m.minerRDB.DelMinerByRigID(ctx, miner.RigID); err != nil {
+		return err
+	}
+	if err := m.minerDAO.DelMiner(ctx, userID, minerID); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (m *MinerService) UpdateMiner(ctx context.Context, userID, farmID, minerID int, updateInfo map[string]any) error {

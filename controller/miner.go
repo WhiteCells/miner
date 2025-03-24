@@ -273,7 +273,9 @@ func (c *MinerController) SetAutoFan(ctx *gin.Context) {
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
-	if err := c.minerService.SetAutoFan(ctx, &req); err != nil {
+	userID := ctx.GetInt("user_id")
+
+	if err := c.minerService.SetAutoFan(ctx, userID, &req); err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
@@ -292,8 +294,9 @@ func (c *MinerController) GetAutoFan(ctx *gin.Context) {
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
+	userID := ctx.GetInt("user_id")
 
-	autofan, err := c.minerService.GetAutoFan(ctx, farmID, minerID)
+	autofan, err := c.minerService.GetAutoFan(ctx, userID, farmID, minerID)
 	if err != nil {
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
