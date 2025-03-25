@@ -83,7 +83,7 @@ type HiveOsConfig struct {
 	// Rig hostname
 	WorkerName string `json:"worker_name"`
 	// Id of the farm
-	FarmID string `json:"farm_id"`
+	FarmID int `json:"farm_id"`
 	// Selected miners
 	Miner  string `json:"miner"`
 	Miner2 string `json:"miner2"`
@@ -185,9 +185,7 @@ type HiveOsAutoFan struct {
 
 // 生成字符串会被写入 /hive-config/rig.conf
 func GenerateHiveOsConfig(data *HiveOsConfig) string {
-	template := `
-### MINERS HIVE CONFIGS ###
-
+	template := `### MINERS HIVE CONFIGS ###
 # URL
 HIVE_HOST_URL="%s"
 API_HOST_URLs="%s"
@@ -202,7 +200,7 @@ RIG_PASSWD="%s"
 WORKER_NAME="%s"
 
 # Id of the farm
-FARM_ID=%s
+FARM_ID=%d
 
 # Selected miners
 MINER=%s
@@ -240,8 +238,6 @@ SSH_PASSWORD_ENABLE=%s
 `
 	return fmt.Sprintf(template,
 		// URL
-		//GenerateHiveOsUrl(),
-		//GenerateHiveOsUrl(),
 		data.HiveOsUrl,
 		data.ApiHiveOsUrls,
 		// Id of the rig
@@ -287,9 +283,7 @@ SSH_PASSWORD_ENABLE=%s
 
 // 生成字符串会被写入 /hive-config/wallet.conf
 func GenerateHiveOsWallet(data *HiveOsWallet) string {
-	template := `
-### FLIGHT SHEET
-
+	template := `### FLIGHT SHEET
 # Miner custom
 CUSTOM_MINER="%s"
 CUSTOM_INSTALL_URL="%s"
@@ -321,7 +315,7 @@ META='{
 
 // 生成字符串会被写入 /hive-config/autofan.conf
 func GenerateHiveOsAutofan(data *HiveOsAutoFan) string {
-	template := `
+	template := `### autofan
 ENABLED=%s
 TARGET_TEMP=%s
 TARGET_MEM_TEMP=%s

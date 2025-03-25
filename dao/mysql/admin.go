@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"context"
+	"errors"
 	"miner/common/status"
 	"miner/model"
 	"miner/utils"
@@ -15,7 +16,10 @@ func NewAdminDAO() *AdminDAO {
 
 // 删除用户
 func (dao *AdminDAO) DelUser(ctx context.Context, userID int) error {
-	return utils.DB.WithContext(ctx).Delete(&model.User{}, userID).Error
+	if err := utils.DB.WithContext(ctx).Delete(&model.User{}, userID).Error; err != nil {
+		return errors.New("failed to delete user")
+	}
+	return nil
 }
 
 // 获取用户
@@ -32,53 +36,60 @@ func (dao *AdminDAO) GetUsers(ctx context.Context, query map[string]any) ([]mode
 
 	// 查询总数
 	if err := db.Count(&total).Error; err != nil {
-		return nil, -1, err
+		return nil, -1, errors.New("no user found")
 	}
 
 	// 分页查询
-	err := db.
+	if err := db.
 		Offset((pageNum - 1) * pageSize).
 		Limit(pageSize).
 		Order("id"). // 目前用 ID，后续有需求在修改
-		Find(&users).Error
+		Find(&users).Error; err != nil {
+		return nil, -1, errors.New("no user found")
+	}
 
-	return users, total, err
+	return users, total, nil
 }
 
 // 获取所有用户
 func (dao *AdminDAO) GetAllUsers(ctx context.Context) ([]model.User, error) {
 	var users []model.User
-	err := utils.DB.WithContext(ctx).Find(&users).Error
-	return users, err
+	if err := utils.DB.WithContext(ctx).Find(&users).Error; err != nil {
+		return nil, errors.New("")
+	}
+	return users, nil
 }
 
 // 获取用户状态
 func (m *AdminDAO) GetUserStatus(ctx context.Context, userID int) (status.UserStatus, error) {
 	var user model.User
-	err := utils.DB.WithContext(ctx).
+	if err := utils.DB.WithContext(ctx).
 		Where("id=?", userID).
-		Error
-	return user.Status, err
+		Error; err != nil {
+		return status.UserNone, errors.New("")
+	}
+	return user.Status, nil
 }
 
 // 设置免费 GPU 数量
 func (m *AdminDAO) SetFreeGpuNum(ctx context.Context, num int) error {
 	var system model.System
-	err := utils.DB.WithContext(ctx).
-		Find(&system).Error
-	if err != nil {
-		return err
+	if err := utils.DB.WithContext(ctx).
+		Find(&system).Error; err != nil {
+		return errors.New("")
 	}
 	system.FreeGpuNum = num
-	return utils.DB.WithContext(ctx).Save(&system).Error
+	if err := utils.DB.WithContext(ctx).Save(&system).Error; err != nil {
+		return errors.New("")
+	}
+	return nil
 }
 
 // 获取免费 GPU 数量
 func (m *AdminDAO) GetFreeGpuNum(ctx context.Context) (int, error) {
 	var system model.System
-	err := utils.DB.WithContext(ctx).Find(&system).Error
-	if err != nil {
-		return -1, err
+	if err := utils.DB.WithContext(ctx).Find(&system).Error; err != nil {
+		return -1, errors.New("")
 	}
 	return system.FreeGpuNum, nil
 }
@@ -95,14 +106,14 @@ func (dao *AdminDAO) GetUserOperlogs(ctx context.Context, query map[string]any) 
 
 	// 查询总数
 	if err := db.Count(&total).Error; err != nil {
-		return nil, -1, err
+		return nil, -1, errors.New("")
 	}
 
 	// 分页查询
 	if err := db.Offset((pageNum - 1) * pageSize).
 		Limit(pageSize).
 		Find(&logs).Error; err != nil {
-		return nil, -1, err
+		return nil, -1, errors.New("")
 	}
 
 	return logs, total, nil
@@ -128,7 +139,7 @@ func (dao *AdminDAO) GetUserLoginlogs(ctx context.Context, query map[string]any)
 		Offset((pageNum - 1) * pageSize).
 		Limit(pageSize).
 		Find(&logs).Error; err != nil {
-		return nil, -1, err
+		return nil, -1, errors.New("")
 	}
 
 	return logs, total, nil
@@ -146,7 +157,7 @@ func (dao *AdminDAO) GetUserPointslogs(ctx context.Context, query map[string]any
 	if err := utils.DB.WithContext(ctx).
 		Where(model.Pointslog{}).
 		Count(&total).Error; err != nil {
-		return nil, -1, err
+		return nil, -1, errors.New("")
 	}
 
 	// 分页查询
@@ -154,7 +165,7 @@ func (dao *AdminDAO) GetUserPointslogs(ctx context.Context, query map[string]any
 		Offset((pageNum - 1) * pageSize).
 		Limit(pageSize).
 		Find(&records).Error; err != nil {
-		return nil, -1, err
+		return nil, -1, errors.New("")
 	}
 
 	return records, total, nil
@@ -171,14 +182,14 @@ func (dao *AdminDAO) GetFarms(ctx context.Context, query map[string]any) ([]mode
 	db := utils.DB.WithContext(ctx).Model(&model.Farm{})
 
 	if err := db.Count(&total).Error; err != nil {
-		return nil, -1, err
+		return nil, -1, errors.New("")
 	}
 
 	if err := db.
 		Offset((pageNum - 1) * pageSize).
 		Limit(pageSize).
 		Find(&farms).Error; err != nil {
-		return nil, -1, err
+		return nil, -1, errors.New("")
 	}
 
 	return farms, total, nil
@@ -199,14 +210,14 @@ func (dao *AdminDAO) GetUserMiners(ctx context.Context, userID int, query map[st
 
 	if err := db.
 		Count(&total).Error; err != nil {
-		return nil, -1, err
+		return nil, -1, errors.New("")
 	}
 
 	if err := db.
 		Offset((pageNum - 1) * pageSize).
 		Limit(pageSize).
 		Find(&miners).Error; err != nil {
-		return nil, -1, err
+		return nil, -1, errors.New("")
 	}
 
 	return miners, total, nil
@@ -216,12 +227,12 @@ func (dao *AdminDAO) GetUserMiners(ctx context.Context, userID int, query map[st
 func (dao *AdminDAO) SetUserStatus(ctx context.Context, userID int, status status.UserStatus) error {
 	var user model.User
 	if err := utils.DB.WithContext(ctx).First(&user, userID).Error; err != nil {
-		return err
+		return errors.New("")
 	}
 
 	user.Status = status
 	if err := utils.DB.WithContext(ctx).Save(user).Error; err != nil {
-		return err
+		return errors.New("")
 	}
 
 	return nil
@@ -251,7 +262,7 @@ func (m *AdminDAO) GetGlobalFs(ctx context.Context) ([]model.Fs, error) {
 func (m *AdminDAO) GetInviteReward(ctx context.Context) (float32, error) {
 	var system model.System
 	if err := utils.DB.WithContext(ctx).First(&system).Error; err != nil {
-		return -1, err
+		return -1, errors.New("")
 	}
 	return system.InviteReward, nil
 }
@@ -260,7 +271,7 @@ func (m *AdminDAO) GetInviteReward(ctx context.Context) (float32, error) {
 func (m *AdminDAO) SetInviteReward(ctx context.Context, reward float32) error {
 	var system model.System
 	if err := utils.DB.WithContext(ctx).First(&system).Error; err != nil {
-		return err
+		return errors.New("")
 	}
 	system.InviteReward = reward
 	return utils.DB.WithContext(ctx).Save(system).Error
@@ -270,7 +281,7 @@ func (m *AdminDAO) SetInviteReward(ctx context.Context, reward float32) error {
 func (m *AdminDAO) GetRechargeRatio(ctx context.Context) (float32, error) {
 	var system model.System
 	if err := utils.DB.WithContext(ctx).First(&system).Error; err != nil {
-		return -1, err
+		return -1, errors.New("")
 	}
 	return system.RechargeRatio, nil
 }
@@ -279,17 +290,20 @@ func (m *AdminDAO) GetRechargeRatio(ctx context.Context) (float32, error) {
 func (m *AdminDAO) SetRechargeRatio(ctx context.Context, ratio float32) error {
 	var system model.System
 	if err := utils.DB.WithContext(ctx).First(&system).Error; err != nil {
-		return err
+		return errors.New("")
 	}
 	system.RechargeRatio = ratio
-	return utils.DB.WithContext(ctx).Save(system).Error
+	if err := utils.DB.WithContext(ctx).Save(system).Error; err != nil {
+		return errors.New("")
+	}
+	return nil
 }
 
 // 获取充值返现
 func (m *AdminDAO) GetRechargeReward(ctx context.Context) (float32, error) {
 	var system model.System
 	if err := utils.DB.WithContext(ctx).First(&system).Error; err != nil {
-		return -1, err
+		return -1, errors.New("")
 	}
 	return system.InviteReward, nil
 }
@@ -298,17 +312,20 @@ func (m *AdminDAO) GetRechargeReward(ctx context.Context) (float32, error) {
 func (m *AdminDAO) SetRechargeReward(ctx context.Context, reward float32) error {
 	var system model.System
 	if err := utils.DB.WithContext(ctx).First(&system).Error; err != nil {
-		return err
+		return errors.New("")
 	}
 	system.RechargeReward = reward
-	return utils.DB.WithContext(ctx).Save(system).Error
+	if err := utils.DB.WithContext(ctx).Save(system).Error; err != nil {
+		return errors.New("")
+	}
+	return nil
 }
 
 // 获取注册开关
 func (m *AdminDAO) GetSwitchRegister(ctx context.Context) (status.RegisterStatus, error) {
 	var system model.System
 	if err := utils.DB.WithContext(ctx).First(&system).Error; err != nil {
-		return status.RegisterNone, err
+		return status.RegisterNone, errors.New("")
 	}
 	return system.SwitchRegister, nil
 }
@@ -317,8 +334,11 @@ func (m *AdminDAO) GetSwitchRegister(ctx context.Context) (status.RegisterStatus
 func (m *AdminDAO) SetSwitchRegister(ctx context.Context, s status.RegisterStatus) error {
 	var system model.System
 	if err := utils.DB.WithContext(ctx).First(&system).Error; err != nil {
-		return err
+		return errors.New("")
 	}
 	system.SwitchRegister = s
-	return utils.DB.WithContext(ctx).Save(system).Error
+	if err := utils.DB.WithContext(ctx).Save(system).Error; err != nil {
+		return errors.New("")
+	}
+	return nil
 }

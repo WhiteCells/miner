@@ -12,7 +12,6 @@ import (
 	"miner/model/info"
 	"miner/utils"
 	"slices"
-	"strconv"
 )
 
 type MinerService struct {
@@ -54,7 +53,7 @@ func (m *MinerService) CreateMiner(ctx context.Context, userID, farmID int, req 
 			HiveOsUrl:     utils.GenerateHiveOsUrl(),
 			ApiHiveOsUrls: utils.GenerateHiveOsUrl(),
 			WorkerName:    req.Name,
-			FarmID:        strconv.Itoa(farmID),
+			FarmID:        farmID,
 			RigID:         miner.ID,
 			RigPasswd:     pass,
 		},
@@ -68,7 +67,7 @@ func (m *MinerService) CreateMiner(ctx context.Context, userID, farmID int, req 
 		return nil, errors.New("set cached failed")
 	}
 
-	return miner, err
+	return miner, nil
 }
 
 func (m *MinerService) DelMiner(ctx context.Context, userID, farmID, minerID int) error {

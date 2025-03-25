@@ -7,6 +7,8 @@ import (
 )
 
 func Init(ctx *gin.Engine) {
+	NewHiveosRoute().InitHiveosRoute(ctx)
+
 	ctx.Use(middleware.OperLog())
 
 	NewUserRoute().InitUserRoute(ctx)
@@ -15,5 +17,4 @@ func Init(ctx *gin.Engine) {
 	NewFsRoute().InitFsRoute(ctx)
 	NewWalletRoute().InitWalletRoute(ctx)
 	NewAdminRoute().InitAdminRoute(ctx)
-	NewHiveosRoute().InitHiveosRoute(ctx)
 }
