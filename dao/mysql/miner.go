@@ -158,34 +158,41 @@ func (MinerDAO) GetMiners(ctx context.Context, query map[string]any) (*[]model.M
 	return &miners, total, nil
 }
 
-// 获取矿机
-func (dao *MinerDAO) GetMiner(ctx context.Context, userID, farmID int, query map[string]any) (*[]model.Miner, int64, error) {
-	var miners []model.Miner
-	var total int64
-
-	pageNum := query["page_num"].(int)
-	pageSize := query["page_size"].(int)
-
-	db := utils.DB.WithContext(ctx).
-		Model(&model.Miner{}).
-		Joins("JOIN farm_miner ON farm_miner.miner_id = miner.id").
-		Joins("JOIN user_miner ON user_miner.miner_id = miner.id").
-		Joins("JOIN user_farm ON user_farm.farm_id = farm_miner.farm_id").
-		Where("user_farm.user_id = ? AND user_farm.farm_id = ? AND user_miner.user_id = ?", userID, farmID, userID)
-
-	// 查询总数
-	if err := db.Count(&total).Error; err != nil {
-		return nil, -1, err
-	}
-
-	// 分页查询
-	err := db.
-		Limit(pageSize).
-		Offset((pageNum - 1) * pageSize).
-		Find(&miners).Error
-
-	return &miners, total, err
+// 通过 rigID 获取矿机
+func (MinerDAO) GetMinerByRigID(ctx context.Context, rigID string) (*model.Miner, error) {
+	var miner model.Miner
+	err := utils.DB.WithContext(ctx).First(&miner, "rig_id=?", rigID).Error
+	return &miner, err
 }
+
+// 通过 farmID 获取矿场下的所有矿机
+// func (dao *MinerDAO) GetMinersByFarmID(ctx context.Context, farmID int, query map[string]any) (*[]model.Miner, int64, error) {
+// 	var miners []model.Miner
+// 	var total int64
+
+// 	pageNum := query["page_num"].(int)
+// 	pageSize := query["page_size"].(int)
+
+// 	db := utils.DB.WithContext(ctx).
+// 		Model(&model.Miner{}).
+// 		Joins("JOIN farm_miner ON farm_miner.miner_id = miner.id").
+// 		Joins("JOIN user_miner ON user_miner.miner_id = miner.id").
+// 		Joins("JOIN user_farm ON user_farm.farm_id = farm_miner.farm_id").
+// 		Where("user_farm.user_id = ? AND user_farm.farm_id = ? AND user_miner.user_id = ?", userID, farmID, userID)
+
+// 	// 查询总数
+// 	if err := db.Count(&total).Error; err != nil {
+// 		return nil, -1, err
+// 	}
+
+// 	// 分页查询
+// 	err := db.
+// 		Limit(pageSize).
+// 		Offset((pageNum - 1) * pageSize).
+// 		Find(&miners).Error
+
+// 	return &miners, total, err
+// }
 
 // 应用飞行表
 func (MinerDAO) ApplyFs(ctx context.Context, minerID, fsID int) error {

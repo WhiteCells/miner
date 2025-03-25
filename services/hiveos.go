@@ -202,30 +202,40 @@ func (m *HiveosService) helloCaseUseHash(ctx *gin.Context) {
 func (m *HiveosService) statsCase(ctx *gin.Context, rigID string) {
 	var req dto.HiveOsReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		rsp.Error(ctx, http.StatusBadRequest, err.Error(), "")
+		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
 	m.formatOutput(&req)
 
+	// 通过 rigID 获取 miner
+	miner, err := m.minerDAO.GetMinerByRigID(ctx, rigID)
+	if err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
+		return
+	}
+
 	// 从 req 中获取 rigID，根据 rigID 查询 hiveOsRDB farmID:minerID
-	_, farmID, minerID, err := m.hiveosDAO.GetRigFarmAndMinerID(ctx, rigID)
-	if err != nil {
-		rsp.Error(ctx, http.StatusNotAcceptable, err.Error(), "")
-		return
-	}
-	// 通过 farmID 和 minerID 获取 miner
-	miner, err := m.minerRDB.GetByID(ctx, farmID, minerID)
-	if err != nil {
-		log.Println(farmID, minerID, "minerRDB.GetByID")
-		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), "")
-		return
-	}
+	// _, farmID, minerID, err := m.hiveosDAO.GetRigFarmAndMinerID(ctx, rigID)
+	// if err != nil {
+	// 	rsp.Error(ctx, http.StatusNotAcceptable, err.Error(), "")
+	// 	return
+	// }
+	// // 通过 farmID 和 minerID 获取 miner
+	// miner, err := m.minerRDB.GetByID(ctx, farmID, minerID)
+	// if err != nil {
+	// 	log.Println(farmID, minerID, "minerRDB.GetByID")
+	// 	rsp.Error(ctx, http.StatusInternalServerError, err.Error(), "")
+	// 	return
+	// }
 	// 验证密码
 	if req.Params.Passwd != miner.Pass {
-		log.Println(req.Params.Passwd, miner.Pass, "req.Params.Passwd")
+		log.Println("stats case valid password error", req.Params.Passwd, miner.Pass)
 		rsp.Error(ctx, http.StatusInternalServerError, "invalid pass", "")
 		return
 	}
+
+	//
+	minerInfo, err := m.minerRDB.GetMinerByRigID(ctx, rigID)
 
 	// 对 req 的数据进行存储
 	m.setMinerStats(ctx, rigID, &req)
@@ -238,9 +248,9 @@ func (m *HiveosService) statsCase(ctx *gin.Context, rigID string) {
 		return
 	}
 
-	config := utils.GenerateHiveOsConfig(&miner.HiveOsConfig)
-	wallet := utils.GenerateHiveOsWallet(&miner.HiveOsWallet)
-	autofan := utils.GenerateHiveOsAutofan(&miner.HiveOsAutoFan)
+	config := utils.GenerateHiveOsConfig(&minerInfo.HiveOsConfig)
+	wallet := utils.GenerateHiveOsWallet(&minerInfo.HiveOsWallet)
+	autofan := utils.GenerateHiveOsAutofan(&minerInfo.HiveOsAutoFan)
 
 	// 从 taskRDB 中拿出对应的 task
 	task, err := m.taskRDB.GetTask(ctx, rigID)
@@ -417,14 +427,14 @@ func (m *HiveosService) setMinerStats(ctx context.Context, rigID string, req *dt
 	return m.hiveosRDB.SetMinerStats(ctx, rigID, &stats)
 }
 
-func (m *HiveosService) PostTask(ctx context.Context, req *dto.PostTaskReq) (string, error) {
+func (m *HiveosService) PostTask(ctx context.Context, req *dto.PostTaskReq) (int, error) {
 	task := &model.Task{
 		Type:    req.Type,
 		Status:  info.Pending,
 		Content: req.Content,
 	}
 	if err := m.taskDAO.AddTask(ctx, req.RigID, task); err != nil {
-		return "", err
+		return -1, err
 	}
 
 	return task.ID, nil

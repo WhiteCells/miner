@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"miner/model"
 	"miner/utils"
+	"strconv"
 )
 
 type TaskDAO struct {
@@ -23,7 +24,8 @@ func (dao *TaskDAO) AddTask(ctx context.Context, rigID string, task *model.Task)
 	if err := utils.DB.WithContext(ctx).Create(task).Error; err != nil {
 		return err
 	}
-	return utils.RDB.RPush(ctx, key, task.ID)
+	taskIDStr := strconv.Itoa(task.ID)
+	return utils.RDB.RPush(ctx, key, taskIDStr)
 }
 
 // 获取任务
