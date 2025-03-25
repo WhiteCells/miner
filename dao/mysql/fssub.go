@@ -62,7 +62,7 @@ func (FssubDAO) GetFssubByID(ctx context.Context, fssubID int) (*model.Fssub, er
 	return &fssub, err
 }
 
-func (FssubDAO) GetFssubByFsID(ctx context.Context, fsID int, query map[string]any) (*[]model.Fssub, int64, error) {
+func (FssubDAO) GetFssubByFsID(ctx context.Context, fsID int, query map[string]any) ([]model.Fssub, int64, error) {
 	var fssubs []model.Fssub
 	var total int64
 
@@ -84,7 +84,7 @@ func (FssubDAO) GetFssubByFsID(ctx context.Context, fsID int, query map[string]a
 		Limit(pageSize).
 		Find(&fssubs).
 		Error
-	return &fssubs, total, err
+	return fssubs, total, err
 }
 
 // update

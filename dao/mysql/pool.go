@@ -56,7 +56,7 @@ func (PoolDAO) GetPoolByID(ctx context.Context, poolID int) (*model.Pool, error)
 	return &pool, err
 }
 
-func (PoolDAO) GetPools(ctx context.Context, query map[string]any) (*[]model.Pool, int64, error) {
+func (PoolDAO) GetPools(ctx context.Context, query map[string]any) ([]model.Pool, int64, error) {
 	var pools []model.Pool
 	var total int64
 
@@ -78,5 +78,5 @@ func (PoolDAO) GetPools(ctx context.Context, query map[string]any) (*[]model.Poo
 		return nil, -1, err
 	}
 
-	return &pools, total, nil
+	return pools, total, nil
 }

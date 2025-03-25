@@ -96,7 +96,7 @@ package service
 // }
 
 // // GetAllFs 获取用户的所有飞行表
-// func (s *FsService) GetAllFs(ctx context.Context) (*[]info.Fs, error) {
+// func (s *FsService) GetAllFs(ctx context.Context) ([]info.Fs, error) {
 // 	userID, exists := ctx.Value("user_id").(string)
 // 	if !exists {
 // 		return nil, errors.New("invalid user_id in context")

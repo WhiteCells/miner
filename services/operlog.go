@@ -16,10 +16,10 @@ func NewOperlogService() *OperlogService {
 	}
 }
 
-func (m *OperlogService) GetOperlogByID(ctx context.Context, userID int, query map[string]any) (*[]model.Operlog, int64, error) {
+func (m *OperlogService) GetOperlogByID(ctx context.Context, userID int, query map[string]any) ([]model.Operlog, int64, error) {
 	return m.operlogDAO.GetOperlogByID(ctx, userID, query)
 }
 
-func (m *OperlogService) GetOperlogs(ctx context.Context, query map[string]any) (*[]model.Operlog, int64, error) {
+func (m *OperlogService) GetOperlogs(ctx context.Context, query map[string]any) ([]model.Operlog, int64, error) {
 	return m.operlogDAO.GetOperlogs(ctx, query)
 }

@@ -31,11 +31,12 @@ func (m *FarmController) CreateFarm(ctx *gin.Context) {
 	}
 	userID := ctx.GetInt("user_id")
 
-	if err := m.farmService.CreateFarm(ctx, userID, &req); err != nil {
+	farm, err := m.farmService.CreateFarm(ctx, userID, &req)
+	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
-	rsp.Success(ctx, http.StatusOK, "create farm success", nil)
+	rsp.Success(ctx, http.StatusOK, "create farm success", farm)
 }
 
 // 删除矿场
@@ -70,22 +71,6 @@ func (c *FarmController) UpdateFarm(ctx *gin.Context) {
 
 	rsp.Success(ctx, http.StatusOK, "update farm success", nil)
 }
-
-// UpdateFarmHash 更新矿场hash
-// func (c *FarmController) UpdateFarmHash(ctx *gin.Context) {
-// 	var req dto.UpdateFarmHashReq
-// 	if err := ctx.ShouldBindJSON(&req); err != nil {
-// 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
-// 		return
-// 	}
-
-// 	if err := c.farmService.UpdateFarmHash(ctx, &req); err != nil {
-// 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
-// 		return
-// 	}
-
-// 	rsp.Success(ctx, http.StatusOK, "update farm hash success", nil)
-// }
 
 // 获取用户所有的矿场
 func (c *FarmController) GetFarms(ctx *gin.Context) {
@@ -142,6 +127,20 @@ func (c *FarmController) ApplyFs(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "get user all farm", nil)
 }
 
+// 取消应用
+func (m *FarmController) UnApplyFs(ctx *gin.Context) {
+	var req dto.UnApplyFarmFsReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
+		return
+	}
+	userID := ctx.GetInt("user_id")
+
+	if err := m.farmService.UnApplyFs(ctx, userID, req.FarmID, req.FsID); err != nil {
+
+	}
+}
+
 // 转移矿场
 func (c *FarmController) Transfer(ctx *gin.Context) {
 	var req dto.TransferFarmReq
@@ -157,4 +156,9 @@ func (c *FarmController) Transfer(ctx *gin.Context) {
 	}
 
 	rsp.Success(ctx, http.StatusOK, "transfer farm success", nil)
+}
+
+// 添加管理
+func (c *FarmController) AddMember(ctx *gin.Context) {
+
 }

@@ -47,10 +47,10 @@ func (m *FsService) GetFsByFsID(ctx context.Context, fsID int) (*model.Fs, error
 	return m.fsDAO.GetFsByFsID(ctx, fsID)
 }
 
-func (m *FsService) GetFsByUserID(ctx context.Context, userID int, query map[string]any) (*[]model.Fs, int64, error) {
+func (m *FsService) GetFsByUserID(ctx context.Context, userID int, query map[string]any) ([]model.Fs, int64, error) {
 	return m.fsDAO.GetFsByUserID(ctx, userID, query)
 }
 
-func (m *FsService) GetFss(ctx context.Context, query map[string]any) (*[]model.Fs, int64, error) {
+func (m *FsService) GetFss(ctx context.Context, query map[string]any) ([]model.Fs, int64, error) {
 	return m.fsDAO.GetFss(ctx, query)
 }

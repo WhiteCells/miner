@@ -8,18 +8,19 @@ import (
 	"math/big"
 
 	"github.com/bwmarrin/snowflake"
+	"github.com/google/uuid"
 )
 
-func GeneratePass(length int) (string, error) {
+func GenerateRigPass(length int) (string, error) {
 	if length < 8 {
 		return "", errors.New("invalid argument")
 	}
-	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	const charset = "abcdefghjkmnpqrstuvwxyzABCDEFGHJKMNPQRSTUVWXYZ23456789"
 	str := make([]byte, length)
 	for i := range str {
 		num, err := rand.Int(rand.Reader, big.NewInt(int64(len(charset))))
 		if err != nil {
-			return "", err
+			return "", errors.New("rand int error")
 		}
 		str[i] = charset[num.Int64()]
 	}
@@ -36,10 +37,8 @@ func GenerateUID() (string, error) {
 }
 
 // 28a0259f06d50b134d1c90bd11521ceb0d9fc282
-// 3c658db850c04e9728e0ff51f5116998af8e1ae5
-func GenerateFarmHash(data string) string {
+func GenerateFarmHash() string {
 	hash := sha1.New()
-	hash.Write([]byte(data))
-	rawHash := hash.Sum(nil)
-	return hex.EncodeToString(rawHash)
+	hash.Write([]byte(uuid.New().String()))
+	return hex.EncodeToString(hash.Sum(nil))
 }

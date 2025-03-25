@@ -287,7 +287,7 @@ package service
 // 	return result, nil
 // }
 
-// func (s *UserService) GetCoins(ctx context.Context) (*[]string, error) {
+// func (s *UserService) GetCoins(ctx context.Context) ([]string, error) {
 // 	infos, err := s.coinRDB.GetAll(ctx)
 // 	if err != nil {
 // 		return nil, err
@@ -299,7 +299,7 @@ package service
 // 	return &coins, nil
 // }
 
-// func (s *UserService) GetPools(ctx context.Context, coinName string) (*[]info.Pool, error) {
+// func (s *UserService) GetPools(ctx context.Context, coinName string) ([]info.Pool, error) {
 // 	return s.poolRDB.GetAll(ctx, coinName)
 // }
 
@@ -455,6 +455,6 @@ package service
 // 	return account.Address.Hex(), privateKey, nil
 // }
 
-// func (s *UserService) GetSoftAll(ctx context.Context, coinName string) (*[]info.Soft, error) {
+// func (s *UserService) GetSoftAll(ctx context.Context, coinName string) ([]info.Soft, error) {
 // 	return s.softRDB.GetAll(ctx, coinName)
 // }

@@ -72,7 +72,7 @@ func (WalletDAO) UpdateWallet(ctx context.Context, userID, walletID int, updates
 }
 
 // 获取指定货币的钱包
-func (WalletDAO) GetWalletByCoinID(ctx context.Context, userID, coinID int, query map[string]any) (*[]model.Wallet, int64, error) {
+func (WalletDAO) GetWalletByCoinID(ctx context.Context, userID, coinID int, query map[string]any) ([]model.Wallet, int64, error) {
 	var wallets []model.Wallet
 	var total int64
 
@@ -95,7 +95,7 @@ func (WalletDAO) GetWalletByCoinID(ctx context.Context, userID, coinID int, quer
 		return nil, -1, err
 	}
 
-	return &wallets, total, nil
+	return wallets, total, nil
 }
 
 // 获取指定钱包
@@ -106,7 +106,7 @@ func (WalletDAO) GetWalletByID(ctx context.Context, walletID int) (*model.Wallet
 }
 
 // 获取用户所有钱包
-func (WalletDAO) GetWallets(ctx context.Context, userID int, query map[string]any) (*[]model.Wallet, int64, error) {
+func (WalletDAO) GetWallets(ctx context.Context, userID int, query map[string]any) ([]model.Wallet, int64, error) {
 	var wallets []model.Wallet
 	var total int64
 
@@ -129,5 +129,5 @@ func (WalletDAO) GetWallets(ctx context.Context, userID int, query map[string]an
 		Error; err != nil {
 		return nil, -1, err
 	}
-	return &wallets, total, nil
+	return wallets, total, nil
 }

@@ -86,7 +86,7 @@ func (FsDAO) GetFsByFsID(ctx context.Context, fsID int) (*model.Fs, error) {
 }
 
 // 获取指定用户指定飞行表
-func (FsDAO) GetFsByUserID(ctx context.Context, userID int, query map[string]any) (*[]model.Fs, int64, error) {
+func (FsDAO) GetFsByUserID(ctx context.Context, userID int, query map[string]any) ([]model.Fs, int64, error) {
 	var fss []model.Fs
 	var total int64
 
@@ -110,11 +110,11 @@ func (FsDAO) GetFsByUserID(ctx context.Context, userID int, query map[string]any
 		return nil, -1, err
 	}
 
-	return &fss, total, nil
+	return fss, total, nil
 }
 
 // 获取所有飞行表
-func (FsDAO) GetFss(ctx context.Context, query map[string]any) (*[]model.Fs, int64, error) {
+func (FsDAO) GetFss(ctx context.Context, query map[string]any) ([]model.Fs, int64, error) {
 	var fss []model.Fs
 	var total int64
 
@@ -136,7 +136,7 @@ func (FsDAO) GetFss(ctx context.Context, query map[string]any) (*[]model.Fs, int
 		return nil, -1, err
 	}
 
-	return &fss, total, nil
+	return fss, total, nil
 }
 
 // 矿机应用飞行表
@@ -159,33 +159,3 @@ func (FsDAO) ApplyFsToMiner(ctx context.Context, fsID int, minerID int) error {
 		return nil
 	})
 }
-
-// 飞行表应用钱包
-// func (FsDAO) ApplyWallet(ctx context.Context, fsID int, walletID int) error {
-// 	return utils.DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-// 		// 检查飞行表币种和钱包币种是否一致
-// 		var fs model.Fs
-// 		if err := tx.First(&fs, fsID).Error; err != nil {
-// 			return err
-// 		}
-// 		var wallet model.Wallet
-// 		if err := tx.First(&wallet, walletID).Error; err != nil {
-// 			return err
-// 		}
-// 		// 删除原有 Fs-wallet 联系
-// 		if err := tx.Model(&relation.FsWallet{}).
-// 			Where("Fs_id = ? AND wallet_id = ?", fsID, walletID).
-// 			Delete(&relation.FsWallet{}).Error; err != nil {
-// 			return err
-// 		}
-// 		// 建立新的 Fs-wallet 联系
-// 		FsWallet := &relation.FsWallet{
-// 			FsID:     fsID,
-// 			WalletID: walletID,
-// 		}
-// 		if err := tx.Create(&FsWallet).Error; err != nil {
-// 			return err
-// 		}
-// 		return nil
-// 	})
-// }

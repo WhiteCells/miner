@@ -51,7 +51,7 @@ func (c *SoftAllRDB) Get(ctx context.Context, name string) (*info.Soft, error) {
 	return &info_, nil
 }
 
-func (c *SoftAllRDB) GetAll(ctx context.Context) (*[]info.Soft, error) {
+func (c *SoftAllRDB) GetAll(ctx context.Context) ([]info.Soft, error) {
 	field := MakeField(SoftAllField)
 
 	infos, err := utils.RDB.HGetAll(ctx, field)
@@ -68,7 +68,7 @@ func (c *SoftAllRDB) GetAll(ctx context.Context) (*[]info.Soft, error) {
 		Softs = append(Softs, info_)
 	}
 
-	return &Softs, nil
+	return Softs, nil
 }
 
 func (c *SoftAllRDB) Exists(ctx context.Context, name string) bool {

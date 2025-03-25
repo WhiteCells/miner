@@ -77,7 +77,7 @@ type HiveOsConfig struct {
 	HiveOsUrl     string `json:"hive_os_url"`
 	ApiHiveOsUrls string `json:"api_hive_os_urls"`
 	// Id of the rig
-	RigID string `json:"rig_id"`
+	RigID int `json:"rig_id"`
 	// Password of the rig
 	RigPasswd string `json:"rig_passwd"`
 	// Rig hostname
@@ -193,7 +193,7 @@ HIVE_HOST_URL="%s"
 API_HOST_URLs="%s"
 
 # Id of the rig
-RIG_ID=%s
+RIG_ID=%d
 
 # Rig password as in admin panel
 RIG_PASSWD="%s"
@@ -361,11 +361,7 @@ CUSTOM_CRITICAL_TEMP="%s"
 
 // 生成 hiveosurl
 func GenerateHiveOsUrl() string {
-	//host := Config.Server.Host
-	//port := Config.Server.Port
-	//return fmt.Sprintf("http://%s:%d", host, port)
-	hiveOsUrl := Config.Server.HiveOsUrl
-	return fmt.Sprintf(hiveOsUrl)
+	return Config.Server.HiveOsUrl
 }
 
 func GeneratePort() string {

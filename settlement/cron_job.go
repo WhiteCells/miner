@@ -43,7 +43,7 @@ func processPointsDeduct(ctx context.Context) {
 	}
 
 	workerCnt := 10
-	userChan := make(chan model.User, len(*users))
+	userChan := make(chan model.User, len(users))
 	var wg sync.WaitGroup
 
 	for range workerCnt {
@@ -58,7 +58,7 @@ func processPointsDeduct(ctx context.Context) {
 		}()
 	}
 
-	for _, user := range *users {
+	for _, user := range users {
 		userChan <- user
 	}
 	close(userChan)
@@ -94,7 +94,7 @@ func processUserPoints(ctx context.Context, user *model.User) {
 		}
 
 		gpuNum := 0
-		for _, farm := range *farms {
+		for _, farm := range farms {
 			p, err := userFarmDAO.GetPerm(ctx, user.ID, farm.ID)
 			if err != nil {
 				continue
@@ -138,7 +138,7 @@ func processUserPoints(ctx context.Context, user *model.User) {
 			return
 		}
 
-		detail := fmt.Sprintf("farm num:%d gpu num:%d", len(*farms), gpuNum)
+		detail := fmt.Sprintf("farm num:%d gpu num:%d", len(farms), gpuNum)
 		pointslog := &model.Pointslog{
 			UserID:  user.ID,
 			Type:    points.PointSettlement,

@@ -28,15 +28,10 @@ func NewLimiter(limit int, duration time.Duration) *Limiter {
 
 func (m *Limiter) Limit() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		userID, exists := ctx.Value("user_id").(string)
-		if !exists {
-			rsp.Error(ctx, http.StatusInternalServerError, "invalid user_id in context", "")
-			ctx.Abort()
-			return
-		}
+		userID := ctx.GetInt("user_id")
 		url := ctx.Request.RequestURI
 		method := ctx.Request.Method
-		key := fmt.Sprintf("limit:%s:%s:%s", method, url, userID)
+		key := fmt.Sprintf("limit:%s:%s:%d", method, url, userID)
 		redisCtx := ctx.Request.Context()
 		now := time.Now().UnixMilli()
 

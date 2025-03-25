@@ -51,7 +51,7 @@ func (c *CoinRDB) Get(ctx context.Context, name string) (*info.Coin, error) {
 	return &info_, nil
 }
 
-func (c *CoinRDB) GetAll(ctx context.Context) (*[]info.Coin, error) {
+func (c *CoinRDB) GetAll(ctx context.Context) ([]info.Coin, error) {
 	field := MakeField(CoinField)
 
 	infos, err := utils.RDB.HGetAll(ctx, field)
@@ -68,7 +68,7 @@ func (c *CoinRDB) GetAll(ctx context.Context) (*[]info.Coin, error) {
 		coins = append(coins, info_)
 	}
 
-	return &coins, nil
+	return coins, nil
 }
 
 func (c *CoinRDB) Exists(ctx context.Context, name string) bool {

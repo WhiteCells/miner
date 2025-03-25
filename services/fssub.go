@@ -43,6 +43,6 @@ func (m *FssubService) GetFssubByID(ctx context.Context, fssubID int) (*model.Fs
 	return m.fssubDAO.GetFssubByID(ctx, fssubID)
 }
 
-func (m *FssubService) GetFssubByFsID(ctx context.Context, fsID int, query map[string]any) (*[]model.Fssub, int64, error) {
+func (m *FssubService) GetFssubByFsID(ctx context.Context, fsID int, query map[string]any) ([]model.Fssub, int64, error) {
 	return m.fssubDAO.GetFssubByFsID(ctx, fsID, query)
 }

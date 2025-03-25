@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"miner/model/info"
 	"miner/utils"
+	"strconv"
 	"strings"
 )
 
@@ -56,10 +57,11 @@ func (c *HiveOsRDB) ExistsRigID(ctx context.Context, rigID string) bool {
 // +--------------------+----------+
 // | key                | val      |
 // +--------------------+----------+
-// | os_stats:<rig_id>  | <stats>  |
+// | os:stats:<rig_id>  | <stats>  |
 // +--------------------+----------+
-func (c *HiveOsRDB) SetMinerStats(ctx context.Context, rigID string, stats *info.MinerStats) error {
-	key := MakeKey(OsStatsField, rigID)
+func (c *HiveOsRDB) SetMinerStats(ctx context.Context, rigID int, stats *info.MinerStats) error {
+	rigIDStr := strconv.Itoa(rigID)
+	key := MakeKey(OsStatsField, rigIDStr)
 	minerStatsByte, err := json.Marshal(stats)
 	if err != nil {
 		return err
@@ -84,10 +86,11 @@ func (c *HiveOsRDB) GetMinerStats(ctx context.Context, rigID string) (*info.Mine
 // +-------------------+-----------+
 // | key               | val       |
 // +-------------------+-----------+
-// | os_info:<rig_id>  | <info>    |
+// | os:info:<rig_id>  | <info>    |
 // +-------------------+-----------+
-func (c *HiveOsRDB) SetMinerInfo(ctx context.Context, rigID string, info *info.MinerInfo) error {
-	key := MakeKey(OsInfoField, rigID)
+func (c *HiveOsRDB) SetMinerInfo(ctx context.Context, rigID int, info *info.MinerInfo) error {
+	rigIDStr := strconv.Itoa(rigID)
+	key := MakeKey(OsInfoField, rigIDStr)
 	minerInfoByte, err := json.Marshal(info)
 	if err != nil {
 		return err

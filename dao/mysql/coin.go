@@ -31,7 +31,7 @@ func (CoinDAO) GetCoin(ctx context.Context, coinID int) (*model.Coin, error) {
 	return &coin, err
 }
 
-func (CoinDAO) GetCoins(ctx context.Context, query map[string]any) (*[]model.Coin, int64, error) {
+func (CoinDAO) GetCoins(ctx context.Context, query map[string]any) ([]model.Coin, int64, error) {
 	var coin []model.Coin
 	var total int64
 
@@ -48,5 +48,5 @@ func (CoinDAO) GetCoins(ctx context.Context, query map[string]any) (*[]model.Coi
 		Limit(pageSize).
 		Find(&coin).
 		Error
-	return &coin, total, err
+	return coin, total, err
 }

@@ -23,7 +23,7 @@ func NewAdminService() *AdminService {
 	}
 }
 
-func (m *AdminService) GetUsers(ctx context.Context, query map[string]any) (*[]model.User, int64, error) {
+func (m *AdminService) GetUsers(ctx context.Context, query map[string]any) ([]model.User, int64, error) {
 	return m.adminDAO.GetUsers(ctx, query)
 }
 
@@ -47,7 +47,7 @@ func (m *AdminService) GetMnemonic(ctx context.Context) (string, error) {
 	return m.adminRDB.GetMnemonic(ctx)
 }
 
-func (m *AdminService) GetAllMnemonic(ctx context.Context) (*[]string, error) {
+func (m *AdminService) GetAllMnemonic(ctx context.Context) ([]string, error) {
 	return m.adminRDB.GetAllMnemonic(ctx)
 }
 
@@ -59,7 +59,7 @@ func (m *AdminService) GetBscApiKey(ctx context.Context) (string, error) {
 	return m.bscApiKeyRDB.ZRangeWithScore(ctx)
 }
 
-func (m *AdminService) GetAllBscApiKey(ctx context.Context) (*[]string, error) {
+func (m *AdminService) GetAllBscApiKey(ctx context.Context) ([]string, error) {
 	return m.bscApiKeyRDB.ZRange(ctx)
 }
 
@@ -83,7 +83,7 @@ func (m *AdminService) DelBscApiKey(ctx context.Context, apikey string) error {
 // 	return m.adminDAO.GetPool(poolID)
 // }
 
-// func (m *AdminService) GetAllPools(ctx context.Context, query map[string]any) (*[]model.Pool, error) {
+// func (m *AdminService) GetAllPools(ctx context.Context, query map[string]any) ([]model.Pool, error) {
 // 	return m.adminDAO.GetAllPools(query)
 // }
 
@@ -95,27 +95,27 @@ func (m *AdminService) GetFreeGpuNum(ctx context.Context) (int, error) {
 	return m.adminDAO.GetFreeGpuNum(ctx)
 }
 
-func (m *AdminService) GetUserOperlogs(ctx context.Context, query map[string]any) (*[]model.Operlog, int64, error) {
+func (m *AdminService) GetUserOperlogs(ctx context.Context, query map[string]any) ([]model.Operlog, int64, error) {
 	return m.adminDAO.GetUserOperlogs(ctx, query)
 }
 
-func (m *AdminService) GetUserPointslogs(ctx context.Context, query map[string]any) (*[]model.Pointslog, int64, error) {
+func (m *AdminService) GetUserPointslogs(ctx context.Context, query map[string]any) ([]model.Pointslog, int64, error) {
 	return m.adminDAO.GetUserPointslogs(ctx, query)
 }
 
-func (m *AdminService) GetUserLoginlogs(ctx context.Context, query map[string]any) (*[]model.Loginlog, int64, error) {
+func (m *AdminService) GetUserLoginlogs(ctx context.Context, query map[string]any) ([]model.Loginlog, int64, error) {
 	return m.adminDAO.GetUserLoginlogs(ctx, query)
 }
 
-func (m *AdminService) GetFarms(ctx context.Context, query map[string]any) (*[]model.Farm, int64, error) {
+func (m *AdminService) GetFarms(ctx context.Context, query map[string]any) ([]model.Farm, int64, error) {
 	return m.farmDAO.GetFarms(ctx, query)
 }
 
-func (m *AdminService) GetFarmsByUserID(ctx context.Context, userID int, query map[string]any) (*[]model.Farm, int64, error) {
+func (m *AdminService) GetFarmsByUserID(ctx context.Context, userID int, query map[string]any) ([]model.Farm, int64, error) {
 	return m.farmDAO.GetFarmsByUserID(ctx, userID, query)
 }
 
-func (m *AdminService) GetUserMiners(ctx context.Context, userID int, query map[string]any) (*[]model.Miner, int64, error) {
+func (m *AdminService) GetUserMiners(ctx context.Context, userID int, query map[string]any) ([]model.Miner, int64, error) {
 	return m.adminDAO.GetUserMiners(ctx, userID, query)
 }
 

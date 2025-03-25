@@ -111,28 +111,28 @@ func (m *UserService) Register(ctx *gin.Context, req *dto.RegisterReq) (string, 
 	}
 
 	// 取出助记词
-	mn, err := m.adminRDB.GetMnemonic(ctx)
-	if err != nil {
-		return "", err
-	}
+	// mn, err := m.adminRDB.GetMnemonic(ctx)
+	// if err != nil {
+	// 	return "", err
+	// }
 
-	address, key, err := utils.GenerateAddress(mn, uid)
-	if err != nil {
-		return "", err
-	}
+	// address, key, err := utils.GenerateAddress(mn, uid)
+	// if err != nil {
+	// 	return "", err
+	// }
 
 	user := &model.User{
-		Name:        req.Username,
-		Password:    password,
-		Secret:      secret,
-		Address:     address,
+		Name:     req.Username,
+		Password: password,
+		Secret:   secret,
+		// Address:     address,
 		Email:       req.Email,
 		Role:        role.User,
 		LastBalance: 0,
 		Status:      status.UserOn,
 		UID:         uid,
 		InviteCode:  uid,
-		Key:         key,
+		// Key:         key,
 	}
 
 	if err := m.userDAO.CreateUser(ctx, user); err != nil {
@@ -186,11 +186,11 @@ func (m *UserService) GetUserPointsBalance(ctx context.Context, userID int) (flo
 	return m.userDAO.GetUserPointsBalance(ctx, userID)
 }
 
-func (m *UserService) GetUserOperlogs(ctx context.Context, userID int, query map[string]any) (*[]model.Operlog, error) {
+func (m *UserService) GetUserOperlogs(ctx context.Context, userID int, query map[string]any) ([]model.Operlog, error) {
 	return m.userDAO.GetUserOperlogs(ctx, userID, query)
 }
 
-func (m *UserService) GetUserPointslog(ctx context.Context, userID int, query map[string]any) (*[]model.Pointslog, error) {
+func (m *UserService) GetUserPointslog(ctx context.Context, userID int, query map[string]any) ([]model.Pointslog, error) {
 	return m.userDAO.GetUserPointslogs(ctx, userID, query)
 }
 

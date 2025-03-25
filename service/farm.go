@@ -156,7 +156,7 @@ package service
 // }
 
 // // GetFarm 获取用户的所有矿场信息
-// func (s *FarmService) GetAllFarm(ctx context.Context) (*[]info.Farm, error) {
+// func (s *FarmService) GetAllFarm(ctx context.Context) ([]info.Farm, error) {
 // 	userID, exists := ctx.Value("user_id").(string)
 // 	if !exists {
 // 		return nil, errors.New("invalid user_id in context")

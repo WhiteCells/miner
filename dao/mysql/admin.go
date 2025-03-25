@@ -19,7 +19,7 @@ func (dao *AdminDAO) DelUser(ctx context.Context, userID int) error {
 }
 
 // 获取用户
-func (dao *AdminDAO) GetUsers(ctx context.Context, query map[string]any) (*[]model.User, int64, error) {
+func (dao *AdminDAO) GetUsers(ctx context.Context, query map[string]any) ([]model.User, int64, error) {
 	var users []model.User
 	var total int64
 
@@ -42,14 +42,14 @@ func (dao *AdminDAO) GetUsers(ctx context.Context, query map[string]any) (*[]mod
 		Order("id"). // 目前用 ID，后续有需求在修改
 		Find(&users).Error
 
-	return &users, total, err
+	return users, total, err
 }
 
 // 获取所有用户
-func (dao *AdminDAO) GetAllUsers(ctx context.Context) (*[]model.User, error) {
+func (dao *AdminDAO) GetAllUsers(ctx context.Context) ([]model.User, error) {
 	var users []model.User
 	err := utils.DB.WithContext(ctx).Find(&users).Error
-	return &users, err
+	return users, err
 }
 
 // 获取用户状态
@@ -84,7 +84,7 @@ func (m *AdminDAO) GetFreeGpuNum(ctx context.Context) (int, error) {
 }
 
 // 获取用户日志
-func (dao *AdminDAO) GetUserOperlogs(ctx context.Context, query map[string]any) (*[]model.Operlog, int64, error) {
+func (dao *AdminDAO) GetUserOperlogs(ctx context.Context, query map[string]any) ([]model.Operlog, int64, error) {
 	var logs []model.Operlog
 	var total int64
 
@@ -105,11 +105,11 @@ func (dao *AdminDAO) GetUserOperlogs(ctx context.Context, query map[string]any) 
 		return nil, -1, err
 	}
 
-	return &logs, total, nil
+	return logs, total, nil
 }
 
 // 获取用户登陆日志
-func (dao *AdminDAO) GetUserLoginlogs(ctx context.Context, query map[string]any) (*[]model.Loginlog, int64, error) {
+func (dao *AdminDAO) GetUserLoginlogs(ctx context.Context, query map[string]any) ([]model.Loginlog, int64, error) {
 	var logs []model.Loginlog
 	var total int64
 
@@ -131,11 +131,11 @@ func (dao *AdminDAO) GetUserLoginlogs(ctx context.Context, query map[string]any)
 		return nil, -1, err
 	}
 
-	return &logs, total, nil
+	return logs, total, nil
 }
 
 // 获取用户积分记录
-func (dao *AdminDAO) GetUserPointslogs(ctx context.Context, query map[string]any) (*[]model.Pointslog, int64, error) {
+func (dao *AdminDAO) GetUserPointslogs(ctx context.Context, query map[string]any) ([]model.Pointslog, int64, error) {
 	var records []model.Pointslog
 	var total int64
 
@@ -157,11 +157,11 @@ func (dao *AdminDAO) GetUserPointslogs(ctx context.Context, query map[string]any
 		return nil, -1, err
 	}
 
-	return &records, total, nil
+	return records, total, nil
 }
 
 // 获取用户的矿场
-func (dao *AdminDAO) GetFarms(ctx context.Context, query map[string]any) (*[]model.Farm, int64, error) {
+func (dao *AdminDAO) GetFarms(ctx context.Context, query map[string]any) ([]model.Farm, int64, error) {
 	var farms []model.Farm
 	var total int64
 
@@ -181,11 +181,11 @@ func (dao *AdminDAO) GetFarms(ctx context.Context, query map[string]any) (*[]mod
 		return nil, -1, err
 	}
 
-	return &farms, total, nil
+	return farms, total, nil
 }
 
 // 获取用户的矿机
-func (dao *AdminDAO) GetUserMiners(ctx context.Context, userID int, query map[string]any) (*[]model.Miner, int64, error) {
+func (dao *AdminDAO) GetUserMiners(ctx context.Context, userID int, query map[string]any) ([]model.Miner, int64, error) {
 	var miners []model.Miner
 	var total int64
 
@@ -209,7 +209,7 @@ func (dao *AdminDAO) GetUserMiners(ctx context.Context, userID int, query map[st
 		return nil, -1, err
 	}
 
-	return &miners, total, nil
+	return miners, total, nil
 }
 
 // 设置用户状态
@@ -239,12 +239,12 @@ func (m *AdminDAO) UpdateGlobalFs(ctx context.Context, fsID int) error {
 	return nil
 }
 
-func (m *AdminDAO) GetGlobalFs(ctx context.Context) (*[]model.Fs, error) {
+func (m *AdminDAO) GetGlobalFs(ctx context.Context) ([]model.Fs, error) {
 	var globalFs []model.Fs
 	err := utils.DB.WithContext(ctx).
 		Where("is_global=?", 1).
 		Find(&globalFs).Error
-	return &globalFs, err
+	return globalFs, err
 }
 
 // 获取充值返现

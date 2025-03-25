@@ -14,7 +14,7 @@ func NewLoginlogDAO() *LoginlogDAO {
 }
 
 // 获取指定用户日志
-func (m *LoginlogDAO) GetLoginlogByID(ctx context.Context, userID int, query map[string]any) (*[]model.Loginlog, int64, error) {
+func (m *LoginlogDAO) GetLoginlogByID(ctx context.Context, userID int, query map[string]any) ([]model.Loginlog, int64, error) {
 	var logs []model.Loginlog
 	var total int64
 
@@ -33,11 +33,11 @@ func (m *LoginlogDAO) GetLoginlogByID(ctx context.Context, userID int, query map
 		Limit(pageSize).
 		Find(&logs).Error
 
-	return &logs, total, err
+	return logs, total, err
 }
 
 // 获取登录日志
-func (m *LoginlogDAO) GetLoginlogs(ctx context.Context, query map[string]any) (*[]model.Loginlog, int64, error) {
+func (m *LoginlogDAO) GetLoginlogs(ctx context.Context, query map[string]any) ([]model.Loginlog, int64, error) {
 	var logs []model.Loginlog
 	var total int64
 
@@ -55,5 +55,5 @@ func (m *LoginlogDAO) GetLoginlogs(ctx context.Context, query map[string]any) (*
 		Limit(pageSize).
 		Find(&logs).Error
 
-	return &logs, total, err
+	return logs, total, err
 }

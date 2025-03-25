@@ -8,6 +8,7 @@ import (
 	"miner/common/role"
 	"miner/common/rsp"
 	"miner/common/status"
+	"miner/dao/mysql"
 	"miner/dao/redis"
 	"miner/utils"
 
@@ -56,16 +57,13 @@ func JWTAuth() gin.HandlerFunc {
 	}
 }
 
+var userDAO = mysql.NewUserDAO()
+
 // 角色验证
 func RoleAuth(roles ...role.RoleType) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		userID, exists := ctx.Value("user_id").(string)
-		if !exists {
-			rsp.Error(ctx, http.StatusForbidden, "user_id not found", nil)
-			ctx.Abort()
-			return
-		}
-		user, err := UserRDB.GetByID(ctx, userID)
+		userID := ctx.GetInt("user_id")
+		user, err := userDAO.GetUserByID(ctx, userID)
 		if err != nil {
 			rsp.Error(ctx, http.StatusForbidden, "user not found", nil)
 			ctx.Abort()
@@ -83,13 +81,8 @@ func RoleAuth(roles ...role.RoleType) gin.HandlerFunc {
 // 状态验证
 func StatusAuth() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		userID, exists := ctx.Value("user_id").(string)
-		if !exists {
-			rsp.Error(ctx, http.StatusForbidden, "user_id not in context", nil)
-			ctx.Abort()
-			return
-		}
-		user, err := UserRDB.GetByID(ctx, userID)
+		userID := ctx.GetInt("user_id")
+		user, err := userDAO.GetUserByID(ctx, userID)
 		if err != nil {
 			rsp.Error(ctx, http.StatusForbidden, "user not found", nil)
 			ctx.Abort()

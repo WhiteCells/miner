@@ -36,27 +36,27 @@ package service
 // }
 
 // // GetAllUser 获取所有用户信息
-// func (s *AdminService) GetAllUser(ctx context.Context) (*[]info.User, error) {
+// func (s *AdminService) GetAllUser(ctx context.Context) ([]info.User, error) {
 // 	return s.adminRDB.GetAllUsers(ctx)
 // }
 
 // // GetUserOperLogs 获取用户操作日志
-// func (s *AdminService) GetUserOperLogs(ctx context.Context, query map[string]any) (*[]model.Operlog, int64, error) {
+// func (s *AdminService) GetUserOperLogs(ctx context.Context, query map[string]any) ([]model.Operlog, int64, error) {
 // 	return s.adminDAO.GetUserOperlogs(ctx, query)
 // }
 
 // // GetUserLoginLogs 获取用户登陆日志
-// func (s *AdminService) GetUserLoginLogs(ctx context.Context, query map[string]any) (*[]model.Loginlog, int64, error) {
+// func (s *AdminService) GetUserLoginLogs(ctx context.Context, query map[string]any) ([]model.Loginlog, int64, error) {
 // 	return s.adminDAO.GetUserLoginlogs(ctx, query)
 // }
 
 // // GetUserPointsRecords 获取用户积分记录
-// func (s *AdminService) GetUserPointsRecords(ctx context.Context, query map[string]any) (*[]model.Pointslog, int64, error) {
+// func (s *AdminService) GetUserPointsRecords(ctx context.Context, query map[string]any) ([]model.Pointslog, int64, error) {
 // 	return s.adminDAO.GetUserPointslogs(ctx, query)
 // }
 
 // // GetUserFarms 获取用户的矿场
-// func (s *AdminService) GetUserFarms(ctx context.Context) (*[]info.Farm, error) {
+// func (s *AdminService) GetUserFarms(ctx context.Context) ([]info.Farm, error) {
 // 	userID, exists := ctx.Value("user_id").(string)
 // 	if !exists {
 // 		return nil, errors.New("invalid user_id in context")
@@ -65,7 +65,7 @@ package service
 // }
 
 // // GetUserMiners 获取用户的矿机
-// func (s *AdminService) GetUserMiners(ctx context.Context, farmID string) (*[]info.Miner, error) {
+// func (s *AdminService) GetUserMiners(ctx context.Context, farmID string) ([]info.Miner, error) {
 // 	return s.adminRDB.GetUserMiners(ctx, farmID)
 // }
 
@@ -137,7 +137,7 @@ package service
 // }
 
 // // GetAllMnemonic 获取所有助记词
-// func (s *AdminService) GetAllMnemonic(ctx context.Context) (*[]string, error) {
+// func (s *AdminService) GetAllMnemonic(ctx context.Context) ([]string, error) {
 // 	return s.adminRDB.GetAllMnemonic(ctx)
 // }
 
@@ -152,7 +152,7 @@ package service
 // }
 
 // // GetAllApiKey 获取所有 apikey
-// func (s *AdminService) GetAllBscApiKey(ctx context.Context) (*[]string, error) {
+// func (s *AdminService) GetAllBscApiKey(ctx context.Context) ([]string, error) {
 // 	return s.bscApiKeyRDB.ZRange(ctx)
 // }
 
@@ -177,7 +177,7 @@ package service
 // }
 
 // // GetAllCoin 获取所有代币
-// func (s *AdminService) GetAllCoin(ctx context.Context) (*[]info.Coin, error) {
+// func (s *AdminService) GetAllCoin(ctx context.Context) ([]info.Coin, error) {
 // 	return s.coinRDB.GetAll(ctx)
 // }
 
@@ -213,12 +213,12 @@ package service
 // }
 
 // // GetAllPool 获取所有矿池
-// func (s *AdminService) GetAllPool(ctx context.Context) (*[]info.Pool, error) {
+// func (s *AdminService) GetAllPool(ctx context.Context) ([]info.Pool, error) {
 // 	return s.poolsRDB.GetAll(ctx)
 // }
 
 // // GetAllPoolByCoin 根据coin获取所有矿池
-// func (s *AdminService) GetAllPoolByCoin(ctx context.Context, coinName string) (*[]info.Pool, error) {
+// func (s *AdminService) GetAllPoolByCoin(ctx context.Context, coinName string) ([]info.Pool, error) {
 // 	return s.poolRDB.GetAll(ctx, coinName)
 // }
 
@@ -259,12 +259,12 @@ package service
 // }
 
 // // GetAllSoft 获取所有矿池
-// func (s *AdminService) GetAllSoft(ctx context.Context) (*[]info.Soft, error) {
+// func (s *AdminService) GetAllSoft(ctx context.Context) ([]info.Soft, error) {
 // 	return s.softAllRDB.GetAll(ctx)
 // }
 
 // // GetAllSoftByCoin 根据coin获取所有矿池
-// func (s *AdminService) GetAllSoftByCoin(ctx context.Context, coinName string) (*[]info.Soft, error) {
+// func (s *AdminService) GetAllSoftByCoin(ctx context.Context, coinName string) ([]info.Soft, error) {
 // 	return s.softRDB.GetAll(ctx, coinName)
 // }
 

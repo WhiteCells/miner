@@ -44,7 +44,7 @@ func (m *WalletService) UpdateWallet(ctx context.Context, userID, walletID int, 
 	return m.walletDAO.UpdateWallet(ctx, userID, walletID, updates)
 }
 
-func (m *WalletService) GetWalletByCoinID(ctx context.Context, userID, coinID int, query map[string]any) (*[]model.Wallet, int64, error) {
+func (m *WalletService) GetWalletByCoinID(ctx context.Context, userID, coinID int, query map[string]any) ([]model.Wallet, int64, error) {
 	return m.walletDAO.GetWalletByCoinID(ctx, userID, coinID, query)
 }
 
@@ -52,6 +52,6 @@ func (m *WalletService) GetWalletByWalletID(ctx context.Context, userID, walletI
 	return m.walletDAO.GetWalletByID(ctx, walletID)
 }
 
-func (m *WalletService) GetWalletsByUserID(ctx context.Context, userID int, query map[string]any) (*[]model.Wallet, int64, error) {
+func (m *WalletService) GetWalletsByUserID(ctx context.Context, userID int, query map[string]any) ([]model.Wallet, int64, error) {
 	return m.walletDAO.GetWallets(ctx, userID, query)
 }

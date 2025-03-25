@@ -52,7 +52,7 @@ func (c *PoolRDB) Get(ctx context.Context, coin string, name string) (*info.Pool
 	return &info_, nil
 }
 
-func (c *PoolRDB) GetAll(ctx context.Context, coin string) (*[]info.Pool, error) {
+func (c *PoolRDB) GetAll(ctx context.Context, coin string) ([]info.Pool, error) {
 	field := MakeField(PoolField, coin)
 
 	infos, err := utils.RDB.HGetAll(ctx, field)
@@ -69,7 +69,7 @@ func (c *PoolRDB) GetAll(ctx context.Context, coin string) (*[]info.Pool, error)
 		pools = append(pools, info_)
 	}
 
-	return &pools, nil
+	return pools, nil
 }
 
 func (c *PoolRDB) Exists(ctx context.Context, coin string, name string) bool {

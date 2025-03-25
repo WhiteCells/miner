@@ -2,6 +2,7 @@ package relationdao
 
 import (
 	"context"
+	"errors"
 	"miner/common/perm"
 	"miner/model/relation"
 	"miner/utils"
@@ -31,8 +32,10 @@ func (UserFarmDAO) UnBindUserFromFarm(ctx context.Context, userID int, farmID in
 
 func (UserFarmDAO) GetPerm(ctx context.Context, userID int, farmID int) (perm.FarmPerm, error) {
 	var userFarm relation.UserFarm
-	err := utils.DB.
+	if err := utils.DB.
 		Where("user_id = ? AND farm_id = ?", userID, farmID).
-		First(&userFarm).Error
-	return userFarm.Perm, err
+		First(&userFarm).Error; err != nil {
+		return perm.FarmNone, errors.New("no association")
+	}
+	return userFarm.Perm, nil
 }

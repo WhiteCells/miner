@@ -80,12 +80,12 @@ func (r *RedisClient) ZRangeWithScore(ctx context.Context, field string) (string
 	return res[0].Member.(string), nil
 }
 
-func (r *RedisClient) ZRange(ctx context.Context, field string) (*[]string, error) {
+func (r *RedisClient) ZRange(ctx context.Context, field string) ([]string, error) {
 	res, err := r.Client.ZRange(ctx, field, 0, -1).Result()
 	if err != nil {
 		return nil, err
 	}
-	return &res, nil
+	return res, nil
 }
 
 // 主要用于判断 field key 是否已经村存在

@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"log"
 	"miner/common/dto"
 	"miner/common/rsp"
@@ -44,24 +43,24 @@ func NewHiveosService() *HiveosService {
 }
 
 func (m *HiveosService) Poll(ctx *gin.Context) {
-	rigID := ctx.Query("id_rig")
+	rigIDStr := ctx.Query("id_rig")
 	method := ctx.Query("method")
 
 	switch method {
 	case "hello":
-		if rigID != "" {
-			m.helloCase(ctx, rigID)
+		if rigIDStr != "" {
+			m.helloCase(ctx, rigIDStr)
 		} else {
 			m.helloCaseUseHash(ctx)
 		}
 	case "stats":
-		m.statsCase(ctx, rigID)
+		m.statsCase(ctx, rigIDStr)
 	case "message":
-		m.messageCase(ctx, rigID)
+		m.messageCase(ctx, rigIDStr)
 	}
 }
 
-func (m *HiveosService) helloCase(ctx *gin.Context, rigID string) {
+func (m *HiveosService) helloCase(ctx *gin.Context, rigIDStr string) {
 	var req dto.HelloReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		utils.Logger.Error("helloCase ShouldBindJSON, error" + err.Error())
@@ -70,39 +69,48 @@ func (m *HiveosService) helloCase(ctx *gin.Context, rigID string) {
 	}
 	m.formatOutput(&req)
 
-	miner, err := m.minerRDB.GetMinerByRigID(ctx, rigID)
+	rigID, err := strconv.Atoi(rigIDStr)
 	if err != nil {
-		log.Println(rigID, "minerRDB.GetMinerByRigID")
+		utils.Logger.Error("helloCase rigIDStr conv error" + err.Error())
+		log.Println("helloCase rigIDStr conv error", rigID, err.Error())
+		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
+		return
+	}
+
+	// 获取 miner 缓存
+	minerInfo, err := m.minerRDB.GetMinerByRigID(ctx, rigID)
+	if err != nil {
+		utils.Logger.Error("helloCase GetMinerByRigID" + err.Error())
+		log.Println("helloCase minerRDB.GetMinerByRigID", rigID, err.Error())
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
 
 	// 验证密码
-	if req.Params.Passwd != miner.HiveOsConfig.RigPasswd {
-		log.Println(req.Params.Passwd, miner.HiveOsConfig.RigPasswd, "req.Params.Passwd")
-		rsp.Error(ctx, http.StatusInternalServerError, "invalid pass", "")
+	if req.Params.Passwd != minerInfo.HiveOsConfig.RigPasswd {
+		log.Println(req.Params.Passwd, minerInfo.HiveOsConfig.RigPasswd, "req.Params.Passwd")
+		rsp.Error(ctx, http.StatusInternalServerError, "invalid pass", nil)
 		return
 	}
 
 	// 对 req 的数据进行存储
-	errSetInfo := m.setMinerInfo(ctx, rigID, &req)
-	if errSetInfo != nil {
-		rsp.Error(ctx, http.StatusInternalServerError, "failed to set hiveos info", "")
+	if err := m.setMinerInfo(ctx, rigID, &req); err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, "failed to set hiveos info", nil)
 		return
 	}
 
 	// 更新 miner GpuNum
-	miner.GpuNum = len(req.Params.Gpu)
-	if err := m.minerRDB.UpdateMinerByRigID(ctx, rigID, miner); err != nil {
-		rsp.Error(ctx, http.StatusInternalServerError, "failed to update miner info", "")
+	minerInfo.GpuNum = len(req.Params.Gpu)
+	if err := m.minerRDB.UpdateMinerByRigID(ctx, rigID, minerInfo); err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, "failed to update miner info", nil)
 		return
 	}
 
-	config := utils.GenerateHiveOsConfig(&miner.HiveOsConfig)
-	wallet := utils.GenerateHiveOsWallet(&miner.HiveOsWallet)
-	autofan := utils.GenerateHiveOsAutofan(&miner.HiveOsAutoFan)
+	config := utils.GenerateHiveOsConfig(&minerInfo.HiveOsConfig)
+	wallet := utils.GenerateHiveOsWallet(&minerInfo.HiveOsWallet)
+	autofan := utils.GenerateHiveOsAutofan(&minerInfo.HiveOsAutoFan)
 
-	rsp_ := &dto.ServerRsp{
+	rsp := &dto.ServerRsp{
 		ID:      0,
 		Jsonrpc: "2.0",
 		Result: dto.ServerRsp_Result{
@@ -115,65 +123,63 @@ func (m *HiveosService) helloCase(ctx *gin.Context, rigID string) {
 		},
 	}
 
-	//log.Println("rsp", rsp_)
+	m.formatOutput(&rsp)
 
-	ctx.JSON(http.StatusOK, rsp_)
+	ctx.JSON(http.StatusOK, rsp)
 }
 
 // poll hello case use hash
 func (m *HiveosService) helloCaseUseHash(ctx *gin.Context) {
 	var req dto.HelloReq
-	body, err := io.ReadAll(ctx.Request.Body)
-	err = json.Unmarshal(body, &req)
-	if err != nil {
-		utils.Logger.Error("helloCaseUseHash Unmarshal req error:" + err.Error())
-		rsp.Error(ctx, http.StatusBadRequest, err.Error(), "")
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		utils.Logger.Error("helloCase ShouldBindJSON, error" + err.Error())
+		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
+	m.formatOutput(&req)
 
 	// 获取 farm
 	farm, err := m.farmDAO.GetFarmByHash(ctx, req.Params.FarmHash)
-	// 创建 miner
-	rigID, err := m.minerService.generateRigID(ctx, 8)
 	if err != nil {
-		rsp.Error(ctx, http.StatusBadRequest, err.Error(), "")
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), "")
 		return
 	}
-	pass, err := m.minerService.generateRigPass(ctx, 8)
+	// 创建 miner
+	pass, err := utils.GenerateRigPass(8)
 	if err != nil {
-		rsp.Error(ctx, http.StatusBadRequest, err.Error(), "")
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), "")
 		return
 	}
 	miner := &model.Miner{
-		Name:  req.Params.WorkerName,
-		RigID: rigID,
-		Pass:  pass,
+		Name: req.Params.WorkerName,
+		Pass: pass,
 	}
-	err = m.minerDAO.CreateMiner(ctx, farm.ID, miner)
-
+	if err = m.minerDAO.CreateMiner(ctx, farm.ID, miner); err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), "")
+		return
+	}
 	// 创建 miner 缓存
-	minerInfo := &info.Miner{}
-	if err := m.minerRDB.CreateMinerByRigID(ctx, miner.RigID, minerInfo); err != nil {
+	minerInfo := &info.Miner{
+		HiveOsConfig: utils.HiveOsConfig{
+			HiveOsUrl:     utils.GenerateHiveOsUrl(),
+			ApiHiveOsUrls: utils.GenerateHiveOsUrl(),
+			WorkerName:    req.Params.Mb.Bios,
+			FarmID:        strconv.Itoa(farm.ID),
+			RigID:         miner.ID,
+			RigPasswd:     pass,
+		},
+	}
+	if err := m.minerRDB.CreateMinerByRigID(ctx, miner.ID, minerInfo); err != nil {
 		utils.Logger.Error("helloCaseUseHash CreateMinerByRigID error" + err.Error())
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), "")
 		return
 	}
 
-	if err := m.setMinerInfo(ctx, rigID, &req); err != nil {
+	if err := m.setMinerInfo(ctx, miner.ID, &req); err != nil {
 		utils.Logger.Error("helloCaseUseHash setMinerInfo error" + err.Error())
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), "")
 		return
 	}
-
-	// farm, err := m.farmDAO.GetFarmByHash(ctx, req.Params.FarmHash)
-
-	// createMinerReq := dto.CreateMinerReq{
-	// 	Name:   req.Params.WorkerName,
-	// 	FarmID: farm.ID,
-	// }
-	// // 这里会有一个逻辑问题
-	// // userID 应该是 farm 的管理员的 userID 还是使用 hash 的 userID
-	// m.minerService.CreateMiner(ctx, userID, farm.ID, &createMinerReq)
 
 	config := utils.GenerateHiveOsConfig(&minerInfo.HiveOsConfig)
 	wallet := utils.GenerateHiveOsWallet(&minerInfo.HiveOsWallet)
@@ -199,7 +205,7 @@ func (m *HiveosService) helloCaseUseHash(ctx *gin.Context) {
 }
 
 // Poll stats case
-func (m *HiveosService) statsCase(ctx *gin.Context, rigID string) {
+func (m *HiveosService) statsCase(ctx *gin.Context, rigIDStr string) {
 	var req dto.HiveOsReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
@@ -207,26 +213,20 @@ func (m *HiveosService) statsCase(ctx *gin.Context, rigID string) {
 	}
 	m.formatOutput(&req)
 
+	rigID, err := strconv.Atoi(rigIDStr)
+	if err != nil {
+		utils.Logger.Error("statsCase rigIDStr conv error" + err.Error())
+		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
+		return
+	}
+
 	// 通过 rigID 获取 miner
-	miner, err := m.minerDAO.GetMinerByRigID(ctx, rigID)
+	miner, err := m.minerDAO.GetMinerByID(ctx, rigID)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
 
-	// 从 req 中获取 rigID，根据 rigID 查询 hiveOsRDB farmID:minerID
-	// _, farmID, minerID, err := m.hiveosDAO.GetRigFarmAndMinerID(ctx, rigID)
-	// if err != nil {
-	// 	rsp.Error(ctx, http.StatusNotAcceptable, err.Error(), "")
-	// 	return
-	// }
-	// // 通过 farmID 和 minerID 获取 miner
-	// miner, err := m.minerRDB.GetByID(ctx, farmID, minerID)
-	// if err != nil {
-	// 	log.Println(farmID, minerID, "minerRDB.GetByID")
-	// 	rsp.Error(ctx, http.StatusInternalServerError, err.Error(), "")
-	// 	return
-	// }
 	// 验证密码
 	if req.Params.Passwd != miner.Pass {
 		log.Println("stats case valid password error", req.Params.Passwd, miner.Pass)
@@ -236,17 +236,13 @@ func (m *HiveosService) statsCase(ctx *gin.Context, rigID string) {
 
 	//
 	minerInfo, err := m.minerRDB.GetMinerByRigID(ctx, rigID)
+	if err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), "")
+		return
+	}
 
 	// 对 req 的数据进行存储
 	m.setMinerStats(ctx, rigID, &req)
-
-	// 通过 minerID 获取其 fsID
-
-	rigIDInt, err := strconv.Atoi(rigID)
-	if err != nil {
-		rsp.Error(ctx, http.StatusInternalServerError, "convertion failed", err.Error())
-		return
-	}
 
 	config := utils.GenerateHiveOsConfig(&minerInfo.HiveOsConfig)
 	wallet := utils.GenerateHiveOsWallet(&minerInfo.HiveOsWallet)
@@ -268,7 +264,7 @@ func (m *HiveosService) statsCase(ctx *gin.Context, rigID string) {
 	switch task.Type {
 	case info.Cmd:
 		ctx.JSON(http.StatusOK, &dto.ServerRsp{
-			ID:      rigIDInt,
+			ID:      rigID,
 			Jsonrpc: "2.0",
 			Result: dto.ServerRsp_Result{
 				ID:        task.ID,
@@ -284,7 +280,7 @@ func (m *HiveosService) statsCase(ctx *gin.Context, rigID string) {
 
 	case info.Config:
 		ctx.JSON(http.StatusOK, &dto.ServerRsp{
-			ID:      rigIDInt,
+			ID:      rigID,
 			Jsonrpc: "2.0",
 			Result: dto.ServerRsp_Result{
 				ID:        task.ID,
@@ -300,7 +296,7 @@ func (m *HiveosService) statsCase(ctx *gin.Context, rigID string) {
 }
 
 // Poll message case
-func (m *HiveosService) messageCase(ctx *gin.Context, rigID string) {
+func (m *HiveosService) messageCase(ctx *gin.Context, rigIDStr string) {
 	// 这一次 hiveos 的请求为上一次 服务器 回包（命令、配置）的结果
 	var req dto.HiveOsResReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -308,6 +304,13 @@ func (m *HiveosService) messageCase(ctx *gin.Context, rigID string) {
 		return
 	}
 	m.formatOutput(&req)
+
+	rigID, err := strconv.Atoi(rigIDStr)
+	if err != nil {
+		utils.Logger.Error("messageCase rigIDStr conv error" + err.Error())
+		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
+		return
+	}
 
 	// 查找命令
 	// 根绝请求生成新的任务，更新任务中的 result
@@ -332,19 +335,13 @@ func (m *HiveosService) messageCase(ctx *gin.Context, rigID string) {
 	log.Println("task:", task)
 	log.Println("=======================")
 
-	_, farmID, minerID, err := m.hiveosDAO.GetRigFarmAndMinerID(ctx, rigID)
+	// 通过 rigID 获取 miner
+	miner, err := m.minerDAO.GetMinerByID(ctx, rigID)
 	if err != nil {
-		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), "hiveOsRDB.GetRigFarmAndMinerID")
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
-	// 通过 farmID 和 minerID 获取 miner
-	miner, err := m.minerRDB.GetByID(ctx, farmID, minerID)
-	if err != nil {
-		log.Println(farmID, minerID)
-		log.Println("minerRDB.GetByID")
-		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), "")
-		return
-	}
+
 	// 验证密码
 	if req.Params.Passwd != miner.Pass {
 		log.Println(req.Params.Passwd, miner.Pass)
@@ -353,11 +350,15 @@ func (m *HiveosService) messageCase(ctx *gin.Context, rigID string) {
 		return
 	}
 
-	// 通过 minerID 获取其 fsID
+	minerInfo, err := m.minerRDB.GetMinerByRigID(ctx, rigID)
+	if err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
+		return
+	}
 
-	config := utils.GenerateHiveOsConfig(&miner.HiveOsConfig)
-	wallet := utils.GenerateHiveOsWallet(&miner.HiveOsWallet)
-	autofan := utils.GenerateHiveOsAutofan(&miner.HiveOsAutoFan)
+	config := utils.GenerateHiveOsConfig(&minerInfo.HiveOsConfig)
+	wallet := utils.GenerateHiveOsWallet(&minerInfo.HiveOsWallet)
+	autofan := utils.GenerateHiveOsAutofan(&minerInfo.HiveOsAutoFan)
 
 	ctx.JSON(http.StatusOK, &dto.ServerRsp{
 		ID:      0,
@@ -373,7 +374,7 @@ func (m *HiveosService) messageCase(ctx *gin.Context, rigID string) {
 	})
 }
 
-func (m *HiveosService) setMinerInfo(ctx context.Context, rigID string, req *dto.HelloReq) error {
+func (m *HiveosService) setMinerInfo(ctx context.Context, rigID int, req *dto.HelloReq) error {
 	var info info.MinerInfo
 	info.RigID = req.Params.RigID
 	info.Passwd = req.Params.Passwd
@@ -405,7 +406,7 @@ func (m *HiveosService) setMinerInfo(ctx context.Context, rigID string, req *dto
 	return m.hiveosRDB.SetMinerInfo(ctx, rigID, &info)
 }
 
-func (m *HiveosService) setMinerStats(ctx context.Context, rigID string, req *dto.HiveOsReq) error {
+func (m *HiveosService) setMinerStats(ctx context.Context, rigID int, req *dto.HiveOsReq) error {
 	var stats info.MinerStats
 	stats.Algo = req.Params.MinerStats.Algo
 	stats.BusNumbers = req.Params.MinerStats.BusNumbers

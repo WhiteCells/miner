@@ -77,7 +77,7 @@ package service
 // 	return nil
 // }
 
-// func (s *WalletService) GetAllWallet(ctx context.Context) (*[]info.Wallet, error) {
+// func (s *WalletService) GetAllWallet(ctx context.Context) ([]info.Wallet, error) {
 // 	userID := ctx.Value("user_id").(string)
 // 	return s.walletRDB.GetAll(ctx, userID)
 // }
@@ -87,7 +87,7 @@ package service
 // 	return s.walletRDB.GetByID(ctx, userID, walletID)
 // }
 
-// func (s *WalletService) GetAllWalletByCoin(ctx context.Context, coin string) (*[]info.Wallet, error) {
+// func (s *WalletService) GetAllWalletByCoin(ctx context.Context, coin string) ([]info.Wallet, error) {
 // 	userID := ctx.Value("user_id").(string)
 // 	if coin == "" {
 // 		return s.walletRDB.GetAll(ctx, userID)
@@ -96,7 +96,7 @@ package service
 // }
 
 // // GetAllWalletAllCoin
-// func (s *WalletService) GetAllWalletAllCoin(ctx context.Context) (*[]string, error) {
+// func (s *WalletService) GetAllWalletAllCoin(ctx context.Context) ([]string, error) {
 // 	userID := ctx.Value("user_id").(string)
 // 	var coins []string
 // 	wallets, err := s.walletRDB.GetAll(ctx, userID)

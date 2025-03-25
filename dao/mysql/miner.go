@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"context"
+	"errors"
 	"miner/model"
 	"miner/model/relation"
 	"miner/utils"
@@ -17,64 +18,42 @@ func NewMinerDAO() *MinerDAO {
 
 // 创建矿机
 func (dao *MinerDAO) CreateMiner(ctx context.Context, farmID int, miner *model.Miner) error {
-	// 创建矿机时就需要将用户与用户与矿机进行联系
-	err := utils.DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		// 创建 miner
+	return utils.DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		// miner
 		if err := tx.Create(miner).Error; err != nil {
-			return err
+			return errors.New("failed to create miner")
 		}
-
-		// // 建立 user-miner 关联
-		// userMiner := &relation.UserMiner{
-		// 	UserID:  userID,
-		// 	MinerID: miner.ID,
-		// 	// Perm:    perm.MinerOwner,
-		// }
-		// if err := tx.Create(userMiner).Error; err != nil {
-		// 	return err
-		// }
-
-		// 建立 farm-miner 关联
+		// farm-miner
 		farmMiner := &relation.FarmMiner{
 			FarmID:  farmID,
 			MinerID: miner.ID,
 		}
 		if err := tx.Create(farmMiner).Error; err != nil {
-			return err
+			return errors.New("failed to create farm-miner")
 		}
 		return nil
 	})
-	return err
 }
 
 // 删除矿机
 func (dao *MinerDAO) DelMiner(ctx context.Context, userID, minerID int) error {
-	err := utils.DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		// 删除 user-miner 关联
+	return utils.DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		// farm-miner
 		if err := tx.
-			Where("user_id=? AND miner_id=?", userID, minerID).
-			Delete(&relation.UserMiner{}).Error; err != nil {
-			return err
+			Delete(&relation.FarmMiner{}, "miner_id=?", minerID).Error; err != nil {
+			return errors.New("failed to delete farm-miner")
 		}
-		// 删除 farm-miner 关联
+		// miner-fs
 		if err := tx.
-			Where("miner_id=?", minerID).
-			Delete(&relation.FarmMiner{}).Error; err != nil {
-			return err
+			Delete(&relation.MinerFs{}, "miner_id=?", minerID).Error; err != nil {
+			return errors.New("failed to delete miner-fs")
 		}
-		// 删除 miner-fs 关联
-		if err := tx.
-			Where("miner_id = ?", minerID).
-			Delete(&relation.MinerFs{}).Error; err != nil {
-			return err
-		}
-		// 删除 miner
+		// miner
 		if err := tx.Delete(&model.Miner{}, minerID).Error; err != nil {
-			return err
+			return errors.New("failed to delete miner")
 		}
 		return nil
 	})
-	return err
 }
 
 // 更新矿机
@@ -85,30 +64,17 @@ func (dao *MinerDAO) UpdateMiner(ctx context.Context, userID, minerID int, updat
 		Updates(updateInfo).Error
 }
 
-// 更新矿机状态
-func (dao *MinerDAO) UpdateMinerStatus(ctx context.Context, minerID int, status int) error {
-	return utils.DB.WithContext(ctx).
-		Model(&model.Miner{}).
-		Where("id = ?", minerID).
-		Update("status", status).Error
-}
-
 // 获取指定矿机
-func (dao *MinerDAO) GetMinerByMinerID(ctx context.Context, userID, minerID int) (*model.Miner, error) {
-	var total int64
-	if err := utils.DB.WithContext(ctx).
-		Model(&relation.UserMiner{}).
-		Where("user_id=? AND miner_id=?", userID, minerID).
-		Count(&total).Error; err != nil {
-		return nil, err
-	}
+func (dao *MinerDAO) GetMinerByID(ctx context.Context, minerID int) (*model.Miner, error) {
 	var miner model.Miner
-	err := utils.DB.WithContext(ctx).First(&miner, minerID).Error
-	return &miner, err
+	if err := utils.DB.WithContext(ctx).First(&miner, minerID).Error; err != nil {
+		return nil, errors.New("db miner not found")
+	}
+	return &miner, nil
 }
 
 // 获取指定矿场的所有矿机
-func (dao *MinerDAO) GetMinersByFarmID(ctx context.Context, farmID int, query map[string]any) (*[]model.Miner, int64, error) {
+func (dao *MinerDAO) GetMinersByFarmID(ctx context.Context, farmID int, query map[string]any) ([]model.Miner, int64, error) {
 	var miners []model.Miner
 	var total int64
 
@@ -131,11 +97,11 @@ func (dao *MinerDAO) GetMinersByFarmID(ctx context.Context, farmID int, query ma
 		return nil, -1, err
 	}
 
-	return &miners, total, nil
+	return miners, total, nil
 }
 
 // 获取所有矿机
-func (MinerDAO) GetMiners(ctx context.Context, query map[string]any) (*[]model.Miner, int64, error) {
+func (MinerDAO) GetMiners(ctx context.Context, query map[string]any) ([]model.Miner, int64, error) {
 	var miners []model.Miner
 	var total int64
 
@@ -155,53 +121,7 @@ func (MinerDAO) GetMiners(ctx context.Context, query map[string]any) (*[]model.M
 		return nil, -1, err
 	}
 
-	return &miners, total, nil
-}
-
-// 通过 rigID 获取矿机
-func (MinerDAO) GetMinerByRigID(ctx context.Context, rigID string) (*model.Miner, error) {
-	var miner model.Miner
-	err := utils.DB.WithContext(ctx).First(&miner, "rig_id=?", rigID).Error
-	return &miner, err
-}
-
-// 通过 farmID 获取矿场下的所有矿机
-// func (dao *MinerDAO) GetMinersByFarmID(ctx context.Context, farmID int, query map[string]any) (*[]model.Miner, int64, error) {
-// 	var miners []model.Miner
-// 	var total int64
-
-// 	pageNum := query["page_num"].(int)
-// 	pageSize := query["page_size"].(int)
-
-// 	db := utils.DB.WithContext(ctx).
-// 		Model(&model.Miner{}).
-// 		Joins("JOIN farm_miner ON farm_miner.miner_id = miner.id").
-// 		Joins("JOIN user_miner ON user_miner.miner_id = miner.id").
-// 		Joins("JOIN user_farm ON user_farm.farm_id = farm_miner.farm_id").
-// 		Where("user_farm.user_id = ? AND user_farm.farm_id = ? AND user_miner.user_id = ?", userID, farmID, userID)
-
-// 	// 查询总数
-// 	if err := db.Count(&total).Error; err != nil {
-// 		return nil, -1, err
-// 	}
-
-// 	// 分页查询
-// 	err := db.
-// 		Limit(pageSize).
-// 		Offset((pageNum - 1) * pageSize).
-// 		Find(&miners).Error
-
-// 	return &miners, total, err
-// }
-
-// 应用飞行表
-func (MinerDAO) ApplyFs(ctx context.Context, minerID, fsID int) error {
-	return nil
-}
-
-// 取消应用飞行表
-func (MinerDAO) UnApplyFs(ctx context.Context, minerID, fsID int) error {
-	return nil
+	return miners, total, nil
 }
 
 // 转移
@@ -224,12 +144,4 @@ func (dao *MinerDAO) Transfer(ctx context.Context, fromFarmID, minerID int, toFa
 		return nil
 	})
 	return err
-}
-
-func (MinerDAO) ExistsRigID(ctx context.Context, rigID string) bool {
-	var count int64
-	err := utils.DB.WithContext(ctx).
-		Model(&model.Miner{}).
-		Count(&count).Error
-	return err == nil
 }

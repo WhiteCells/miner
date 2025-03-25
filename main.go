@@ -15,7 +15,7 @@ var configPath string
 
 // go run main.go -f config.dev.yml
 func init() {
-	flag.StringVar(&configPath, "c", "./config.yml", "path to config file")
+	flag.StringVar(&configPath, "c", "./config.dev.yml", "path to config file")
 	flag.Parse()
 
 	utils.InitConfig(configPath, "yml")

@@ -272,7 +272,7 @@ package service
 // }
 
 // // GetMiner 获取用户在矿场的所有矿机
-// func (s *MinerService) GetFarmAllMiner(ctx context.Context, farmID string) (*[]info.Miner, error) {
+// func (s *MinerService) GetFarmAllMiner(ctx context.Context, farmID string) ([]info.Miner, error) {
 // 	miners, err := s.minerRDB.GetAll(ctx, farmID)
 // 	return miners, err
 // }

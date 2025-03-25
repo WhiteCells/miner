@@ -17,7 +17,7 @@ func (dao *PointslogDAO) CreatePointslog(ctx context.Context, log *model.Pointsl
 }
 
 // 获取指定用户积分日志
-func (dao *PointslogDAO) GetPointslogByID(ctx context.Context, userID int, query map[string]any) (*[]model.Pointslog, int64, error) {
+func (dao *PointslogDAO) GetPointslogByID(ctx context.Context, userID int, query map[string]any) ([]model.Pointslog, int64, error) {
 	var logs []model.Pointslog
 	var total int64
 
@@ -34,11 +34,11 @@ func (dao *PointslogDAO) GetPointslogByID(ctx context.Context, userID int, query
 		Limit(pageSize).
 		Find(&logs).Error
 
-	return &logs, total, err
+	return logs, total, err
 }
 
 // 获取积分日志
-func (PointslogDAO) GetPointslogs(ctx context.Context, query map[string]any) (*[]model.Pointslog, int64, error) {
+func (PointslogDAO) GetPointslogs(ctx context.Context, query map[string]any) ([]model.Pointslog, int64, error) {
 	var logs []model.Pointslog
 	var total int64
 
@@ -55,7 +55,7 @@ func (PointslogDAO) GetPointslogs(ctx context.Context, query map[string]any) (*[
 		Limit(pageSize).
 		Find(&logs).Error
 
-	return &logs, total, err
+	return logs, total, err
 }
 
 func (dao *PointslogDAO) GetUserPointsBalance(ctx context.Context, userID int) (int, error) {

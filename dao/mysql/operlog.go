@@ -13,7 +13,7 @@ func NewOperLogDAO() *OperLogDAO {
 }
 
 // 获取操作日志
-func (OperLogDAO) GetOperlogs(ctx context.Context, query map[string]any) (*[]model.Operlog, int64, error) {
+func (OperLogDAO) GetOperlogs(ctx context.Context, query map[string]any) ([]model.Operlog, int64, error) {
 	var logs []model.Operlog
 	var total int64
 
@@ -32,11 +32,11 @@ func (OperLogDAO) GetOperlogs(ctx context.Context, query map[string]any) (*[]mod
 		Order("time desc").
 		Find(&logs).Error
 
-	return &logs, total, err
+	return logs, total, err
 }
 
 // 获取指定用户操作日志
-func (dao *OperLogDAO) GetOperlogByID(ctx context.Context, userID int, query map[string]any) (*[]model.Operlog, int64, error) {
+func (dao *OperLogDAO) GetOperlogByID(ctx context.Context, userID int, query map[string]any) ([]model.Operlog, int64, error) {
 	var logs []model.Operlog
 	var total int64
 
@@ -56,5 +56,5 @@ func (dao *OperLogDAO) GetOperlogByID(ctx context.Context, userID int, query map
 		Order("time desc").
 		Find(&logs).Error
 
-	return &logs, total, err
+	return logs, total, err
 }

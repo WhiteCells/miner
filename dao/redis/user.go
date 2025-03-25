@@ -93,7 +93,7 @@ func (c *UserRDB) GetByEmail(ctx context.Context, email string) (*info.User, err
 }
 
 // 获取所用用户信息
-func (c *UserRDB) GetAll(ctx context.Context) (*[]info.User, error) {
+func (c *UserRDB) GetAll(ctx context.Context) ([]info.User, error) {
 	idUser, err := utils.RDB.HGetAll(ctx, UserField)
 	if err != nil {
 		return nil, err
@@ -106,7 +106,7 @@ func (c *UserRDB) GetAll(ctx context.Context) (*[]info.User, error) {
 		}
 		users = append(users, *user)
 	}
-	return &users, err
+	return users, err
 }
 
 // 是否存在邮箱

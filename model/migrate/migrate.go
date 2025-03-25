@@ -27,7 +27,7 @@ func Migrate() error {
 		&relation.MinerFs{},
 		&relation.UserFarm{},
 		&relation.UserFs{},
-		&relation.UserMiner{},
+		// &relation.UserMiner{},
 		&relation.UserWallet{},
 	)
 }

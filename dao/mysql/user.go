@@ -65,11 +65,11 @@ func (UserDAO) GetUserByInviteCode(ctx context.Context, inviteCode string) (*mod
 	return &user, err
 }
 
-func (UserDAO) GetAllUsers(ctx context.Context) (*[]model.User, error) {
+func (UserDAO) GetAllUsers(ctx context.Context) ([]model.User, error) {
 	var user []model.User
 	err := utils.DB.WithContext(ctx).
 		Find(&user).Error
-	return &user, err
+	return user, err
 }
 
 func (UserDAO) GetUserAddress(ctx context.Context, userID int) (string, error) {
@@ -85,20 +85,20 @@ func (UserDAO) GetUserPointsBalance(ctx context.Context, userID int) (float32, e
 	return user.InvitePoints + user.RechargePoints, err
 }
 
-func (UserDAO) GetUserOperlogs(ctx context.Context, userID int, query map[string]any) (*[]model.Operlog, error) {
+func (UserDAO) GetUserOperlogs(ctx context.Context, userID int, query map[string]any) ([]model.Operlog, error) {
 	var operlogs []model.Operlog
 	err := utils.DB.WithContext(ctx).
 		Where("user_id = ?", userID).
 		Find(&operlogs).Error
-	return &operlogs, err
+	return operlogs, err
 }
 
-func (UserDAO) GetUserPointslogs(ctx context.Context, userID int, query map[string]any) (*[]model.Pointslog, error) {
+func (UserDAO) GetUserPointslogs(ctx context.Context, userID int, query map[string]any) ([]model.Pointslog, error) {
 	var pointslogs []model.Pointslog
 	err := utils.DB.WithContext(ctx).
 		Where("user_id = ?", userID).
 		Find(&pointslogs).Error
-	return &pointslogs, err
+	return pointslogs, err
 }
 
 func (UserDAO) UpdatePassword(ctx context.Context, userID int, newPassword string) error {

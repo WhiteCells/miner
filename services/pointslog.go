@@ -16,10 +16,10 @@ func NewPointslogService() *PointslogService {
 	}
 }
 
-func (m *PointslogService) GetPointslogByUserID(ctx context.Context, userID int, query map[string]any) (*[]model.Pointslog, int64, error) {
+func (m *PointslogService) GetPointslogByUserID(ctx context.Context, userID int, query map[string]any) ([]model.Pointslog, int64, error) {
 	return m.pointslogDAO.GetPointslogByID(ctx, userID, query)
 }
 
-func (m *PointslogService) GetPointslogs(ctx context.Context, query map[string]any) (*[]model.Pointslog, int64, error) {
+func (m *PointslogService) GetPointslogs(ctx context.Context, query map[string]any) ([]model.Pointslog, int64, error) {
 	return m.pointslogDAO.GetPointslogs(ctx, query)
 }

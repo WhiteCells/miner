@@ -19,3 +19,7 @@ func NewCoinService() *CoinService {
 func (m *CoinService) CreateCoin(ctx context.Context, userID int, coin *model.Coin) error {
 	return m.coinDAO.CreateCoin(ctx, coin)
 }
+
+func (m *CoinService) DelCoin(ctx context.Context, userID, coinID int) error {
+	return m.coinDAO.DelCoin(ctx, coinID)
+}

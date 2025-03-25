@@ -32,7 +32,7 @@ func NewAdminRDB() *AdminRDB {
 }
 
 // 获取所有用户信息
-func (c *AdminRDB) GetAllUsers(ctx context.Context) (*[]info.User, error) {
+func (c *AdminRDB) GetAllUsers(ctx context.Context) ([]info.User, error) {
 	idInfo, err := utils.RDB.HGetAll(ctx, UserField)
 	if err != nil {
 		return nil, err
@@ -45,16 +45,16 @@ func (c *AdminRDB) GetAllUsers(ctx context.Context) (*[]info.User, error) {
 		}
 		users = append(users, *user)
 	}
-	return &users, nil
+	return users, nil
 }
 
 // 获取指定用户的所有矿场
-func (c *AdminRDB) GetUserFarms(ctx context.Context, userID string) (*[]info.Farm, error) {
+func (c *AdminRDB) GetUserFarms(ctx context.Context, userID string) ([]info.Farm, error) {
 	return c.farmRDB.GetAll(ctx, userID)
 }
 
 // 获取指定用户的所有矿机
-// func (c *AdminRDB) GetUserMiners(ctx context.Context, farmID string) (*[]info.Miner, error) {
+// func (c *AdminRDB) GetUserMiners(ctx context.Context, farmID string) ([]info.Miner, error) {
 // 	return c.minerRDB.GetAll(ctx, farmID)
 // }
 
@@ -224,18 +224,18 @@ func (c *AdminRDB) GetMnemonic(ctx context.Context) (string, error) {
 	key := MakeKey(Mnemonic, Active)
 	mnemonic, err := utils.RDB.Get(ctx, key)
 	if err != nil {
-		return "", err
+		return "", errors.New("mnemonic not set")
 	}
 	// 解密
 	mnemonic, err = c.decryptMnemonic(mnemonic, utils.Config.Mnemonic.Key)
 	if err != nil {
-		return "", err
+		return "", errors.New("failed to decrypt mnemonic")
 	}
 	return mnemonic, nil
 }
 
 // 获取所有助记词
-func (c *AdminRDB) GetAllMnemonic(ctx context.Context) (*[]string, error) {
+func (c *AdminRDB) GetAllMnemonic(ctx context.Context) ([]string, error) {
 	var mnemonics []string
 
 	// active
@@ -261,7 +261,7 @@ func (c *AdminRDB) GetAllMnemonic(ctx context.Context) (*[]string, error) {
 		}
 	}
 
-	return &mnemonics, nil
+	return mnemonics, nil
 }
 
 // 加密助记词

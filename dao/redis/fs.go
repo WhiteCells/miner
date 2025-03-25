@@ -52,7 +52,7 @@ func (c *FsRDB) Del(ctx context.Context, userID string, fsID string) error {
 }
 
 // 查询飞行表
-func (c *FsRDB) GetAll(ctx context.Context, userID string) (*[]info.Fs, error) {
+func (c *FsRDB) GetAll(ctx context.Context, userID string) ([]info.Fs, error) {
 	field := MakeField(FsField, userID)
 	idInfo, err := utils.RDB.HGetAll(ctx, field)
 	if err != nil {
@@ -66,7 +66,7 @@ func (c *FsRDB) GetAll(ctx context.Context, userID string) (*[]info.Fs, error) {
 		}
 		fss = append(fss, *fs)
 	}
-	return &fss, nil
+	return fss, nil
 }
 
 // 通过 ID 查询

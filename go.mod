@@ -7,6 +7,7 @@ require (
 	github.com/ethereum/go-ethereum v1.14.12
 	github.com/gin-gonic/gin v1.10.0
 	github.com/golang-jwt/jwt/v4 v4.5.1
+	github.com/google/uuid v1.4.0
 	github.com/miguelmota/go-ethereum-hdwallet v0.1.2
 	github.com/mojocn/base64Captcha v1.3.6
 	github.com/natefinch/lumberjack v2.0.0+incompatible

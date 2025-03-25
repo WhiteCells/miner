@@ -40,7 +40,7 @@ func (c *FarmRDB) Del(ctx context.Context, userID string, farmID string) error {
 }
 
 // 查询
-func (c *FarmRDB) GetAll(ctx context.Context, userID string) (*[]info.Farm, error) {
+func (c *FarmRDB) GetAll(ctx context.Context, userID string) ([]info.Farm, error) {
 	field := MakeField(FarmField, userID)
 	idInfo, err := utils.RDB.HGetAll(ctx, field)
 	if err != nil {
@@ -54,7 +54,7 @@ func (c *FarmRDB) GetAll(ctx context.Context, userID string) (*[]info.Farm, erro
 		}
 		farms = append(farms, *farm)
 	}
-	return &farms, nil
+	return farms, nil
 }
 
 // 通过 ID 查询

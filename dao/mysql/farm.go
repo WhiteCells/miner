@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"context"
+	"miner/common/perm"
 	"miner/model"
 	"miner/model/relation"
 	"miner/utils"
@@ -16,7 +17,7 @@ func NewFarmDAO() *FarmDAO {
 }
 
 // 创建矿场
-func (FarmDAO) CreateFarm(ctx context.Context, farm *model.Farm, userID int) error {
+func (FarmDAO) CreateFarm(ctx context.Context, userID int, farm *model.Farm) error {
 	return utils.DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		// farm
 		if err := tx.Create(farm).Error; err != nil {
@@ -26,6 +27,7 @@ func (FarmDAO) CreateFarm(ctx context.Context, farm *model.Farm, userID int) err
 		userFarm := &relation.UserFarm{
 			UserID: userID,
 			FarmID: farm.ID,
+			Perm:   perm.FarmOwner,
 		}
 		if err := tx.Create(userFarm).Error; err != nil {
 			return err
@@ -70,7 +72,7 @@ func (FarmDAO) GetFarmByHash(ctx context.Context, hash string) (*model.Farm, err
 }
 
 // 获取所有矿场
-func (FarmDAO) GetFarms(ctx context.Context, query map[string]any) (*[]model.Farm, int64, error) {
+func (FarmDAO) GetFarms(ctx context.Context, query map[string]any) ([]model.Farm, int64, error) {
 	var farms []model.Farm
 	var total int64
 
@@ -91,11 +93,11 @@ func (FarmDAO) GetFarms(ctx context.Context, query map[string]any) (*[]model.Far
 		return nil, -1, err
 	}
 
-	return &farms, total, nil
+	return farms, total, nil
 }
 
 // 获取用户的矿场
-func (FarmDAO) GetFarmsByUserID(ctx context.Context, userID int, query map[string]any) (*[]model.Farm, int64, error) {
+func (FarmDAO) GetFarmsByUserID(ctx context.Context, userID int, query map[string]any) ([]model.Farm, int64, error) {
 	var farms []model.Farm
 	var total int64
 
@@ -118,7 +120,7 @@ func (FarmDAO) GetFarmsByUserID(ctx context.Context, userID int, query map[strin
 		return nil, -1, err
 	}
 
-	return &farms, total, nil
+	return farms, total, nil
 }
 
 // 获取指定矿场
@@ -129,13 +131,13 @@ func (FarmDAO) GetFarmByFarmID(ctx context.Context, farmID int) (*model.Farm, er
 }
 
 // 获取所有矿场
-func (FarmDAO) GetAllFarmsByUserID(ctx context.Context, userID int) (*[]model.Farm, error) {
+func (FarmDAO) GetAllFarmsByUserID(ctx context.Context, userID int) ([]model.Farm, error) {
 	var farms []model.Farm
 	err := utils.DB.WithContext(ctx).
 		Model(&model.Farm{}).
 		Joins("JOIN user_farm ON user_farm.farm_id=farm").
 		Where("user_farm.user_id=?", userID).Error
-	return &farms, err
+	return farms, err
 }
 
 // 矿场应用飞行表
@@ -169,12 +171,12 @@ func (dao *FarmDAO) Transfer(ctx context.Context, userID, toUserID, farmID int) 
 			return err
 		}
 		// 更新 user-miner 关联
-		if err := tx.Model(&relation.UserMiner{}).
-			Where("user_id = ?", userID).
-			Updates(map[string]any{"user_id": toUserID}).
-			Error; err != nil {
-			return err
-		}
+		// if err := tx.Model(&relation.UserMiner{}).
+		// 	Where("user_id = ?", userID).
+		// 	Updates(map[string]any{"user_id": toUserID}).
+		// 	Error; err != nil {
+		// 	return err
+		// }
 		return nil
 	})
 }

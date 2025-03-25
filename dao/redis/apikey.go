@@ -52,7 +52,7 @@ func (c *BscApiKeyRDB) ZRangeWithScore(ctx context.Context) (string, error) {
 }
 
 // 获取所有 apikey
-func (c *BscApiKeyRDB) ZRange(ctx context.Context) (*[]string, error) {
+func (c *BscApiKeyRDB) ZRange(ctx context.Context) ([]string, error) {
 	return utils.RDB.ZRange(ctx, ApiKeyBscField)
 }
 

@@ -3,8 +3,10 @@ package redis
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"miner/model/info"
 	"miner/utils"
+	"strconv"
 )
 
 type MinerRDB struct{}
@@ -15,8 +17,9 @@ func NewMinerRDB() *MinerRDB {
 
 // key
 // rigID:<info>
-func (MinerRDB) CreateMinerByRigID(ctx context.Context, rigID string, miner *info.Miner) error {
-	field := MakeField(MinerField, rigID)
+func (MinerRDB) CreateMinerByRigID(ctx context.Context, rigID int, miner *info.Miner) error {
+	rigIDStr := strconv.Itoa(rigID)
+	field := MakeField(MinerField, rigIDStr)
 	minerJSON, err := json.Marshal(miner)
 	if err != nil {
 		return err
@@ -24,13 +27,15 @@ func (MinerRDB) CreateMinerByRigID(ctx context.Context, rigID string, miner *inf
 	return utils.RDB.Set(ctx, field, string(minerJSON))
 }
 
-func (MinerRDB) DelMinerByRigID(ctx context.Context, rigID string) error {
-	field := MakeField(MinerField, rigID)
+func (MinerRDB) DelMinerByRigID(ctx context.Context, rigID int) error {
+	rigIDStr := strconv.Itoa(rigID)
+	field := MakeField(MinerField, rigIDStr)
 	return utils.RDB.Del(ctx, field)
 }
 
-func (MinerRDB) UpdateMinerByRigID(ctx context.Context, rigID string, miner *info.Miner) error {
-	field := MakeField(MinerField, rigID)
+func (MinerRDB) UpdateMinerByRigID(ctx context.Context, rigID int, miner *info.Miner) error {
+	rigIDStr := strconv.Itoa(rigID)
+	field := MakeField(MinerField, rigIDStr)
 	minerJSON, err := json.Marshal(miner)
 	if err != nil {
 		return err
@@ -38,11 +43,12 @@ func (MinerRDB) UpdateMinerByRigID(ctx context.Context, rigID string, miner *inf
 	return utils.RDB.Set(ctx, field, string(minerJSON))
 }
 
-func (MinerRDB) GetMinerByRigID(ctx context.Context, rigID string) (*info.Miner, error) {
-	field := MakeField(MinerField, rigID)
+func (MinerRDB) GetMinerByRigID(ctx context.Context, rigID int) (*info.Miner, error) {
+	rigIDStr := strconv.Itoa(rigID)
+	field := MakeField(MinerField, rigIDStr)
 	minerJSON, err := utils.RDB.Get(ctx, field)
 	if err != nil {
-		return nil, err
+		return nil, errors.New("redis miner not found")
 	}
 	var miner info.Miner
 	err = json.Unmarshal([]byte(minerJSON), &miner)
@@ -89,7 +95,7 @@ func (MinerRDB) GetMinerByRigID(ctx context.Context, rigID string) (*info.Miner,
 // }
 
 // 获取矿场下的所有矿机
-// func (c *MinerRDB) GetAll(ctx context.Context, farmID int) (*[]info.Miner, error) {
+// func (c *MinerRDB) GetAll(ctx context.Context, farmID int) ([]info.Miner, error) {
 // 	farmIDStr := strconv.Itoa(farmID)
 // 	field := MakeField(MinerField, farmIDStr)
 // 	farmIDMinerID, err := utils.RDB.HGetAll(ctx, field)

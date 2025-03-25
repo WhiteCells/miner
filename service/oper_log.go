@@ -15,7 +15,7 @@ package service
 // }
 
 // // GetOperLogs 获取用户操作日志
-// // func (s *OperLogService) GetOperLogs(ctx context.Context, query map[string]any) (*[]model.Operlog, int64, error) {
+// // func (s *OperLogService) GetOperLogs(ctx context.Context, query map[string]any) ([]model.Operlog, int64, error) {
 // // 	// 调用 DAO 层获取日志
 // // 	logs, total, err := s.operLogDAO.GetOperLogs(query)
 // // 	if err != nil {

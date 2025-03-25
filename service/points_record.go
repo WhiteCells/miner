@@ -15,7 +15,7 @@ package service
 // }
 
 // // 获取用户积分记录
-// // func (s *PointsRecordService) GetPointsRecords(ctx *gin.Context, query map[string]any) (*[]model.Pointslog, int64, error) {
+// // func (s *PointsRecordService) GetPointsRecords(ctx *gin.Context, query map[string]any) ([]model.Pointslog, int64, error) {
 // // 	records, total, err := s.pointslogDAO.GetUserPointslog(query)
 // // 	if err != nil {
 // // 		return nil, -1, errors.New("get user points records failed")

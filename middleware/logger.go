@@ -45,11 +45,7 @@ func OperLog() gin.HandlerFunc {
 		ctx.Next()
 
 		// 业务处理完后
-		userID, exists := ctx.Value("user_id").(int)
-		if !exists {
-			// ctx.
-			return
-		}
+		userID := ctx.GetInt("user_id")
 
 		// 创建操作日志
 		operLog := model.Operlog{

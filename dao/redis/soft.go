@@ -55,7 +55,7 @@ func (c *SoftRDB) Get(ctx context.Context, coin string, name string) (*info.Soft
 	return &info, nil
 }
 
-func (c *SoftRDB) GetAll(ctx context.Context, coin string) (*[]info.Soft, error) {
+func (c *SoftRDB) GetAll(ctx context.Context, coin string) ([]info.Soft, error) {
 	field := MakeField(SoftField, coin)
 
 	infos, err := utils.RDB.HGetAll(ctx, field)
@@ -72,7 +72,7 @@ func (c *SoftRDB) GetAll(ctx context.Context, coin string) (*[]info.Soft, error)
 		softList = append(softList, info_)
 	}
 
-	return &softList, nil
+	return softList, nil
 }
 
 func (c *SoftRDB) Exists(ctx context.Context, coin string, name string) bool {

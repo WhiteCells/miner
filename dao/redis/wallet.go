@@ -48,7 +48,7 @@ func (c *WalletRDB) GetByID(ctx context.Context, userID string, walletID string)
 }
 
 // 获取用户的所有钱包
-func (c *WalletRDB) GetAll(ctx context.Context, userID string) (*[]info.Wallet, error) {
+func (c *WalletRDB) GetAll(ctx context.Context, userID string) ([]info.Wallet, error) {
 	field := MakeField(WalletField, userID)
 	idInfo, err := utils.RDB.HGetAll(ctx, field)
 	if err != nil {
@@ -62,11 +62,11 @@ func (c *WalletRDB) GetAll(ctx context.Context, userID string) (*[]info.Wallet, 
 		}
 		wallets = append(wallets, *wallet)
 	}
-	return &wallets, nil
+	return wallets, nil
 }
 
 // 根据coin获取用户的所有钱包
-func (c *WalletRDB) GetAllByCoin(ctx context.Context, userID string, coin string) (*[]info.Wallet, error) {
+func (c *WalletRDB) GetAllByCoin(ctx context.Context, userID string, coin string) ([]info.Wallet, error) {
 	field := MakeField(WalletField, userID)
 	idInfo, err := utils.RDB.HGetAll(ctx, field)
 	if err != nil {
@@ -82,5 +82,5 @@ func (c *WalletRDB) GetAllByCoin(ctx context.Context, userID string, coin string
 			wallets = append(wallets, *wallet)
 		}
 	}
-	return &wallets, nil
+	return wallets, nil
 }

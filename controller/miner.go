@@ -30,12 +30,13 @@ func (m *MinerController) CreateMiner(ctx *gin.Context) {
 	}
 	userID := ctx.GetInt("user_id")
 
-	if err := m.minerService.CreateMiner(ctx, userID, req.FarmID, &req); err != nil {
+	miner, err := m.minerService.CreateMiner(ctx, userID, req.FarmID, &req)
+	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
 
-	rsp.Success(ctx, http.StatusOK, "create miner success", nil)
+	rsp.Success(ctx, http.StatusOK, "create miner success", miner)
 }
 
 // 删除矿机
@@ -184,7 +185,7 @@ func (c *MinerController) GetMinerByMinerID(ctx *gin.Context) {
 	rsp.QuerySuccess(ctx, http.StatusOK, "get miner by id success", miner)
 }
 
-// 矿机应用飞行表
+// 应用飞行表
 func (c *MinerController) ApplyFs(ctx *gin.Context) {
 	var req dto.ApplyMinerFsReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -208,7 +209,9 @@ func (c *MinerController) Transfer(ctx *gin.Context) {
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
-	if err := c.minerService.Transfer(ctx, req.FromFarmID, req.MinerID, req.ToFarmHash); err != nil {
+	userID := ctx.GetInt("user_id")
+
+	if err := c.minerService.Transfer(ctx, userID, req.FromFarmID, req.MinerID, req.ToFarmHash); err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}

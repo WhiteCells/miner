@@ -8,6 +8,7 @@ import (
 	"miner/model"
 	"miner/model/info"
 	"miner/utils"
+	"strconv"
 )
 
 type TaskRDB struct {
@@ -74,9 +75,10 @@ func (c *TaskRDB) LLen(ctx context.Context, rigID string) (int64, error) {
 }
 
 // 获取矿机的队头任务
-func (c *TaskRDB) GetTask(ctx context.Context, rigID string) (*model.Task, error) {
+func (c *TaskRDB) GetTask(ctx context.Context, rigID int) (*model.Task, error) {
+	rigIDStr := strconv.Itoa(rigID)
 	// redis list 中弹出队头
-	taskID, err := c.LPop(ctx, rigID)
+	taskID, err := c.LPop(ctx, rigIDStr)
 	if err != nil {
 		return nil, errors.New("no task in redis list")
 	}

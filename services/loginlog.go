@@ -16,10 +16,10 @@ func NewLoginlogService() *LoginlogService {
 	}
 }
 
-func (m *LoginlogService) GetLoginlogByID(ctx context.Context, userID int, query map[string]any) (*[]model.Loginlog, int64, error) {
+func (m *LoginlogService) GetLoginlogByID(ctx context.Context, userID int, query map[string]any) ([]model.Loginlog, int64, error) {
 	return m.loginlogDAO.GetLoginlogByID(ctx, userID, query)
 }
 
-func (m *LoginlogService) GetLoginlogs(ctx context.Context, query map[string]any) (*[]model.Loginlog, int64, error) {
+func (m *LoginlogService) GetLoginlogs(ctx context.Context, query map[string]any) ([]model.Loginlog, int64, error) {
 	return m.loginlogDAO.GetLoginlogs(ctx, query)
 }
