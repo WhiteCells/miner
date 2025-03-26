@@ -21,8 +21,8 @@ func (CoinDAO) DelCoin(ctx context.Context, coinID int) error {
 	return utils.DB.WithContext(ctx).Delete(&model.Coin{}, coinID).Error
 }
 
-func (CoinDAO) UpdateCoin(ctx context.Context, coinID int, coin *model.Coin) error {
-	return utils.DB.WithContext(ctx).Save(coin).Error
+func (CoinDAO) UpdateCoin(ctx context.Context, userID, coinID int, updateInfo map[string]any) error {
+	return utils.DB.WithContext(ctx).Updates(updateInfo).Error
 }
 
 func (CoinDAO) GetCoin(ctx context.Context, coinID int) (*model.Coin, error) {

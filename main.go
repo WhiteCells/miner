@@ -13,7 +13,7 @@ import (
 
 var configPath string
 
-// go run main.go -f config.dev.yml
+// go run main.go -c config.dev.yml
 func init() {
 	flag.StringVar(&configPath, "c", "./config.dev.yml", "path to config file")
 	flag.Parse()

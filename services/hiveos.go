@@ -106,18 +106,14 @@ func (m *HiveosService) helloCase(ctx *gin.Context, rigIDStr string) {
 		return
 	}
 
-	config := utils.GenerateHiveOsConfig(&minerInfo.HiveOsConfig)
-	wallet := utils.GenerateHiveOsWallet(&minerInfo.HiveOsWallet)
-	autofan := utils.GenerateHiveOsAutofan(&minerInfo.HiveOsAutoFan)
-
 	rsp := &dto.ServerRsp{
 		ID:      0,
 		Jsonrpc: "2.0",
 		Result: dto.ServerRsp_Result{
 			ID:        99999,
-			Config:    config,
-			Wallet:    wallet,
-			Autofan:   autofan,
+			Config:    utils.GenerateHiveOsConfig(&minerInfo.HiveOsConfig),
+			Wallet:    utils.GenerateHiveOsWallet(&minerInfo.HiveOsWallet),
+			Autofan:   utils.GenerateHiveOsAutofan(&minerInfo.HiveOsAutoFan),
 			Justwrite: 1,
 			Confseq:   1,
 		},
@@ -182,20 +178,16 @@ func (m *HiveosService) helloCaseUseHash(ctx *gin.Context) {
 		return
 	}
 
-	config := utils.GenerateHiveOsConfig(&minerInfo.HiveOsConfig)
-	wallet := utils.GenerateHiveOsWallet(&minerInfo.HiveOsWallet)
-	autofan := utils.GenerateHiveOsAutofan(&minerInfo.HiveOsAutoFan)
-
 	rsp := &dto.ServerHashRsp{
 		Jsonrpc: "2.0",
 		ID:      0,
 		Result: dto.ServerHashRsp_Result{
 			RigName:         miner.Name,
 			RespositoryList: "",
-			Config:          config,
-			Wallet:          wallet,
+			Config:          utils.GenerateHiveOsConfig(&minerInfo.HiveOsConfig),
+			Wallet:          utils.GenerateHiveOsWallet(&minerInfo.HiveOsWallet),
 			NvidiaOc:        "",
-			Autofan:         autofan,
+			Autofan:         utils.GenerateHiveOsAutofan(&minerInfo.HiveOsAutoFan),
 			Confseq:         1,
 		},
 	}
@@ -207,7 +199,6 @@ func (m *HiveosService) helloCaseUseHash(ctx *gin.Context) {
 
 // Poll stats case
 func (m *HiveosService) statsCase(ctx *gin.Context, rigIDStr string) {
-	log.Fatalln(ctx.Request.Body)
 	var req dto.HiveOsReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
@@ -243,10 +234,6 @@ func (m *HiveosService) statsCase(ctx *gin.Context, rigIDStr string) {
 		return
 	}
 
-	config := utils.GenerateHiveOsConfig(&minerInfo.HiveOsConfig)
-	wallet := utils.GenerateHiveOsWallet(&minerInfo.HiveOsWallet)
-	autofan := utils.GenerateHiveOsAutofan(&minerInfo.HiveOsAutoFan)
-
 	// 从 taskRDB 中拿出对应的 task
 	task, err := m.taskRDB.GetTask(ctx, rigID)
 	if err != nil {
@@ -266,9 +253,9 @@ func (m *HiveosService) statsCase(ctx *gin.Context, rigIDStr string) {
 			Jsonrpc: "2.0",
 			Result: dto.ServerRsp_Result{
 				ID:        task.ID,
-				Config:    config,
-				Wallet:    wallet,
-				Autofan:   autofan,
+				Config:    utils.GenerateHiveOsConfig(&minerInfo.HiveOsConfig),
+				Wallet:    utils.GenerateHiveOsWallet(&minerInfo.HiveOsWallet),
+				Autofan:   utils.GenerateHiveOsAutofan(&minerInfo.HiveOsAutoFan),
 				Justwrite: 1,
 				Command:   "exec",
 				Exec:      task.Content,
@@ -282,9 +269,9 @@ func (m *HiveosService) statsCase(ctx *gin.Context, rigIDStr string) {
 			Jsonrpc: "2.0",
 			Result: dto.ServerRsp_Result{
 				ID:        task.ID,
-				Config:    config,
-				Wallet:    wallet,
-				Autofan:   autofan,
+				Config:    utils.GenerateHiveOsConfig(&minerInfo.HiveOsConfig),
+				Wallet:    utils.GenerateHiveOsWallet(&minerInfo.HiveOsWallet),
+				Autofan:   utils.GenerateHiveOsAutofan(&minerInfo.HiveOsAutoFan),
 				Justwrite: 1,
 				Command:   "config",
 				Confseq:   1,
@@ -310,13 +297,26 @@ func (m *HiveosService) messageCase(ctx *gin.Context, rigIDStr string) {
 		return
 	}
 
+	// 通过 rigID 获取 miner
+	minerInfo, err := m.minerRDB.GetMinerByRigID(ctx, rigID)
+	if err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
+		return
+	}
+	// 验证密码
+	if req.Params.Passwd != minerInfo.HiveOsConfig.RigPasswd {
+		log.Println(req.Params.Passwd, minerInfo.HiveOsConfig.RigPasswd)
+		log.Println("req.Params.Passwd")
+		rsp.Error(ctx, http.StatusInternalServerError, "invalid pass", "")
+		return
+	}
+
 	// 查找命令
 	// 根绝请求生成新的任务，更新任务中的 result
 	taskID := req.Params.ID
 	task, err := m.taskDAO.GetTask(ctx, taskID)
 	if err != nil {
-		log.Println(taskID)
-		log.Println("taskRDB.Get")
+		log.Println("taskID:", taskID, "taskRDB.Get error", err.Error())
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), "")
 		return
 	}
@@ -333,32 +333,14 @@ func (m *HiveosService) messageCase(ctx *gin.Context, rigIDStr string) {
 	log.Println("task:", task)
 	log.Println("=======================")
 
-	// 通过 rigID 获取 miner
-	minerInfo, err := m.minerRDB.GetMinerByRigID(ctx, rigID)
-	if err != nil {
-		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
-		return
-	}
-	// 验证密码
-	if req.Params.Passwd != minerInfo.HiveOsConfig.RigPasswd {
-		log.Println(req.Params.Passwd, minerInfo.HiveOsConfig.RigPasswd)
-		log.Println("req.Params.Passwd")
-		rsp.Error(ctx, http.StatusInternalServerError, "invalid pass", "")
-		return
-	}
-
-	config := utils.GenerateHiveOsConfig(&minerInfo.HiveOsConfig)
-	wallet := utils.GenerateHiveOsWallet(&minerInfo.HiveOsWallet)
-	autofan := utils.GenerateHiveOsAutofan(&minerInfo.HiveOsAutoFan)
-
 	ctx.JSON(http.StatusOK, &dto.ServerRsp{
 		ID:      0,
 		Jsonrpc: "2.0",
 		Result: dto.ServerRsp_Result{
 			ID:        0,
-			Config:    config,
-			Wallet:    wallet,
-			Autofan:   autofan,
+			Config:    utils.GenerateHiveOsConfig(&minerInfo.HiveOsConfig),
+			Wallet:    utils.GenerateHiveOsWallet(&minerInfo.HiveOsWallet),
+			Autofan:   utils.GenerateHiveOsAutofan(&minerInfo.HiveOsAutoFan),
 			Justwrite: 1,
 			Confseq:   1,
 		},
