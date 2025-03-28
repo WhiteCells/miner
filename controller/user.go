@@ -20,7 +20,15 @@ func NewUserController() *UserController {
 	}
 }
 
-// Register 用户注册
+// @Summary 用户注册
+// @Description 用户注册
+// @Tags user
+// @Accept json
+// @Produce json
+// @Param body body dto.RegisterReq true "注册请求体"
+// @Success 200 {object} dto.LoginRsp "登录成功，返回用户信息及 token"
+// @Failure 400 {object} rsp.ErrorBody "登录失败"
+// @Router /user/register [post]
 func (c *UserController) Register(ctx *gin.Context) {
 	var req dto.RegisterReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -36,10 +44,19 @@ func (c *UserController) Register(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "register success", secret)
 }
 
-// Login 用户登陆
+// @Summary 用户登录
+// @Description 用户通过邮箱、密码和 Google 验证码进行登录
+// @Tags user
+// @Accept json
+// @Produce json
+// @Param body body dto.LoginReq true "请求体"
+// @Success 200 {object} dto.LoginRsp "成功，返回用户信息及 token"
+// @Failure 400 {object} dto.ErrorMsgBody "失败"
+// @Router /user/login [post]
 func (c *UserController) Login(ctx *gin.Context) {
 	var req dto.LoginReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
+		// rsp.Error2(ctx, http.StatusBadRequest, err.Error())
 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
 		return
 	}
@@ -48,16 +65,33 @@ func (c *UserController) Login(ctx *gin.Context) {
 
 	permissions, token, user, err := c.userService.Login(ctx, clientIP, &req)
 	if err != nil {
+		// rsp.Error2(ctx, http.StatusInternalServerError, err.Error())
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
 		return
 	}
 
+	user.Key = ""
 	ctx.Set("user_id", user.ID)
+
+	// r := &dto.LoginRsp{
+	// 	AccessToken: token,
+	// 	User:        *user,
+	// 	Perm:        permissions,
+	// }
+	// rsp.Success2(ctx, http.StatusOK, r)
 
 	rsp.LoginSuccess(ctx, http.StatusOK, "login success", user, token, permissions)
 }
 
-// Logout 用户登出
+// @Summary 用户登出
+// @Description 用户登出
+// @Tags user
+// @Accept json
+// @Produce json
+// @Param body body dto.LoginReq true "请求体"
+// @Success 200 {object} dto.LoginRsp "成功"
+// @Failure 400 {object} dto.ErrorMsgBody "失败"
+// @Router /user/logout [post]
 func (c *UserController) Logout(ctx *gin.Context) {
 	if err := c.userService.Logout(ctx); err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
@@ -66,21 +100,14 @@ func (c *UserController) Logout(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "logout success", nil)
 }
 
-// UpdatePasswd 修改密码
-// func (c *UserController) UpdatePasswd(ctx *gin.Context) {
-// 	var req dto.UpdatePasswdReq
-// 	if err := ctx.ShouldBindJSON(&req); err != nil {
-// 		rsp.Error(ctx, http.StatusBadRequest, err.Error(), nil)
-// 		return
-// 	}
-// 	if err := c.userService.UpdatePasswd(ctx, &req); err != nil {
-// 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
-// 		return
-// 	}
-// 	rsp.Success(ctx, http.StatusOK, "update passwd success", nil)
-// }
-
-// 获取积分余额
+// @Summary 用户获取积分余额
+// @Description 用户获取积分余额
+// @Tags user
+// @Accept json
+// @Produce json
+// @Success 200 {object} dto.ErrorMsgBody "成功"
+// @Failure 400 {object} dto.ErrorMsgBody "失败"
+// @Router /user/balance [get]
 func (c *UserController) GetPointsBalance(ctx *gin.Context) {
 	userID := ctx.GetInt("user_id")
 	balance, err := c.userService.GetUserPointsBalance(ctx, userID)

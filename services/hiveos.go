@@ -6,8 +6,10 @@ import (
 	"fmt"
 	"log"
 	"miner/common/dto"
+	"miner/common/perm"
 	"miner/common/rsp"
 	"miner/dao/mysql"
+	"miner/dao/mysql/relationdao"
 	"miner/dao/redis"
 	"miner/model"
 	"miner/model/info"
@@ -26,6 +28,8 @@ type HiveosService struct {
 	minerRDB     *redis.MinerRDB
 	taskRDB      *redis.TaskRDB
 	taskDAO      *mysql.TaskDAO
+	userFarmDAO  *relationdao.UserFarmDAO
+	farmMinerDAO *relationdao.FarmMinerDAO
 	minerService MinerService
 }
 
@@ -38,6 +42,8 @@ func NewHiveosService() *HiveosService {
 		minerRDB:     redis.NewMinerRDB(),
 		taskRDB:      redis.NewTaskRDB(),
 		taskDAO:      mysql.NewTaskDAO(),
+		userFarmDAO:  relationdao.NewUserFarmDAO(),
+		farmMinerDAO: relationdao.NewFarmMinerDAO(),
 		minerService: *NewMinerService(),
 	}
 }
@@ -311,26 +317,24 @@ func (m *HiveosService) messageCase(ctx *gin.Context, rigIDStr string) {
 		return
 	}
 
-	// 查找命令
-	// 根绝请求生成新的任务，更新任务中的 result
+	// 更新任务
 	taskID := req.Params.ID
-	task, err := m.taskDAO.GetTask(ctx, taskID)
+	updateInfo := map[string]any{
+		"result": req.Params.Payload,
+		"status": info.Done,
+	}
+	taskIDInt, err := strconv.Atoi(taskID)
 	if err != nil {
-		log.Println("taskID:", taskID, "taskRDB.Get error", err.Error())
-		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), "")
+		rsp.Error(ctx, http.StatusInternalServerError, "failed strconv", nil)
 		return
 	}
-
-	task.Result = req.Params.Payload
-	task.Status = info.Done
-
-	if err := m.taskDAO.UpdateTask(ctx, task); err != nil {
+	if err := m.taskDAO.UpdateTask(ctx, taskIDInt, updateInfo); err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), "update result failed")
 		return
 	}
 
 	log.Println("=======================")
-	log.Println("task:", task)
+	log.Println("task:", req.Params.Payload)
 	log.Println("=======================")
 
 	ctx.JSON(http.StatusOK, &dto.ServerRsp{
@@ -401,13 +405,24 @@ func (m *HiveosService) setMinerStats(ctx context.Context, rigID int, req *dto.H
 	return m.hiveosRDB.SetMinerStats(ctx, rigID, &stats)
 }
 
-func (m *HiveosService) PostTask(ctx context.Context, req *dto.PostTaskReq) (int, error) {
+func (m *HiveosService) PostTask(ctx context.Context, userID int, req *dto.PostTaskReq) (int, error) {
 	task := &model.Task{
 		Type:    req.Type,
 		Status:  info.Pending,
 		Content: req.Content,
 	}
-	if err := m.taskDAO.AddTask(ctx, req.RigID, task); err != nil {
+
+	// 检查 user 对 farm 权限
+	p, err := m.userFarmDAO.GetPerm(ctx, userID, req.FarmID)
+	if err != nil || (p != perm.FarmManager && p != perm.FarmOwner) {
+		return -1, err
+	}
+	// farm 与 miner 关联
+	if err := m.farmMinerDAO.ExistMiner(ctx, req.FarmID, req.MinerID); err != nil {
+		return -1, err
+	}
+
+	if err := m.taskDAO.AddTask(ctx, userID, req.FarmID, req.MinerID, task); err != nil {
 		return -1, err
 	}
 

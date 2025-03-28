@@ -79,7 +79,7 @@ func (FarmDAO) GetFarms(ctx context.Context, query map[string]any) ([]model.Farm
 	pageNum := query["page_num"].(int)
 	pageSize := query["page_size"].(int)
 
-	db := utils.DB.WithContext(ctx).Where(&model.Farm{})
+	db := utils.DB.WithContext(ctx).Model(&model.Farm{})
 
 	if err := db.
 		Count(&total).Error; err != nil {

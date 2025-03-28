@@ -1,6 +1,9 @@
 package dto
 
-import "miner/model/info"
+import (
+	"miner/model"
+	"miner/model/info"
+)
 
 type LoginReq struct {
 	Email    string `json:"email" binding:"required,min=3,max=32"`
@@ -11,11 +14,21 @@ type LoginReq struct {
 	//GoogleCode string `json:"google_code" binding:"required"`
 }
 
+type LoginRsp struct {
+	AccessToken string     `json:"access_token"`
+	User        model.User `json:"user"`
+	Perm        []string   `json:"perm"`
+}
+
 type RegisterReq struct {
 	Username   string `json:"username" binding:"required,min=3,max=32"`
 	Password   string `json:"password" binding:"required,min=6,max=32"`
 	Email      string `json:"email" binding:"required,email,max=32"`
 	InviteCode string `json:"invite_code"`
+}
+
+type RegisterRsp struct {
+	Secret string `json:"secret"`
 }
 
 type GenerateCaptchaRsp struct {

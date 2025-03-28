@@ -72,7 +72,29 @@ func (c *FarmController) UpdateFarm(ctx *gin.Context) {
 	rsp.Success(ctx, http.StatusOK, "update farm success", nil)
 }
 
-// 获取用户所有的矿场
+// 获取用户的所有矿场
+func (c *FarmController) GetFarmsByUserID(ctx *gin.Context) {
+	var params params.PageParams
+	if err := ctx.ShouldBindQuery(&params); err != nil {
+		rsp.Error(ctx, http.StatusBadRequest, "invalid parmas", nil)
+		return
+	}
+	query := map[string]any{
+		"page_num":  params.PageNum,
+		"page_size": params.PageSize,
+	}
+	userID := ctx.GetInt("user_id")
+
+	farms, total, err := c.farmService.GetFarmsByUserID(ctx, userID, query)
+	if err != nil {
+		rsp.Error(ctx, http.StatusInternalServerError, err.Error(), nil)
+		return
+	}
+
+	rsp.DBQuerySuccess(ctx, http.StatusOK, "get farms success", farms, total)
+}
+
+// 获取所有的矿场
 func (c *FarmController) GetFarms(ctx *gin.Context) {
 	var params params.PageParams
 	if err := ctx.ShouldBindQuery(&params); err != nil {

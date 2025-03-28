@@ -46,6 +46,8 @@ go mod tidy
 go run ./main.go -c config.dev.yml
 ```
 
+`http://127.0.0.1:9090/swagger/index.html`
+
 `redis-cluster` 目录为 持久化的分布式 redis
 
 ### TODO

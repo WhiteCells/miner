@@ -7,6 +7,8 @@ import (
 )
 
 func Init(ctx *gin.Engine) {
+	NewSwaggerRoute().InitSwaggerRoute(ctx)
+
 	NewHiveosRoute().InitHiveosRoute(ctx)
 
 	ctx.Use(middleware.OperLog())

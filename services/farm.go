@@ -54,6 +54,10 @@ func (m *FarmService) GetFarmByFarmID(ctx context.Context, farmID int) (*model.F
 	return m.farmDAO.GetFarmByFarmID(ctx, farmID)
 }
 
+func (m *FarmService) GetFarmsByUserID(ctx context.Context, userID int, query map[string]any) ([]model.Farm, int64, error) {
+	return m.farmDAO.GetFarmsByUserID(ctx, userID, query)
+}
+
 func (m *FarmService) GetFarms(ctx context.Context, query map[string]any) ([]model.Farm, int64, error) {
 	return m.farmDAO.GetFarms(ctx, query)
 }

@@ -32,7 +32,7 @@ func (mr *MinerRoute) InitMinerRoute(r *gin.Engine) {
 		route.PUT("/options", mr.minerController.UpdateMinerOptions)
 		route.PUT("/autofan", mr.minerController.UpdateMinerAutofan)
 		route.PUT("/wallet", mr.minerController.UpdateMinerWallet)
-		route.GET("", mr.minerController.GetFarmAllMiner)
+		route.GET("/:farm_id", mr.minerController.GetFarmAllMiner)
 		route.GET("/info", mr.minerController.GetMinerByMinerID)
 		route.PUT("/apply_fs", mr.minerController.ApplyFs)
 		route.PUT("/transfer", mr.minerController.Transfer)

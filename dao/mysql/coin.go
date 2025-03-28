@@ -18,11 +18,16 @@ func (CoinDAO) CreateCoin(ctx context.Context, coin *model.Coin) error {
 }
 
 func (CoinDAO) DelCoin(ctx context.Context, coinID int) error {
-	return utils.DB.WithContext(ctx).Delete(&model.Coin{}, coinID).Error
+	return utils.DB.WithContext(ctx).
+		Delete(&model.Coin{}, coinID).
+		Error
 }
 
 func (CoinDAO) UpdateCoin(ctx context.Context, userID, coinID int, updateInfo map[string]any) error {
-	return utils.DB.WithContext(ctx).Updates(updateInfo).Error
+	return utils.DB.WithContext(ctx).
+		Model(&model.Coin{}).
+		Where("id=?", coinID).
+		Updates(updateInfo).Error
 }
 
 func (CoinDAO) GetCoin(ctx context.Context, coinID int) (*model.Coin, error) {

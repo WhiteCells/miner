@@ -1,0 +1,211 @@
+definitions:
+  dto.ErrorMsgBody:
+    properties:
+      error:
+        type: string
+    type: object
+  dto.LoginReq:
+    properties:
+      email:
+        maxLength: 32
+        minLength: 3
+        type: string
+      password:
+        maxLength: 32
+        minLength: 6
+        type: string
+    required:
+    - email
+    - password
+    type: object
+  dto.LoginRsp:
+    properties:
+      access_token:
+        type: string
+      perm:
+        items:
+          type: string
+        type: array
+      user:
+        $ref: '#/definitions/model.User'
+    type: object
+  dto.RegisterReq:
+    properties:
+      email:
+        maxLength: 32
+        type: string
+      invite_code:
+        type: string
+      password:
+        maxLength: 32
+        minLength: 6
+        type: string
+      username:
+        maxLength: 32
+        minLength: 3
+        type: string
+    required:
+    - email
+    - password
+    - username
+    type: object
+  model.User:
+    properties:
+      address:
+        type: string
+      email:
+        type: string
+      id:
+        type: integer
+      invite_code:
+        type: string
+      invite_points:
+        type: number
+      invited_by:
+        type: string
+      key:
+        description: todo key 不能返回给用户
+        type: string
+      last_balance:
+        type: number
+      last_check_at:
+        type: string
+      last_login_at:
+        type: string
+      last_login_ip:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      recharge_points:
+        type: number
+      role:
+        $ref: '#/definitions/role.RoleType'
+      secret:
+        type: string
+      status:
+        $ref: '#/definitions/status.UserStatus'
+      uid:
+        type: string
+    type: object
+  role.RoleType:
+    enum:
+    - admin
+    - user
+    type: string
+    x-enum-varnames:
+    - Admin
+    - User
+  rsp.ErrorBody:
+    properties:
+      msg:
+        type: string
+    type: object
+  status.UserStatus:
+    enum:
+    - "1"
+    - "0"
+    - "-1"
+    type: string
+    x-enum-varnames:
+    - UserOn
+    - UserOff
+    - UserNone
+info:
+  contact: {}
+paths:
+  /user/balance:
+    get:
+      consumes:
+      - application/json
+      description: 用户获取积分余额
+      produces:
+      - application/json
+      responses:
+        "400":
+          description: 失败
+          schema:
+            $ref: '#/definitions/dto.ErrorMsgBody'
+      summary: 用户获取积分余额
+      tags:
+      - user
+  /user/login:
+    post:
+      consumes:
+      - application/json
+      description: 用户通过邮箱、密码和 Google 验证码进行登录
+      parameters:
+      - description: 请求体
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LoginReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功，返回用户信息及 token
+          schema:
+            $ref: '#/definitions/dto.LoginRsp'
+        "400":
+          description: 失败
+          schema:
+            $ref: '#/definitions/dto.ErrorMsgBody'
+      summary: 用户登录
+      tags:
+      - user
+  /user/logout:
+    post:
+      consumes:
+      - application/json
+      description: 用户登出
+      parameters:
+      - description: 请求体
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.LoginReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/dto.LoginRsp'
+        "400":
+          description: 失败
+          schema:
+            $ref: '#/definitions/dto.ErrorMsgBody'
+      summary: 用户登出
+      tags:
+      - user
+  /user/register:
+    post:
+      consumes:
+      - application/json
+      description: 用户注册
+      parameters:
+      - description: 注册请求体
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.RegisterReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 登录成功，返回用户信息及 token
+          schema:
+            $ref: '#/definitions/dto.LoginRsp'
+        "400":
+          description: 登录失败
+          schema:
+            $ref: '#/definitions/rsp.ErrorBody'
+      summary: 用户注册
+      tags:
+      - user
+swagger: "2.0"

@@ -31,7 +31,9 @@ func (c *HiveosController) PostTask(ctx *gin.Context) {
 		rsp.Error(ctx, http.StatusBadRequest, "req fromat failed", err.Error())
 		return
 	}
-	taskID, err := c.hiveosService.PostTask(ctx, &req)
+	userID := ctx.GetInt("user_id")
+
+	taskID, err := c.hiveosService.PostTask(ctx, userID, &req)
 	if err != nil {
 		rsp.Error(ctx, http.StatusInternalServerError, "post task failed", err.Error())
 		return

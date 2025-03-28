@@ -19,8 +19,8 @@ func NewTaskDAO() *TaskDAO {
 }
 
 // 添加任务
-func (dao *TaskDAO) AddTask(ctx context.Context, rigID string, task *model.Task) error {
-	key := fmt.Sprintf("%s:%s", "task_id", rigID)
+func (TaskDAO) AddTask(ctx context.Context, userID, farmID, minerID int, task *model.Task) error {
+	key := fmt.Sprintf("%s:%d", "task_id", minerID)
 	if err := utils.DB.WithContext(ctx).Create(task).Error; err != nil {
 		return err
 	}
@@ -38,6 +38,9 @@ func (dao *TaskDAO) GetTask(ctx context.Context, taskID string) (*model.Task, er
 }
 
 // 更新任务
-func (dao *TaskDAO) UpdateTask(ctx context.Context, task *model.Task) error {
-	return utils.DB.WithContext(ctx).Save(task).Error
+func (dao *TaskDAO) UpdateTask(ctx context.Context, taskID int, updateInfo map[string]any) error {
+	return utils.DB.WithContext(ctx).
+		Model(&model.Task{}).
+		Where("id=?", taskID).
+		Updates(updateInfo).Error
 }
